@@ -44,6 +44,8 @@ Product requirements live in `docs/BRIEF.md`; this file records how we build the
 | D16 | Light theme only for MVP | Scope; revisit after launch |
 | D17 | Added `maplibre-gl`, `lucide-react`, `vitest` (all in the approved stack); `@types/node` raised to ^24 | Vitest 5 peer requires `@types/node` ≥22; Node 26 installed |
 | D18 | Added `@supabase/ssr` and `@supabase/supabase-js` (approved stack); profile created by `auth.users` trigger; shell reads profile/memberships through `get_my_context()` RPC; `is_demo` never set by the trigger (seed sets it with service role) | Tables are default-deny; real users must not self-flag as demo |
+| D19 | Registrant becomes the active coordinator of their own `pending` organisation at registration (audited bootstrap); max 3 pending orgs per user. Pending orgs cannot publish (enforced in 2d) | Someone must be able to see and resubmit the application; cap limits spam |
+| D20 | Org verification transitions: pending→verified/rejected, verified→suspended, suspended→verified; `verified` needs recorded checks, `rejected`/`suspended` need a reason; rejected→pending only via coordinator resubmission. `verification_records` blocks UPDATE always and DELETE except for the service role (test cleanup) | Honest, auditable decisions; append-only history |
 
 Add new decisions here with a one-line reason (including any new dependency).
 

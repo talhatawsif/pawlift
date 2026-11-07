@@ -32,6 +32,19 @@ export type TestUser = { id: string; client: Client };
 
 const created: string[] = [];
 const createdOrgs: string[] = [];
+const createdAdmins: string[] = [];
+
+/** Track an org created through an RPC so cleanup removes it. */
+export function trackOrg(id: string) {
+  createdOrgs.push(id);
+}
+
+/** Make an existing test user a platform admin (service role). */
+export async function makeAdmin(userId: string) {
+  const { error } = await admin.from("platform_admins").insert({ user_id: userId });
+  if (error) throw new Error(`makeAdmin failed: ${error.message}`);
+  createdAdmins.push(userId);
+}
 
 export async function createTestUser(label: string): Promise<TestUser> {
   const email = `pawlift-dbtest-${label}-${randomUUID().slice(0, 8)}@example.com`;
@@ -62,10 +75,20 @@ export async function createTestOrg(name: string): Promise<string> {
 }
 
 export async function cleanup() {
-  if (createdOrgs.length) await admin.from("organisations").delete().in("id", createdOrgs);
+  if (createdOrgs.length) {
+    await admin.from("verification_records").delete().in("subject_id", createdOrgs);
+    await admin.from("organisations").delete().in("id", createdOrgs);
+  }
+  if (createdAdmins.length) await admin.from("platform_admins").delete().in("user_id", createdAdmins);
+  // audit_logs.actor_id and verification_records.decided_by reference auth.users without cascade.
+  if (created.length) {
+    await admin.from("audit_logs").delete().in("actor_id", created);
+    await admin.from("verification_records").delete().in("decided_by", created);
+  }
   for (const id of created) await admin.auth.admin.deleteUser(id);
   created.length = 0;
   createdOrgs.length = 0;
+  createdAdmins.length = 0;
 }
 
 /** Every table in the public schema except PostGIS's spatial_ref_sys. */

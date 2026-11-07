@@ -1300,6 +1300,16 @@ export type Database = {
             }
             Returns: string
           }
+      admin_decide_organisation: {
+        Args: {
+          p_checks: Json
+          p_decision: string
+          p_org_id: string
+          p_reason: string
+        }
+        Returns: undefined
+      }
+      admin_list_organisations: { Args: { p_status?: string }; Returns: Json }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
         | {
@@ -1432,6 +1442,7 @@ export type Database = {
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
       get_my_context: { Args: never; Returns: Json }
+      get_org_for_coordinator: { Args: { p_org_id: string }; Returns: Json }
       gettransactionid: { Args: never; Returns: unknown }
       longtransactionsenabled: { Args: never; Returns: boolean }
       populate_geometry_columns:
@@ -1474,6 +1485,36 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      register_organisation: {
+        Args: {
+          p_contact_email: string
+          p_contact_name: string
+          p_contact_phone: string
+          p_description: string
+          p_name: string
+          p_operating_area: string
+          p_registration_details: string
+          p_type: string
+          p_website: string
+        }
+        Returns: string
+      }
+      require_active_user: { Args: never; Returns: string }
+      resubmit_organisation: {
+        Args: {
+          p_contact_email: string
+          p_contact_name: string
+          p_contact_phone: string
+          p_description: string
+          p_name: string
+          p_operating_area: string
+          p_org_id: string
+          p_registration_details: string
+          p_type: string
+          p_website: string
+        }
+        Returns: undefined
+      }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown

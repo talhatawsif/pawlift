@@ -46,6 +46,29 @@ export async function AccountMenu({
               ))}
               {roleLabels(ctx).length === 0 && <li>Member</li>}
             </ul>
+            <ul className="mt-2 border-t border-border pt-2">
+              {ctx.memberships
+                .filter((m) => m.status === "active" && m.is_coordinator)
+                .map((m) => (
+                  <li key={m.org_id}>
+                    <Link href={`/org/${m.org_id}`} className="flex h-10 items-center font-medium">
+                      {m.org_name}
+                    </Link>
+                  </li>
+                ))}
+              <li>
+                <Link href="/org/new" className="flex h-10 items-center font-medium">
+                  Register an organisation
+                </Link>
+              </li>
+              {ctx.is_admin && (
+                <li>
+                  <Link href="/admin/organisations" className="flex h-10 items-center font-medium">
+                    Verify organisations
+                  </Link>
+                </li>
+              )}
+            </ul>
             <form action={signOut} className="mt-3 border-t border-border pt-3">
               <button type="submit" className="flex h-10 w-full items-center gap-2 text-left font-medium">
                 <LogOut size={16} aria-hidden /> Sign out

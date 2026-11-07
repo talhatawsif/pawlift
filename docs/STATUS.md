@@ -1,13 +1,14 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 1d done (Batch 1 complete).
+Updated: 2026-11-08 · Checkpoint 2a done.
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
 - Checkpoint **1b** DONE (migrations applied to pawlift-dev, types generated).
 - Checkpoint **1c** DONE (auth, profile trigger, role-aware shell, demo persona switcher).
 - Checkpoint **1d** DONE (`npm run test:db` harness + RLS tests; Batch 1 gate met).
-- Next: Batch 2, checkpoint **2a**.
+- Checkpoint **2a** DONE (org registration, admin verification, resubmission).
+- Next: Batch 2, checkpoint **2b**.
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -22,15 +23,21 @@ Updated: 2026-11-08 · Checkpoint 1d done (Batch 1 complete).
 None.
 
 ## Exact next action
-Batch 2, checkpoint 2a (PLAN.md §12): org registration; admin verification with recorded checks and reasons; resubmission path. Needs RPCs (security definer, audit in same transaction). Also add a read policy for `suburbs` when first needed. Consider writing the demo seed/`demo:reset` before demo-dependent work.
+Batch 2, checkpoint 2b (PLAN.md §12): invitations (open link and email-bound), join flow, membership requests, approve/remove; volunteer profile, guideline acceptance, admin volunteer verification. Reuse `require_active_user()` and the audit pattern from migration `...000004`. Consider writing the demo seed/`demo:reset` before demo-dependent work (still not written).
 
-Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Confirm email" still ON in pawlift-dev.
+Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>` (build fails otherwise); see `src/app/org/[id]/page.tsx`.
 
 ## Implemented / tested / unverified
 - Implemented: Next.js app, design tokens (`src/app/globals.css`), static shell (`SearchCard`, `BottomSheet`, `MapView`), `.env.example`, README, Vitest config + 1 unit test.
 - Tested: lint, typecheck, test, build all pass; map renders in the browser pane (OpenFreeMap, attribution shown).
 - Unverified: mobile layout and keyboard navigation (placeholder controls are disabled); contrast not formally checked.
 - Notes: MapLibre 6 worker is copied to `public/maplibre/` by `scripts/copy-maplibre-worker.mjs` (predev/prebuild; gitignored) because Turbopack can't bundle it. A single map `error` event currently shows the "couldn't load" alert; refine in 3a.
+
+## 2a summary
+- Implemented: migration `20261108000004_org_registration_verification.sql` (`register_organisation`, `resubmit_organisation`, `admin_decide_organisation`, `get_org_for_coordinator`, `admin_list_organisations`, `require_active_user`, append-only trigger); `src/lib/org.ts`; actions `src/app/org/actions.ts`, `src/app/admin/actions.ts`; pages `/org/new`, `/org/[id]`, `/admin/organisations`, `/admin/organisations/[id]`; `OrgForm`, `DecisionForm`; account menu links; D19/D20 in PLAN.
+- Tested: `npm run test:db` 63/63 (10 new: registration, cap, suspended, admin-only, guards, transitions, immutability, resubmission). lint, typecheck, `npm test` 2/2, build pass. Browser (real pawlift-dev, throwaway users, since deleted): register → pending page; non-admin gets 404 on `/admin`; admin rejects (empty reason refused, then with reason); coordinator sees reason, resubmits, status returns to pending.
+- Unverified: admin "Verify" and suspend/reinstate buttons in the browser (covered by db tests only); mobile layout; keyboard navigation; `suburbs` read policy still not needed.
+- `.claude/launch.json` (dev server config) and `AGENTS.md` left untracked.
 
 ## 1d summary
 - Implemented: `vitest.db.config.ts`, `tests/db/helpers.ts` (refuses unless project ref is in `DEMO_PROJECT_REFS`; creates/cleans up throwaway users and orgs), `tests/db/rls.test.ts`, `tests/unit/no-service-role-in-src.test.ts`, script `test:db`.
