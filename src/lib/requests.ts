@@ -73,6 +73,8 @@ export type PublicRequest = {
   destination_suburb: string;
   origin_lat: number | null;
   origin_lng: number | null;
+  destination_lat: number | null;
+  destination_lng: number | null;
   window_start: string | null;
   window_end: string | null;
 };

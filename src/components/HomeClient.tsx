@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, useTransition, type ReactNode } from "react";
 import { BottomSheet, type Snap } from "@/components/BottomSheet";
 import { LocationExplainer, type ChosenLocation } from "@/components/LocationExplainer";
-import { SearchCard } from "@/components/SearchCard";
+import { SearchCard, type JourneyForm } from "@/components/SearchCard";
+import { RouteMatches } from "@/components/RouteMatches";
+import { findRouteMatches, type JourneyResult } from "@/app/journey/actions";
 import { MapView } from "@/components/map/MapView";
 import { sortByProximity } from "@/lib/geo/distance";
 import type { PublicRequest } from "@/lib/requests";
@@ -18,6 +20,22 @@ export function HomeClient({ requests, error, account }: Props) {
   const [explainer, setExplainer] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [snap, setSnap] = useState<Snap>("peek");
+  const [form, setForm] = useState<JourneyForm>({ destination: null, departLocal: "", maxDetourMin: 15 });
+  const [result, setResult] = useState<JourneyResult | null>(null);
+  const [searched, setSearched] = useState<{ origin: { lat: number; lng: number }; destination: { lat: number; lng: number } } | null>(null);
+  const [pending, startSearch] = useTransition();
+
+  const runSearch = () => {
+    if (!loc || !form.destination) return;
+    const origin = { lat: loc.lat, lng: loc.lng };
+    const destination = { lat: form.destination.lat, lng: form.destination.lng };
+    startSearch(async () => {
+      const res = await findRouteMatches({ origin, destination, departLocal: form.departLocal, maxDetourMin: form.maxDetourMin });
+      setResult(res);
+      setSearched({ origin, destination });
+      setSnap((s) => (s === "peek" ? "half" : s));
+    });
+  };
 
   const ordered: NearbyRequest[] = useMemo(() => {
     if (loc) return sortByProximity(requests, loc);
@@ -57,7 +75,16 @@ export function HomeClient({ requests, error, account }: Props) {
           setSnap((s) => (s === "peek" ? "half" : s));
         }}
       />
-      <SearchCard account={account} originLabel={originLabel} onEditOrigin={() => setExplainer(true)} />
+      <SearchCard
+        account={account}
+        originLabel={originLabel}
+        originKnown={loc != null}
+        onEditOrigin={() => setExplainer(true)}
+        form={form}
+        onChange={setForm}
+        onSubmit={runSearch}
+        pending={pending}
+      />
       <BottomSheet
         requests={ordered}
         loading={false}
@@ -66,6 +93,17 @@ export function HomeClient({ requests, error, account }: Props) {
         selectedId={selectedId}
         snap={snap}
         onSnap={setSnap}
+        top={
+          <RouteMatches
+            result={result}
+            origin={searched?.origin ?? null}
+            destination={searched?.destination ?? null}
+            onSelect={(id) => {
+              setSelectedId(id);
+              setSnap((s) => (s === "peek" ? "half" : s));
+            }}
+          />
+        }
         onSelect={(id) => {
           setSelectedId(id);
           if (id) setSnap((s) => (s === "peek" ? "half" : s));

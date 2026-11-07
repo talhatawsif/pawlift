@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { ArrowLeft, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { formatMelbourne } from "@/lib/org";
@@ -21,9 +21,11 @@ type Props = {
   snap: Snap;
   onSnap: (s: Snap) => void;
   onSelect: (id: string | null) => void;
+  /** Optional section above the nearby list (route matches). */
+  top?: ReactNode;
 };
 
-export function BottomSheet({ requests, loading, error, locationKnown, selectedId, snap, onSnap, onSelect }: Props) {
+export function BottomSheet({ requests, loading, error, locationKnown, selectedId, snap, onSnap, onSelect, top }: Props) {
   const startY = useRef<number | null>(null);
   const moved = useRef(false);
   const scroller = useRef<HTMLDivElement>(null);
@@ -99,6 +101,8 @@ export function BottomSheet({ requests, loading, error, locationKnown, selectedI
               </button>
             ) : (
               <div className="mt-3">
+                {top}
+                {top && <h3 className="mb-2 text-sm font-semibold text-muted">Also nearby</h3>}
                 {error ? (
                   <p role="alert" className="rounded-xl border border-border p-3 text-sm text-danger">
                     The list couldn&apos;t load. Refresh the page to try again.

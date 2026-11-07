@@ -18,11 +18,11 @@ const PLACES: Record<string, LngLat> = {
 // [from, to, minutes, km] — symmetric.
 const PAIRS: [string, string, number, number][] = [
   ["St Albans", "Geelong", 62, 78],
-  ["St Albans", "Melton", 22, 24],
+  ["St Albans", "Melton", 16, 22],
   ["St Albans", "Sunshine", 9, 5],
   ["St Albans", "Footscray", 17, 12],
   ["St Albans", "Werribee", 28, 33],
-  ["Melton", "Geelong", 58, 76],
+  ["Melton", "Geelong", 52, 74],
   ["Melton", "Sunshine", 28, 31],
   ["Melton", "Footscray", 35, 38],
   ["Melton", "Werribee", 26, 30],
@@ -50,7 +50,7 @@ function nearestPlace(p: LngLat): string | null {
 }
 
 function pairFixture(a: string, b: string): { durationS: number; distanceM: number } | null {
-  if (a === b) return { durationS: 300, distanceM: 1500 };
+  if (a === b) return { durationS: 120, distanceM: 800 };
   const hit = PAIRS.find(([x, y]) => (x === a && y === b) || (x === b && y === a));
   return hit ? { durationS: hit[2] * 60, distanceM: hit[3] * 1000 } : null;
 }

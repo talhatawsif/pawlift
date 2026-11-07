@@ -1,6 +1,6 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 3b done.
+Updated: 2026-11-08 · Checkpoint 3c done (Batch 3 complete).
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
@@ -13,7 +13,8 @@ Updated: 2026-11-08 · Checkpoint 3b done.
 - Checkpoint **2d** DONE (requests, photo sanitising, publish guards, public listing).
 - Checkpoint **3a** DONE (map home, bottom sheet, nearby ordering, location explainer, suburb fallback).
 - Checkpoint **3b** DONE (routing adapter, cache RPCs, DEMO fixtures, coordinator geocoding).
-- Next: Batch 3, checkpoint **3c** (matching engine, journey planner UI).
+- Checkpoint **3c** DONE (matching engine, journey planner UI, nav links, `demo:reset` seed). Batch 3 gate met.
+- Next: Batch 4, checkpoint **4a**: do NOT build via /next; start manually in plan mode.
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -28,9 +29,14 @@ Updated: 2026-11-08 · Checkpoint 3b done.
 None.
 
 ## Exact next action
-Batch 3, checkpoint 3c (PLAN §12 and §9): matching engine (`src/lib/matching/`), journey planner UI, route-matched section with detour and source labels, navigation deep links. Use `getRoute(supabase, points, new RouteBudget())` from `src/lib/routing` (max 6 provider calls per search). No ORS key exists, so results are DEMO fixtures. The demo seed/`demo:reset` is still not written; do it first in 3c (gate needs St Albans → Geelong with Biscuit labelled DEMO). DEMO fixtures cover only St Albans, Melton, Geelong, Sunshine, Footscray, Werribee centres (within 4 km).
+Checkpoint **4a** (PLAN §12): `claim_leg`, `confirm_assignment`, `release_assignment`, expiry sweep, concurrency test (parallel claims → exactly one succeeds), idempotent retry test. It touches assignments, so start it manually in plan mode with the full checkpoint prompt.
 
-Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>`; see `src/app/page.tsx`. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server (use static SVG, see `MapView.tsx`). Dev server often already runs on :3000.
+Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>`; see `src/app/page.tsx`. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server (use static SVG, see `MapView.tsx`). Dev server often already runs on :3000. Demo rows are visible only to demo personas (sign in via the DEMO switcher, e.g. Priya); `npm run demo:reset` refreshes request windows (they run seed time → +7 days).
+
+## 3c summary
+- Implemented: `src/lib/matching/` (`prefilter`, `evaluate`, `orderMatches`, `matchJourney`; wait ≤20 min, 5 min handling at each end, ≤5 routed candidates + baseline = ≤6 calls); `src/lib/nav-links/` (Google, Apple, Waze); `src/app/journey/actions.ts` (`findRouteMatches`, nothing stored); `SearchCard` (suburb destination, depart time, max detour), `RouteMatches` ("On your route" + "Also nearby"), `BottomSheet` `top` slot; `scripts/demo-reset.mjs` + `npm run demo:reset`; DEMO fixtures retuned (St Albans–Melton 16, Melton–Geelong 52, same place 2 min); D30 in PLAN.
+- Tested: `npm test` 36/36 (17 new in `tests/unit/matching.test.ts`: detour arithmetic, pickup before drop-off, window, 20 min wait, deadline, capability filter, max detour, prefilter, ordering, DEMO match, no-fixture failure); `test:db` 129/129; lint, typecheck, build pass; `demo:reset` succeeded twice. Browser (pawlift-dev, Priya persona): St Albans → Geelong shows Biscuit "+8 min driving · about 10 min", labelled DEMO, no live claim.
+- Unverified: ORS path of the matcher (no key; request/response shapes still untested); links open correctly in the three apps; keyboard use of the destination combobox; desktop layout; matcher treats relays as one pickup → drop-off; capability filter in the UI (only the unfiltered path was run); `findRouteMatches` has no rate limit beyond the 6-call budget. `demo:reset` seeds people, orgs, locations, 4 requests only; offers, relay, completed transport and verification records wait for Batch 4+ tables; seeded Priya's UI path for cat-with-carrier filter not checked.
 
 ## 3b summary
 - Implemented: migration `...000010_routing_cache_geocode.sql` (`get_cached_route`, `put_cached_route`, `set_location_exact_point`, trigger clearing the point on address change); `src/lib/routing/` (`types`, `demo`, `ors`, `index` with `getRoute`, `RouteBudget`, `geocodeAddress`); `GeocodeButton` and `geocodeLocation` action on `/org/[id]/locations`; D29 in PLAN.
