@@ -49,3 +49,8 @@ Map-first, deliberately like Google Maps. Read BRIEF §3 (including the "never" 
 
 ## Git
 Commit after each passing checkpoint: `b<N>.<checkpoint>: <summary>` (e.g. `b1.a: scaffold app shell`). Push to `origin` (user's private GitHub repo `pawlift`).
+
+## Token and output rules
+- When running checks, show only pass/fail and the first error, never full logs. Don't paste code back to me.
+- Don't re-read files already read this session. Don't read whole docs.
+- Low-risk UI checkpoints can be built in auto-accept mode. Anything touching the database, RLS, permissions, claims, assignments or handovers needs an approved plan first.
