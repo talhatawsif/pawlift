@@ -28,12 +28,17 @@ export async function AccountMenu({
     <div className="flex items-center gap-2">
       {demo && <DemoSwitcher currentUserId={ctx?.user_id} notice={demoNotice} />}
       {!ctx ? (
-        <Link
-          href="/sign-in"
-          className="flex h-9 items-center rounded-full border border-border px-3 text-sm font-medium"
-        >
-          Sign in
-        </Link>
+        <>
+          <Link href="/about" className="flex h-9 items-center px-2 text-sm text-muted underline">
+            About
+          </Link>
+          <Link
+            href="/sign-in"
+            className="flex h-9 items-center rounded-full border border-border px-3 text-sm font-medium"
+          >
+            Sign in
+          </Link>
+        </>
       ) : (
         <details className="relative">
           <summary
@@ -140,7 +145,10 @@ export async function AccountMenu({
                 </li>
               )}
             </ul>
-            <form action={signOut} className="mt-3 border-t border-border pt-3">
+            <Link href="/about" className="mt-3 flex h-10 items-center border-t border-border pt-3 text-muted">
+              About PawLift
+            </Link>
+            <form action={signOut} className="border-t border-border pt-3">
               <button type="submit" className="flex h-10 w-full items-center gap-2 text-left font-medium">
                 <LogOut size={16} aria-hidden /> Sign out
               </button>

@@ -1,10 +1,10 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 6b done (foster receiving, history, settings, admin oversight). Batch 6 in progress.
+Updated: 2026-11-08 · Checkpoint 6c done (public info pages). Batch 6 gate checked.
 
 ## Current
-- Batches 1–4 DONE. Batch 5 removed (D37, one leg per request). Checkpoints 6a, 6b DONE.
-- Next: checkpoint **6c**.
+- Batches 1–4 DONE. Batch 5 removed (D37, one leg per request). Checkpoints 6a, 6b, 6c DONE.
+- Next: Batch 7 (see PLAN §12); saved journeys with notifications still unbuilt.
 
 ## Done
 - Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D34), data model, lifecycle, batch gates → `docs/PLAN.md`
@@ -18,9 +18,14 @@ Updated: 2026-11-08 · Checkpoint 6b done (foster receiving, history, settings, 
 None.
 
 ## Exact next action
-Checkpoint **6c** (PLAN §12): public pages About, How it works, Transport safety, Terms and Privacy, each marked DRAFT for professional review. Low-risk UI, no database. Then Batch 6 gate review (dedupe, recipient permission, reminder timing, suspension tests exist from 6a/6b). Saved journeys with `nearby_request` / `route_match` notifications are not built; schedule as its own checkpoint.
+Start the first Batch 7 checkpoint per PLAN §12 (manually, plan mode if it touches the database). Optional own checkpoint: saved journeys with `nearby_request` / `route_match` notifications.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM, so read all `main` elements. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## 6c summary
+- Implemented: static pages `/about`, `/how-it-works`, `/transport-safety` (renders `GUIDELINES`), `/terms`, `/privacy`; shared `src/components/InfoPage.tsx`; "About" links in `AccountMenu`. Terms, Privacy and Transport safety carry a DRAFT notice; no legal, safety or insurance guarantees.
+- Tested: build, lint, typecheck pass; `npm test` 36/36; `npm run test:db` 220/220 (Batch 6 gate tests from 6a/6b still pass). Browser: all five pages return 200, DRAFT notice shown, `/transport-safety` viewed.
+- Unverified: mobile layout and keyboard use; About link in the menu not clicked; copy needs professional review; the known dev cookies invariant error appeared once in the console (from an auth-reading route, not these static pages).
 
 ## 6b summary
 - Implemented: migration `...000023` (`private_access_log`, `require_admin`, `list_my_incoming_deliveries`, `list_my_foster_history`, `list_transport_history`, `update_org_settings`, `admin_list_incidents`, `admin_list_audit`, `admin_view_private_details`, `admin_list_private_access`); D39, D40. UI: `/foster` incoming animals with "arrived safely" form and past arrivals; `/org/[id]/history`, `/org/[id]/settings`; `/admin/incidents`, `/admin/audit`, `/admin/private-access`; account menu links for admins. Types regenerated. Volunteer history already existed on `/assignments`.
