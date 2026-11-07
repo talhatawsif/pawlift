@@ -43,6 +43,7 @@ Product requirements live in `docs/BRIEF.md`; this file records how we build the
 | D15 | Admin access to private details goes through a function requiring a reason, logged to audit | "Legitimate operational need" made enforceable |
 | D16 | Light theme only for MVP | Scope; revisit after launch |
 | D17 | Added `maplibre-gl`, `lucide-react`, `vitest` (all in the approved stack); `@types/node` raised to ^24 | Vitest 5 peer requires `@types/node` ≥22; Node 26 installed |
+| D18 | Added `@supabase/ssr` and `@supabase/supabase-js` (approved stack); profile created by `auth.users` trigger; shell reads profile/memberships through `get_my_context()` RPC; `is_demo` never set by the trigger (seed sets it with service role) | Tables are default-deny; real users must not self-flag as demo |
 
 Add new decisions here with a one-line reason (including any new dependency).
 
