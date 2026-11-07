@@ -76,12 +76,16 @@ export async function createTestOrg(name: string): Promise<string> {
 
 export async function cleanup() {
   if (createdOrgs.length) {
+    // legs and requests reference locations without cascade; remove them before the org's locations go.
+    await admin.from("transport_requests").delete().in("org_id", createdOrgs);
     await admin.from("verification_records").delete().in("subject_id", createdOrgs);
     await admin.from("organisations").delete().in("id", createdOrgs);
   }
   if (createdAdmins.length) await admin.from("platform_admins").delete().in("user_id", createdAdmins);
   // audit_logs.actor_id and verification_records.decided_by reference auth.users without cascade.
   if (created.length) {
+    // release_authority_attested_by references auth.users without cascade.
+    await admin.from("transport_requests").update({ release_authority_attested_by: null }).in("release_authority_attested_by", created);
     await admin.from("audit_logs").delete().in("actor_id", created);
     await admin.from("verification_records").delete().in("decided_by", created);
   }

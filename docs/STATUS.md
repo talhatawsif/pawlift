@@ -1,6 +1,6 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 2c done.
+Updated: 2026-11-08 · Checkpoint 2d done (Batch 2 complete).
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
@@ -10,7 +10,8 @@ Updated: 2026-11-08 · Checkpoint 2c done.
 - Checkpoint **2a** DONE (org registration, admin verification, resubmission).
 - Checkpoint **2b** DONE (invitations, join flow, membership requests, volunteer profile, guidelines, admin volunteer verification).
 - Checkpoint **2c** DONE (locations, confirmed destinations, foster approval and foster home).
-- Next: Batch 2, checkpoint **2d**.
+- Checkpoint **2d** DONE (requests, photo sanitising, publish guards, public listing).
+- Next: Batch 3, checkpoint **3a** (map home, bottom sheet, nearby ordering).
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -18,22 +19,22 @@ Updated: 2026-11-08 · Checkpoint 2c done.
 
 ## Environment (verified 2026-11-08)
 - macOS; node v26.13.0, npm 11.20.0, git 2.50.1, gh 2.103.3 (logged in as talhatawsif).
-- Next 16.4.5, React 19.3, Tailwind 4, maplibre-gl 6.16, vitest 5.1.
-- Not yet created: Supabase project `pawlift-dev`, `.env.local`, openrouteservice key.
+- Next 16.4.5, React 19.3, Tailwind 4, maplibre-gl 6.16, vitest 5.1, sharp 0.35.
+- Supabase `pawlift-dev` and `.env.local` exist. Not yet created: openrouteservice key.
 
 ## Blockers
 None.
 
 ## Exact next action
-Batch 2, checkpoint 2d (PLAN §12): request create/edit (single leg auto-created), photo sanitising (D12), publish guards (verified org, confirmed destination, release attestation), `public_requests` view and listing. Reuse `is_active_coordinator()`, `require_active_user()`, `locations` (confirmed destinations via `list_org_locations`) and the audit pattern. The demo seed/`demo:reset` is still not written; do it before demo-dependent work (3c at the latest).
+Batch 3, checkpoint 3a (PLAN §12): map home, bottom sheet, nearby ordering, location explainer + manual suburb fallback, "Showing Western Melbourne" state. Read `/requests` (`src/app/requests/page.tsx`) and `public_requests` for the data. The demo seed/`demo:reset` is still not written; do it before demo-dependent work (3c at the latest).
 
-Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>` (build fails otherwise); see `src/app/org/[id]/page.tsx`.
+Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>`; see `src/app/org/[id]/page.tsx`. Browser pane must be *shown* (`show_pane preview`) or Suspense pages stay on "Loading…". Generated RPC types make nullable args non-null; cast at the call site.
 
-## Implemented / tested / unverified
-- Implemented: Next.js app, design tokens (`src/app/globals.css`), static shell (`SearchCard`, `BottomSheet`, `MapView`), `.env.example`, README, Vitest config + 1 unit test.
-- Tested: lint, typecheck, test, build all pass; map renders in the browser pane (OpenFreeMap, attribution shown).
-- Unverified: mobile layout and keyboard navigation (placeholder controls are disabled); contrast not formally checked.
-- Notes: MapLibre 6 worker is copied to `public/maplibre/` by `scripts/copy-maplibre-worker.mjs` (predev/prebuild; gitignored) because Turbopack can't bundle it. A single map `error` event currently shows the "couldn't load" alert; refine in 3a.
+## 2d summary
+- Implemented: migrations `...000007_requests.sql` (RPCs `create_request`, `update_request`, `set_request_photo`, `publish_request`, `cancel_request`, `get_request_for_coordinator`, `list_org_requests`; storage buckets and policies; `public_requests` demo isolation) and `...000008` (conflict code); `src/lib/requests.ts`, `src/lib/time/melbourne.ts`; pages `/org/[id]/requests[/new|/id]`, public `/requests`; `RequestForm`, `RequestActions`; sharp photo pipeline; D26, D27 in PLAN.
+- Tested: `npm run test:db` 121/121 (19 new in `tests/db/requests.test.ts`); `npm test` 4/4; lint, typecheck, build pass. Browser (real pawlift-dev, throwaway user/org, since deleted): create draft, upload photo (draft photo not publicly fetchable), publish, request appears on `/requests` with suburbs only, photo public after publish. EXIF/GPS stripped confirmed with a synthetic JPEG.
+- Unverified: edit/cancel/remove-photo buttons in the browser; mobile layout beyond a narrow pane; keyboard navigation; a failed photo copy at publish only shows a note (no retry); public copy of a photo stays after cancel; `/requests` has no link from the map home yet; windows entered in Melbourne time tested only by unit test.
+- Test helpers now delete requests before orgs and null `release_authority_attested_by` before deleting users.
 
 ## 2c summary
 - Implemented: migration `20261108000006_locations_fosters.sql` (RPCs `list_suburbs`, `create_location`, `update_location`, `confirm_destination`, `list_org_locations`, `set_foster_status`, `upsert_foster_home`, `get_my_foster_homes`; ~40 seeded suburbs); `src/lib/locations.ts`; `/org/[id]/locations`, `/foster`, foster controls on `/org/[id]/members`; `LocationForm`; account-menu link; D24, D25 in PLAN.

@@ -52,6 +52,8 @@ Product requirements live in `docs/BRIEF.md`; this file records how we build the
 
 | D24 | `suburbs` seeded with ~40 Western Melbourne/Geelong suburbs using hand-typed APPROXIMATE centroids (unverified); read via `list_suburbs` RPC. Location `approx_point` is always the suburb centroid; `exact_point` stays null until geocoding (3b) | Public screens must never carry exact coordinates; replace seed with an official dataset before launch |
 | D25 | Confirmed destinations: coordinator of a verified org only; handover points can't be destinations; changing suburb or address clears confirmation; a foster home can be confirmed only while its carer is approved, and revoking approval unconfirms it. One foster_home location per carer per org, edited only via `upsert_foster_home` | Prevents stale or unapproved destinations (PLAN §8) |
+| D26 | Added `sharp` as a direct dependency (already installed transitively by Next) for D12 photo re-encoding: EXIF rotation applied, then all metadata dropped, max 1280px, WebP. Drafts live in private bucket `request-photos`; on publish the server action copies the file to public bucket `animal-photos` (storage policy allows this only for the photo of an open request) | D12 requires server-side sanitising; drafts must not be publicly reachable |
+| D27 | `public_requests` shows only rows whose `is_demo` matches the caller's profile (anon = real). Stale-version conflicts use SQLSTATE 55006, not 40001, because the API layer retries 40001 until timeout. Requests are editable and cancellable only while every leg is `open`; later changes arrive with Batch 4 | Demo/real isolation in the public listing; avoids a hang; keeps 2d inside its scope |
 
 Add new decisions here with a one-line reason (including any new dependency).
 

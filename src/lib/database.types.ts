@@ -1323,6 +1323,12 @@ export type Database = {
       admin_get_volunteer: { Args: { p_user_id: string }; Returns: Json }
       admin_list_organisations: { Args: { p_status?: string }; Returns: Json }
       admin_list_volunteers: { Args: { p_status?: string }; Returns: Json }
+      can_publish_photo: { Args: { p_name: string }; Returns: boolean }
+      can_use_draft_photo: { Args: { p_name: string }; Returns: boolean }
+      cancel_request: {
+        Args: { p_reason: string; p_request_id: string }
+        Returns: undefined
+      }
       confirm_destination: {
         Args: { p_confirm: boolean; p_location_id: string }
         Returns: undefined
@@ -1346,6 +1352,25 @@ export type Database = {
           p_label_public: string
           p_org_id: string
           p_suburb_id: string
+        }
+        Returns: string
+      }
+      create_request: {
+        Args: {
+          p_animal_name: string
+          p_carrier: string
+          p_coordinator_instructions: string
+          p_deadline: string
+          p_destination_location_id: string
+          p_handling: string
+          p_medical_notes: string
+          p_org_id: string
+          p_origin_location_id: string
+          p_required_date: string
+          p_species: string
+          p_urgency: string
+          p_window_end: string
+          p_window_start: string
         }
         Returns: string
       }
@@ -1488,6 +1513,10 @@ export type Database = {
       get_my_foster_homes: { Args: never; Returns: Json }
       get_my_volunteer_profile: { Args: never; Returns: Json }
       get_org_for_coordinator: { Args: { p_org_id: string }; Returns: Json }
+      get_request_for_coordinator: {
+        Args: { p_request_id: string }
+        Returns: Json
+      }
       gettransactionid: { Args: never; Returns: unknown }
       invitation_state: {
         Args: { p_token: string }
@@ -1505,6 +1534,7 @@ export type Database = {
       list_joinable_organisations: { Args: never; Returns: Json }
       list_org_locations: { Args: { p_org_id: string }; Returns: Json }
       list_org_members: { Args: { p_org_id: string }; Returns: Json }
+      list_org_requests: { Args: { p_org_id: string }; Returns: Json }
       list_suburbs: { Args: { p_query: string }; Returns: Json }
       loc_check_text: {
         Args: {
@@ -1517,6 +1547,7 @@ export type Database = {
         Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      photo_org: { Args: { p_name: string }; Returns: string }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }
@@ -1558,6 +1589,10 @@ export type Database = {
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
       preview_invitation: { Args: { p_token: string }; Returns: Json }
+      publish_request: {
+        Args: { p_attest: boolean; p_request_id: string }
+        Returns: undefined
+      }
       register_organisation: {
         Args: {
           p_contact_email: string
@@ -1571,6 +1606,16 @@ export type Database = {
           p_website: string
         }
         Returns: string
+      }
+      req_check_text: {
+        Args: {
+          p_carrier: string
+          p_handling: string
+          p_instr: string
+          p_medical: string
+          p_name: string
+        }
+        Returns: undefined
       }
       request_membership: { Args: { p_org_id: string }; Returns: undefined }
       require_active_user: { Args: never; Returns: string }
@@ -1600,6 +1645,10 @@ export type Database = {
           p_is_foster: boolean
           p_member_id: string
         }
+        Returns: undefined
+      }
+      set_request_photo: {
+        Args: { p_path: string; p_request_id: string }
         Returns: undefined
       }
       st_3dclosestpoint: {
@@ -2195,6 +2244,26 @@ export type Database = {
           p_suburb_id: string
         }
         Returns: undefined
+      }
+      update_request: {
+        Args: {
+          p_animal_name: string
+          p_carrier: string
+          p_coordinator_instructions: string
+          p_deadline: string
+          p_destination_location_id: string
+          p_expected_version: number
+          p_handling: string
+          p_medical_notes: string
+          p_origin_location_id: string
+          p_request_id: string
+          p_required_date: string
+          p_species: string
+          p_urgency: string
+          p_window_end: string
+          p_window_start: string
+        }
+        Returns: number
       }
       updategeometrysrid: {
         Args: {

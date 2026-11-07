@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -i '' 's/^- Next 16.4.5, React 19.3, Tailwind 4, maplibre-gl 6.16, vitest 5.1.$/- Next 16.4.5, React 19.3, Tailwind 4, maplibre-gl 6.16, vitest 5.1, sharp 0.35./' docs/STATUS.md)"
+    ]
+  }
+}
