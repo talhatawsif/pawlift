@@ -11,10 +11,6 @@ export type MyAssignment = {
   leg_status: string;
   window_start: string;
   window_end: string;
-  seq: number;
-  leg_count: number;
-  previous_leg_status: string | null;
-  handover_blocked: boolean;
   request_id: string;
   reference: string;
   animal_name: string;
@@ -86,8 +82,6 @@ export type OrgRow = {
   completed_at: string | null;
   leg_id: string;
   seq: number;
-  is_last_leg: boolean;
-  receiver_outcome: "ok" | "disputed" | null;
   leg_status: string;
   window_start: string;
   window_end: string;
@@ -156,7 +150,7 @@ export const INCIDENT_TYPES = [
 ] as const;
 export const incidentLabel = (v: string) =>
   INCIDENT_TYPES.find((t) => t.value === v)?.label ??
-  (v === "handover_dispute" ? "Handover problem" : v === "late_withdrawal" ? "Late withdrawal" : v);
+  (v === "late_withdrawal" ? "Late withdrawal" : v);
 
 const ACTION_LABEL: Record<string, string> = {
   "assignment.claim": "Volunteer offered to take it",
@@ -169,13 +163,10 @@ const ACTION_LABEL: Record<string, string> = {
   "leg.start": "Trip started",
   "leg.pickup": "Pickup confirmed",
   "leg.delivery": "Delivery confirmed",
+  "receipt.confirm": "Arrival confirmed",
   "request.complete": "Request completed",
   "request.cancel": "Request cancelled",
   "request.publish": "Request published",
-  "handover.receive": "Next driver received the animal",
-  "handover.dispute": "Handover disputed",
-  "receipt.confirm": "Arrival confirmed",
-  "receipt.dispute": "Arrival disputed",
   "incident.report": "Problem reported",
   "incident.resolve": "Problem resolved",
 };
@@ -187,8 +178,8 @@ export const windowLabel = (start: string, end: string) => `${formatMelbourne(st
 export type Bucket = "needs_driver" | "awaiting" | "confirmed" | "in_progress" | "to_complete" | "completed";
 export function bucketOf(r: OrgRow): Bucket {
   if (r.request_status === "completed") return "completed";
-  if (r.request_status === "delivered" && r.is_last_leg) return "to_complete";
-  if (r.leg_status === "en_route" || r.leg_status === "collected" || r.leg_status === "delivered") return "in_progress";
+  if (r.request_status === "delivered") return "to_complete";
+  if (r.leg_status === "en_route" || r.leg_status === "collected") return "in_progress";
   if (r.leg_status === "confirmed") return "confirmed";
   if (r.leg_status === "reserved" || r.leg_status === "offered") return "awaiting";
   return "needs_driver";

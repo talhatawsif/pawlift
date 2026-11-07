@@ -33,7 +33,7 @@ Product requirements live in `docs/BRIEF.md`; this file records how we build the
 | D5 | Private details in separate tables, read via access functions | Column-level RLS is error-prone |
 | D6 | "Matched" is derived (candidates exist), never stored | Brief: matched must never imply consent |
 | D7 | "Needs assistance" = open incident flag; progress state preserved | Brief §7 allows; keeps history intact |
-| D8 | Every request has ≥1 leg; a normal transport is one leg | One assignment model for single and relay |
+| D8 | Every request has exactly one leg (enforced in the database, D37). The `transport_legs` table is kept so assignments, progress and receipts attach to a leg | One assignment model; relays were removed (D37) |
 | D9 | Foster carers = membership flag + org-owned `foster_home` location (org-linked model, no separate foster table) | Simplest isolation per organisation |
 | D10 | Email invitations = invitation bound to an email address, sent by the coordinator via copy-link or `mailto:` | No paid email service; fits existing org tools |
 | D11 | pg_cron for reminders/sweeps plus lazy expiry in RPCs | No external scheduler; correct even if cron lags |
@@ -51,19 +51,20 @@ Product requirements live in `docs/BRIEF.md`; this file records how we build the
 | D23 | Volunteer verification mirrors D20 (pending→verified/rejected, verified↔suspended, rejected→pending via `resubmit_volunteer`); `verified` needs recorded checks and accepted guidelines (`v1`, DRAFT text in `src/lib/guidelines.ts`); admins see no phone numbers; `is_verified_volunteer()` is the internal recheck for later checkpoints | Honest verification; no implied background checks |
 
 | D24 | `suburbs` seeded with ~40 Western Melbourne/Geelong suburbs using hand-typed APPROXIMATE centroids (unverified); read via `list_suburbs` RPC. Location `approx_point` is always the suburb centroid; `exact_point` stays null until geocoding (3b) | Public screens must never carry exact coordinates; replace seed with an official dataset before launch |
-| D25 | Confirmed destinations: coordinator of a verified org only; handover points can't be destinations; changing suburb or address clears confirmation; a foster home can be confirmed only while its carer is approved, and revoking approval unconfirms it. One foster_home location per carer per org, edited only via `upsert_foster_home` | Prevents stale or unapproved destinations (PLAN §8) |
+| D25 | Confirmed destinations: coordinator of a verified org only; changing suburb or address clears confirmation; a foster home can be confirmed only while its carer is approved, and revoking approval unconfirms it. One foster_home location per carer per org, edited only via `upsert_foster_home` | Prevents stale or unapproved destinations (PLAN §8) |
 | D26 | Added `sharp` as a direct dependency (already installed transitively by Next) for D12 photo re-encoding: EXIF rotation applied, then all metadata dropped, max 1280px, WebP. Drafts live in private bucket `request-photos`; on publish the server action copies the file to public bucket `animal-photos` (storage policy allows this only for the photo of an open request) | D12 requires server-side sanitising; drafts must not be publicly reachable |
 | D27 | `public_requests` shows only rows whose `is_demo` matches the caller's profile (anon = real). Stale-version conflicts use SQLSTATE 55006, not 40001, because the API layer retries 40001 until timeout. Requests are editable and cancellable only while every leg is `open`; later changes arrive with Batch 4 | Demo/real isolation in the public listing; avoids a hang; keeps 2d inside its scope |
 | D28 | `list_public_suburbs(text)` RPC is callable by `anon` and returns suburb name, postcode and approximate centroid only; the `suburbs` table stays deny-all. Home nearby ordering is client-side straight-line distance from the public approximate origin point, labelled as such. No new dependency | Manual suburb fallback must work signed out; no extra routing call before 3b |
 
 | D29 | Routing adapter in `src/lib/routing` (no new dependency; plain `fetch`). No `ORS_API_KEY` → DEMO hand-typed suburb-pair fixtures only, never straight-line times. Cache goes through `get_cached_route`/`put_cached_route` RPCs (24 h, rounded ~100 m key, `ors` results only); known limit: any active user could store a wrong estimate for a key. Geocoding via ORS `geocode/search` stores `exact_point` through `set_location_exact_point` (coordinator only, audited; cleared by trigger when the address changes). |
-| D30 | Matching (`src/lib/matching`) runs in TypeScript over `public_requests` rows, not a SQL prefilter: no migration and it is unit-testable. A request is matched as one pickup → drop-off (min/max of leg windows), so multi-leg relays are not matched leg by leg until Batch 5. Journey inputs are used per search and not stored (saved journeys: 6a). `demo:reset` (`scripts/demo-reset.mjs`) seeds with direct service-role inserts, giving requests a window from seed time to +7 days, and puts all demo locations under Western Paws Rescue because requests must use their own org's locations. No new dependency. |
+| D30 | Matching (`src/lib/matching`) runs in TypeScript over `public_requests` rows, not a SQL prefilter: no migration and it is unit-testable. A request is matched as one pickup → drop-off (min/max of leg windows), so each request is one pickup → drop-off. Journey inputs are used per search and not stored (saved journeys: 6a). `demo:reset` (`scripts/demo-reset.mjs`) seeds with direct service-role inserts, giving requests a window from seed time to +7 days, and puts all demo locations under Western Paws Rescue because requests must use their own org's locations. No new dependency. |
 | D31 | Assignment RPCs (`claim_leg`, `confirm_assignment`, `release_assignment`) share `assignment_eligibility_error`: verified, active, guidelines `v1` (mirrored in SQL; bump needs a migration), species in `species_ok`, `has_carrier` whenever carrier text is present (size is free text, not enforced), no overlapping active assignment, demo flag matches. Claims need `window_start > now()`. Expiry runs lazily at the top of each RPC via `sweep_expired_assignments` (pg_cron in 6a); a raised error rolls the sweep back, so expiry is also checked explicitly at confirm. Lock order leg then assignment. |
 | D32 | Offers and exits (migrations 000012–000014): `offer_leg` only to active volunteer members of the request's org, expiry `least(24 h, window_start − 1 h)`; `accept_offer`/`decline_offer`/`withdraw_offer`; `withdraw` (reserved or confirmed; late = confirmed and within 2 h of `window_start` → high `late_withdrawal` incident); `reassign` (reason required, optionally offers to a new volunteer in the same transaction); `cancel_request` now ends every active assignment as `cancelled` for open/assigned/confirmed/en_route requests unless a leg is collected. Offers get a server-made `idempotency_key`. A raised error rolls back the lazy sweep, so an expired offer is swept by the next successful RPC. Revocation = assignment leaves offered/reserved/confirmed; the private-details reader (4c) must key on that. |
-| D33 | Progress and reads (migrations 000015–000018): `start_leg` (from 3 h before `window_start`), `confirm_pickup`, `confirm_delivery` (assignment → `completed`, giver row), `complete_request` (coordinator, receiver row `on_behalf_of`, blocked by open high incidents), `report_incident` (assignee or coordinator; types delay/animal_welfare/vehicle/no_show/other), `resolve_incident`, `get_leg_private_details` (confirmed assignment and leg confirmed/en_route/collected; denied once delivered, so the drop-off address stays available after pickup), read RPCs `list_my_assignments`, `get_request_detail` (with `claim_block` reason), `list_org_assignments`, `list_org_incidents`, `list_org_audit`. Single-leg requests only; multi-leg refused until Batch 5. |
+| D33 | Progress and reads (migrations 000015–000018): `start_leg` (from 3 h before `window_start`), `confirm_pickup`, `confirm_delivery` (assignment → `completed`, giver row), `complete_request` (coordinator, receiver row `on_behalf_of`, blocked by open high incidents), `report_incident` (assignee or coordinator; types delay/animal_welfare/vehicle/no_show/other), `resolve_incident`, `get_leg_private_details` (confirmed assignment and leg confirmed/en_route/collected; denied once delivered, so the drop-off address stays available after pickup), read RPCs `list_my_assignments`, `get_request_detail` (with `claim_block` reason), `list_org_assignments`, `list_org_incidents`, `list_org_audit`. One leg per request (D37). |
 | D34 | A claim is allowed until `window_end` (was: until `window_start`) and holds to `least(now + 4 h, window_end)`; offers keep `window_start − 1 h`. Reason: a pickup window is "any time between start and end", and seeded demo windows start at seed time. |
-| D35 | Leg editor (migration 000019): `split_leg`, `merge_legs`, `update_leg`, `list_request_legs`; shared `validate_leg_chain` enforces PLAN §7 (continuity, chronology, deadline, same org, intermediate stops must be `handover_point`, max 5 legs) on every edit and at publish. Edits only while the request is draft/open and every leg is `open` (as D27); reconfirmation of confirmed legs is 5c. `update_request` refuses origin, destination and first-leg time changes once there is more than one leg (they belong to the leg editor). Stale version = 55006. No new dependency. |
-| D36 | Handovers (migration 000020): relays can be driven. `progress_lock_internal` no longer refuses multi-leg requests; it refuses legs downstream of an unresolved `handover_dispute`. `refresh_progress_status` derives en_route / collected / delivered from all legs. `confirm_pickup` on leg i+1 needs leg i delivered and upserts the receiver row for leg i (replacing a resolved `disputed` row); `dispute_handover` (next driver, leg i+1 en_route) writes a `disputed` receiver row and a high `handover_dispute` incident on leg i; `confirm_receipt` (owning-org coordinator `on_behalf_of`, or approved foster carer with `foster_can_confirm_receipt` linked to the destination) records or disputes the final receipt; `complete_request` keeps its rules but inserts the receiver row only if missing and refuses a disputed one. `get_request_detail` shows the first open leg so later legs are claimable. D33 "single-leg only" no longer applies. No new dependency. |
+| D35 | **Superseded by D37.** Leg editor (migration 000019): `split_leg`, `merge_legs`, `update_leg`, `list_request_legs`; shared `validate_leg_chain` enforces PLAN §7 (continuity, chronology, deadline, same org, intermediate stops must be `handover_point`, max 5 legs) on every edit and at publish. Edits only while the request is draft/open and every leg is `open` (as D27); reconfirmation of confirmed legs is 5c. `update_request` refuses origin, destination and first-leg time changes once there is more than one leg (they belong to the leg editor). Stale version = 55006. No new dependency. |
+| D36 | **Superseded by D37.** Handovers (migration 000020): relays can be driven. `progress_lock_internal` no longer refuses multi-leg requests; it refuses legs downstream of an unresolved `handover_dispute`. `refresh_progress_status` derives en_route / collected / delivered from all legs. `confirm_pickup` on leg i+1 needs leg i delivered and upserts the receiver row for leg i (replacing a resolved `disputed` row); `dispute_handover` (next driver, leg i+1 en_route) writes a `disputed` receiver row and a high `handover_dispute` incident on leg i; `confirm_receipt` (owning-org coordinator `on_behalf_of`, or approved foster carer with `foster_can_confirm_receipt` linked to the destination) records or disputes the final receipt; `complete_request` keeps its rules but inserts the receiver row only if missing and refuses a disputed one. `get_request_detail` shows the first open leg so later legs are claimable. D33 "single-leg only" no longer applies. No new dependency. |
+| D37 | **No volunteer-to-volunteer handovers and no multi-driver relays in the MVP.** Animals are handed over by professionals at pickup, driven by one volunteer, and received by a professional or an approved foster carer at the destination. Reason: animal welfare; a non-professional handover can strand an animal if a driver does not turn up. Implementation (migration 000021, undoing 000019 and 000020 which stay in history because they were applied): `transport_legs` allows one leg per request (`unique (request_id)`, `check (seq = 1)`), leg editor, split/merge, `dispute_handover`, `refresh_progress_status` and the chain validator are dropped, `handover_point` locations, `handover_dispute` incidents and disputed confirmations no longer exist, single-leg bodies of the progress and request RPCs are restored. Kept: `confirm_receipt(request, note)` — final-destination receipt by an approved foster carer with `foster_can_confirm_receipt` linked to the destination, or the owning organisation's coordinator (`on_behalf_of`); `complete_request` records the receipt on the coordinator's behalf if none exists. No new incident rules. Relays can return post-MVP only with a new decision. | Product decision |
 
 Add new decisions here with a one-line reason (including any new dependency).
 
@@ -78,16 +79,16 @@ All tables: `id uuid pk`, `created_at`, `updated_at`; `is_demo boolean` where da
 - `invitations` — org_id, token_hash, email (nullable = open link), roles, created_by, expires_at, max_uses, uses, revoked_at.
 - `volunteer_profiles` — user_id, species_ok (`cat|dog|other`[]), max_size, has_carrier, vehicle_notes, availability (jsonb weekly slots + notes), guidelines_version_accepted, guidelines_accepted_at, verification_status (`pending|verified|rejected|suspended`).
 - `verification_records` — subject_type (`organisation|volunteer`), subject_id, decision, checks_performed (jsonb list of exactly what was checked), reason, decided_by, decided_at. Append-only.
-- `locations` (public part) — org_id, kind (`pound|shelter|rescue_facility|vet|foster_home|handover_point|other`), label_public, suburb_id, approx_point (suburb centroid), is_confirmed_destination, confirmed_by/at, linked_user_id (foster).
+- `locations` (public part) — org_id, kind (`pound|shelter|rescue_facility|vet|foster_home|other`), label_public, suburb_id, approx_point (suburb centroid), is_confirmed_destination, confirmed_by/at, linked_user_id (foster).
 - `location_private` — location_id, exact_address, exact_point, contact_name, contact_phone, instructions. No direct client SELECT; read via `get_leg_private_details()`.
 - `transport_requests` — org_id, reference, animal_name, species, photo_path, urgency (`routine|soon|urgent`), required_date, deadline, handling_requirements, carrier_requirements, status, release_authority_attested_by/at, origin_location_id, destination_location_id, published_at, completed_at, cancelled_at, cancel_reason, version, is_demo.
 - `request_private` — request_id, medical_notes, coordinator_instructions.
-- `transport_legs` — request_id, seq, from_location_id, to_location_id, window_start, window_end, status, started_at, collected_at, delivered_at, cancelled_at, version. Unique (request_id, seq).
+- `transport_legs` — request_id, seq, from_location_id, to_location_id, window_start, window_end, status, started_at, collected_at, delivered_at, cancelled_at, version. Exactly one leg per request: unique (request_id), seq = 1 (D37).
 - `transport_assignments` — leg_id, volunteer_id, kind (`claim|offer`), status, journey_id, idempotency_key, reserved_until, offer_expires_at, confirmed_by/at, ended_at, end_reason. **Partial unique index on leg_id where status in (`offered`,`reserved`,`confirmed`).** Unique (volunteer_id, idempotency_key).
-- `handover_confirmations` — leg_id, role (`giver|receiver`), confirmed_by, on_behalf_of (nullable), confirmed_at, outcome (`ok|disputed`), note.
+- `handover_confirmations` — leg_id, role (`giver|receiver`), confirmed_by, on_behalf_of (nullable), confirmed_at, outcome (`ok`), note. A `giver` row is written at delivery, a `receiver` row at final-destination receipt (D37).
 - `journeys` — user_id, origin_point, destination_point, depart_at, max_detour_min, notify_matches, expires_at. Owner-only. Deleted 7 days after depart_at.
 - `route_cache` — cache_key (hash of rounded coordinates + profile), provider, duration_s, distance_m, legs jsonb, created_at. No client access; used by server routing code through an RPC.
-- `incidents` — request_id, leg_id, raised_by, type (`delay|animal_welfare|vehicle|handover_dispute|late_withdrawal|no_show|other`), severity (`low|high`), description, status (`open|acknowledged|resolved`), resolution, resolved_by/at.
+- `incidents` — request_id, leg_id, raised_by, type (`delay|animal_welfare|vehicle|late_withdrawal|no_show|other`), severity (`low|high`), description, status (`open|acknowledged|resolved`), resolution, resolved_by/at.
 - `notifications` — user_id, type, request_id, leg_id, dedupe_key, payload (non-sensitive), read_at. Unique (user_id, dedupe_key).
 - `notification_preferences` — user_id, nearby_enabled (default false), nearby_radius_km, reminders_enabled (default true), route_match_enabled (default true).
 - `audit_logs` — actor_id, action, entity_type, entity_id, org_id, before/after (redacted jsonb), reason, created_at. Insert only from RPCs; no client write policy.
@@ -104,7 +105,6 @@ Roles: **Anon** · **User** (signed in) · **Vol** (verified volunteer) · **Ass
 | Exact addresses, contacts, instructions for a leg | – | – | – | own leg endpoints only | own home only | ✓ | – | via logged reason |
 | Medical notes | – | – | – | own request | – | ✓ | – | via logged reason |
 | Foster identity and contact | – | – | – | final-leg driver: name + phone | self | ✓ (own org) | – | via logged reason |
-| Adjacent relay driver: first name + phone | – | – | – | adjacent confirmed legs | – | ✓ | – | ✓ |
 | Volunteer directory (names, capabilities, availability) | – | – | – | – | – | own org members | – | ✓ |
 | Journeys | – | owner | owner | owner | owner | – | – | – |
 | Assignments | – | own | own | own | – | own org | – | ✓ |
@@ -116,7 +116,7 @@ Roles: **Anon** · **User** (signed in) · **Vol** (verified volunteer) · **Ass
 | Audit log | – | – | – | – | – | own org | – | ✓ |
 
 Rules:
-- Private leg details are available only while the assignment is `confirmed` and the leg is not yet handover-confirmed. Access ends immediately on withdrawal, reassignment or cancellation (the access function checks current state every call).
+- Private leg details are available only while the assignment is `confirmed` and the leg is not yet delivered. Access ends immediately on withdrawal, reassignment or cancellation (the access function checks current state every call).
 - Suspended accounts (profile, volunteer or organisation) lose all operational actions immediately; reads limited to own history.
 - Demo and real data never mix: real users never see `is_demo` rows; demo personas see only demo rows.
 - Storage: animal photos public only once sanitised and published; nothing else is public. No exact coordinates in API responses, logs, photo metadata or URLs.
@@ -137,25 +137,25 @@ Rules:
 | confirmed → en_route | assigned volunteer | `start_leg` | within 3 h before window_start or later | started_at |
 | confirmed / en_route → open | assigned volunteer | `withdraw` | not collected; within 2 h of window_start → auto `late_withdrawal` incident | ended_at |
 | confirmed / en_route → open | coordinator | `reassign` | not collected | ended_at, reason |
-| en_route → collected | assigned volunteer | `confirm_pickup` | leg 1: always; later legs: previous leg delivered — this also records the previous handover's receiver confirmation | collected_at |
-| collected → delivered | assigned volunteer | `confirm_delivery` | — ; records giver confirmation | delivered_at |
-| any pre-collected → cancelled | coordinator | `cancel_request` / `remove_leg` | no leg of the request is collected | cancelled_at, reason |
+| en_route → collected | assigned volunteer | `confirm_pickup` | — | collected_at |
+| collected → delivered | assigned volunteer | `confirm_delivery` | —; records the giver confirmation | delivered_at |
+| any pre-collected → cancelled | coordinator | `cancel_request` | the leg is not collected | cancelled_at, reason |
 
-A collected leg cannot be cancelled or reassigned directly: the coordinator opens/uses an incident and splits the leg at a handover point (Batch 5).
+A collected leg cannot be cancelled or reassigned directly: the coordinator uses an incident and contacts the volunteer.
 
 ### 5.2 Request states
 Stored, recomputed by `refresh_request_status()` inside every leg RPC.
 - **Draft** → **Open** via `publish_request` (coordinator). Guards: org verified (or demo org in demo env), caller active coordinator, destination confirmed, release authority attested, requirements present, legs form a valid chain (§7).
-- **Open:** any leg open or offered. UI shows "2 of 3 legs filled" for relays.
+- **Open:** the leg is open or offered.
 - **Matched** (derived, display only): open and at least one eligible candidate exists. Never stored.
-- **Assigned:** no open/offered legs; at least one reserved (awaiting coordinator).
-- **Confirmed:** all legs confirmed, none started.
-- **En route:** a driver has started and leg 1 is not yet collected.
-- **Collected:** leg 1 collected; not all legs delivered and handed over.
-- **Delivered:** all legs delivered and all handovers receipt-confirmed.
+- **Assigned:** the leg is reserved (awaiting coordinator).
+- **Confirmed:** the leg is confirmed, not started.
+- **En route:** the driver has started and not yet collected.
+- **Collected:** the animal is collected, not yet delivered.
+- **Delivered:** the leg is delivered. Receipt at the destination is confirmed by `confirm_receipt` or on completion (§7).
 - **Completed:** coordinator `complete_request` from Delivered, with no open high-severity incidents.
 - **Cancelled:** coordinator, from Draft/Open/Assigned/Confirmed/En route with nothing collected.
-- **Needs assistance:** badge while any open incident has severity high or type handover_dispute. Does not change the stored status.
+- **Needs assistance:** badge while any open incident has severity high. Does not change the stored status.
 
 Edits after publish: changes to a leg's locations or window move its confirmed assignment back to `offered` (reconfirmation) and notify the volunteer.
 
@@ -170,15 +170,14 @@ Edits after publish: changes to a leg's locations or window move its confirmed a
 - **Reassignment:** ends the current assignment (`released`, reason recorded), revokes access instantly, leg returns to `open` or is offered to another volunteer.
 - **Cancellation:** ends all active assignments as `cancelled`, notifies volunteers, revokes access, keeps full history.
 
-## 7. Relays and handovers
+## 7. Handover and receipt
 
-- Legs ordered by `seq` from 1. Validation (on save and on publish): leg 1 starts at request origin; last leg ends at request destination; `leg[i].to = leg[i+1].from`; `leg[i].window_start ≤ leg[i+1].window_start`; `leg[i].window_end ≤ leg[i+1].window_end`; last window_end ≤ deadline.
-- Handover points are `handover_point` locations owned by the org (public suburb, private exact place).
-- **Between legs:** giver confirms with `confirm_delivery` on leg i; receiver confirms with `confirm_pickup` on leg i+1. Both rows recorded in `handover_confirmations`.
-- **Final leg:** receiver confirmation by the authorised foster carer (if `foster_can_confirm_receipt`), or the destination's coordinator, or the owning coordinator on their behalf (`on_behalf_of` recorded).
-- **Dispute:** receiver chooses "Something's not right" → handover recorded as disputed, high-severity `handover_dispute` incident opened, coordinators notified, request shows Needs assistance, downstream legs cannot progress until a coordinator resolves.
-- **Downstream disruption:** cancelling, reassigning or re-timing leg k notifies confirmed drivers on legs > k (`upstream_change`) and flags the request for coordinator review. Nothing downstream is cancelled automatically.
-- **Parent completion:** only when every leg is delivered with receipt confirmed and no unresolved dispute.
+No volunteer-to-volunteer handovers or relays in the MVP (D37).
+- **At pickup:** a professional (pound, shelter, rescue or vet staff) hands the animal to the one assigned volunteer; the volunteer records it with `confirm_pickup`.
+- **At the destination:** the volunteer records `confirm_delivery` (giver row in `handover_confirmations`).
+- **Receipt:** the receiver is confirmed by the authorised foster carer (if `foster_can_confirm_receipt` and linked to the destination home), or the owning organisation's coordinator on their behalf (`on_behalf_of` recorded), via `confirm_receipt`. `complete_request` records the coordinator's receipt if none exists.
+- **Problems** use the existing incident flow (`report_incident`, `resolve_incident`); there is no separate dispute flow.
+- **Completion:** coordinator `complete_request` once the request is delivered and no high-severity incident is open.
 
 ## 8. Foster carers
 
@@ -217,7 +216,6 @@ Inserted inside the RPC that causes them, with `ON CONFLICT (user_id, dedupe_key
 | reminder_24h / reminder_2h | pg_cron every 15 min | assigned volunteer (24 h also coordinators) | `remind:{assignment}:{24h|2h}` |
 | picked_up / delivered | pickup / delivery | coordinators, next-leg driver, final receiver | `{status}:{leg}` |
 | cancelled / reassigned | cancel / reassign / withdraw | affected volunteers and coordinators | `ended:{assignment}` |
-| upstream_change | leg k change | confirmed drivers on later legs | `upstream:{leg}:{version}` |
 | incident | incident opened | coordinators; admins if high | `incident:{id}` |
 
 RLS: users read only their own notifications. Web push and email deferred.
@@ -229,7 +227,7 @@ RLS: users read only their own notifications. Web push and email deferred.
 - Persona switcher (demo env only) signs in seeded accounts using `DEMO_PASSWORD` from env.
 - **Personas:** Demo Admin; Sam — coordinator, Western Paws Rescue (DEMO); Priya — volunteer, St Albans, cat carrier; Tom — volunteer, Sunshine, existing org volunteer; Lee — volunteer, Footscray; Jordan — volunteer, pending verification; Mia — foster carer + volunteer, Werribee.
 - **Organisations and places (all fictional):** Western Paws Rescue (DEMO); Westgate Animal Pound (DEMO), Melton; Bayside Cat Haven (DEMO), Geelong; Kindpaws Vet (DEMO), Footscray. Exact addresses are obviously fictional.
-- **Requests:** Biscuit the cat, pound in Melton → Geelong haven (route match for St Albans → Geelong; council pound transfer); dog in Sunshine → Footscray vet (nearby); dedicated offer to Tom; three-leg relay Melton → Sunshine → Footscray → Geelong; delivery to foster Mia; one completed historical transport; one draft; one urgent open request.
+- **Requests:** Biscuit the cat, pound in Melton → Geelong haven (route match for St Albans → Geelong; council pound transfer); dog in Sunshine → Footscray vet (nearby); dedicated offer to Tom; delivery to foster Mia; one completed historical transport; one draft; one urgent open request.
 - Demo route fixtures cover every seeded suburb pair used by these stories; all labelled DEMO estimate.
 
 ## 12. Batches, checkpoints and acceptance gates
@@ -261,11 +259,7 @@ One checkpoint per session. Commit and push after each passing checkpoint.
 - 4c Volunteer assignment screens (start, pickup, delivery, incident, navigation buttons); coordinator dashboard (needs-a-driver first), confirm and complete; audit trail view.
 - *Gate:* BRIEF §13 volunteer story steps 1–10 work end to end by clicking; all 4a/4b tests pass.
 
-**Batch 5 — Relays**
-- 5a Leg editor (split/merge, handover points, chronology and continuity validation).
-- 5b Handover flow, receipt confirmation, dispute → incident.
-- 5c Downstream disruption notices, reconfirmation on edits, parent completion rule, splitting a collected leg via incident.
-- *Gate:* two-driver handover test; parent can't complete with an incomplete leg or open dispute; cancelling leg 2 flags leg 3 driver.
+**Batch 5 — removed (D37).** Relays and volunteer-to-volunteer handovers are out of the MVP; batch numbers are kept so references stay valid.
 
 **Batch 6 — Operations**
 - 6a Notifications UI, preferences, pg_cron reminders and sweeps, journey deletion.
@@ -275,7 +269,7 @@ One checkpoint per session. Commit and push after each passing checkpoint.
 
 **Batch 7 — Release**
 - Opus review of requirement coverage (BRIEF §15) and security; Sonnet fixes.
-- Accessibility pass (keyboard, focus, labels, contrast), responsive polish, Playwright e2e for both demo stories plus foster and relay demos.
+- Accessibility pass (keyboard, focus, labels, contrast), responsive polish, Playwright e2e for both demo stories plus the foster demo.
 - README complete; Vercel preview prepared (public deploy only with explicit OK).
 - *Gate:* all suites green; demo reset succeeds twice; report verified capabilities, blockers and launch prerequisites.
 

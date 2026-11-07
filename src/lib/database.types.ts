@@ -892,14 +892,14 @@ export type Database = {
           {
             foreignKeyName: "transport_legs_request_id_fkey"
             columns: ["request_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "public_requests"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "transport_legs_request_id_fkey"
             columns: ["request_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "transport_requests"
             referencedColumns: ["id"]
           },
@@ -1363,7 +1363,7 @@ export type Database = {
         Returns: undefined
       }
       confirm_receipt: {
-        Args: { p_note: string; p_outcome: string; p_request_id: string }
+        Args: { p_note: string; p_request_id: string }
         Returns: undefined
       }
       create_invitation: {
@@ -1420,10 +1420,6 @@ export type Database = {
         Returns: undefined
       }
       disablelongtransactions: { Args: never; Returns: string }
-      dispute_handover: {
-        Args: { p_assignment_id: string; p_description: string }
-        Returns: string
-      }
       dropgeometrycolumn:
         | {
             Args: {
@@ -1578,41 +1574,6 @@ export type Database = {
         Returns: boolean
       }
       is_verified_volunteer: { Args: { p_uid: string }; Returns: boolean }
-      leg_edit_guard: {
-        Args: { p_expected_version: number; p_request_id: string }
-        Returns: {
-          animal_name: string
-          cancel_reason: string | null
-          cancelled_at: string | null
-          carrier_requirements: string | null
-          completed_at: string | null
-          created_at: string
-          deadline: string | null
-          destination_location_id: string | null
-          handling_requirements: string | null
-          id: string
-          is_demo: boolean
-          org_id: string
-          origin_location_id: string | null
-          photo_path: string | null
-          published_at: string | null
-          reference: string
-          release_authority_attested_at: string | null
-          release_authority_attested_by: string | null
-          required_date: string | null
-          species: string
-          status: string
-          updated_at: string
-          urgency: string
-          version: number
-        }
-        SetofOptions: {
-          from: "*"
-          to: "transport_requests"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
       list_invitations: { Args: { p_org_id: string }; Returns: Json }
       list_joinable_organisations: { Args: never; Returns: Json }
       list_my_assignments: { Args: never; Returns: Json }
@@ -1626,7 +1587,6 @@ export type Database = {
       list_org_members: { Args: { p_org_id: string }; Returns: Json }
       list_org_requests: { Args: { p_org_id: string }; Returns: Json }
       list_public_suburbs: { Args: { p_query: string }; Returns: Json }
-      list_request_legs: { Args: { p_request_id: string }; Returns: Json }
       list_suburbs: { Args: { p_query: string }; Returns: Json }
       loc_check_text: {
         Args: {
@@ -1639,14 +1599,6 @@ export type Database = {
         Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
-      merge_legs: {
-        Args: {
-          p_expected_version: number
-          p_request_id: string
-          p_seq: number
-        }
-        Returns: number
-      }
       notify_coordinators: {
         Args: {
           p_exclude: string
@@ -1740,10 +1692,6 @@ export type Database = {
         }
         Returns: string
       }
-      refresh_progress_status: {
-        Args: { p_request_id: string }
-        Returns: undefined
-      }
       refresh_request_status: {
         Args: { p_request_id: string }
         Returns: undefined
@@ -1828,17 +1776,6 @@ export type Database = {
       set_request_photo: {
         Args: { p_path: string; p_request_id: string }
         Returns: undefined
-      }
-      split_leg: {
-        Args: {
-          p_expected_version: number
-          p_first_end: string
-          p_handover_location_id: string
-          p_request_id: string
-          p_second_start: string
-          p_seq: number
-        }
-        Returns: number
       }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
@@ -2424,17 +2361,6 @@ export type Database = {
       start_leg: { Args: { p_assignment_id: string }; Returns: undefined }
       sweep_expired_assignments: { Args: never; Returns: number }
       unlockrows: { Args: { "": string }; Returns: number }
-      update_leg: {
-        Args: {
-          p_expected_version: number
-          p_request_id: string
-          p_seq: number
-          p_to_location_id?: string
-          p_window_end: string
-          p_window_start: string
-        }
-        Returns: number
-      }
       update_location: {
         Args: {
           p_contact_name: string
@@ -2498,7 +2424,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      validate_leg_chain: { Args: { p_request_id: string }; Returns: undefined }
       withdraw: {
         Args: { p_assignment_id: string; p_reason: string }
         Returns: undefined

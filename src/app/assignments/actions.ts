@@ -40,16 +40,6 @@ export async function startLeg(_: ActionState, f: FormData) { return run("start_
 export async function confirmPickup(_: ActionState, f: FormData) { return run("confirm_pickup", f); }
 export async function confirmDelivery(_: ActionState, f: FormData) { return run("confirm_delivery", f); }
 
-export async function disputeHandover(_: ActionState, f: FormData): Promise<ActionState> {
-  const id = s(f, "assignment_id");
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("dispute_handover", { p_assignment_id: id, p_description: s(f, "text") });
-  if (error) return { error: requestError(error, "That didn't work. Please try again.") };
-  revalidatePath("/assignments");
-  revalidatePath(`/assignments/${id}`);
-  return { ok: true };
-}
-
 export async function reportIncident(_: ActionState, form: FormData): Promise<ActionState> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("report_incident", {

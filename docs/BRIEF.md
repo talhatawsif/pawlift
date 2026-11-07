@@ -16,7 +16,7 @@ This brief says **what** to build. `docs/PLAN.md` says **how** (architecture, pe
 - One checkpoint per session: plan mode → implement → verify → commit and push → update STATUS.md → report (≤200 words) → stop. Use `/clear` between sessions.
 - Make reasonable, reversible decisions and record them in PLAN.md §2. Ask only when blocked, when scope changes, or before an external or irreversible action. Never request secrets in chat.
 - Build working vertical slices. No broad refactors, speculative abstractions, unnecessary dependencies or deferred features. Never silently drop a requirement; if something can't fit the MVP, say so and offer the best practical alternative.
-- Tests proportionate to the change; always for permissions, state transitions, timing, claims, relays and regressions.
+- Tests proportionate to the change; always for permissions, state transitions, timing, claims and regressions.
 - Failure: isolate the smallest reproduction. After two failed fixes for the same failure, stop, record evidence, propose the next diagnostic.
 - Missing credentials → honest setup state or a clearly labelled DEMO adapter. Never fabricate tests, estimates or integrations.
 - No MCP servers, plugins or subagents unless the user asks.
@@ -27,7 +27,7 @@ PawLift connects rescue organisations, council pounds, shelters, existing transp
 
 **Central idea — incidental journey matching.** Someone driving St Albans → Geelong is shown that a cat at a pound in Melton needs to reach a rescue facility in Geelong, and that it fits their trip with a small detour: "A little detour could help save a cat. About 8 extra minutes." They can accept or ignore it. (Illustrative only — real figures come from configured routing or labelled DEMO fixtures.)
 
-PawLift also supports dedicated volunteers who make deliberate trips between pounds, shelters, rescues, vets and foster carers, and relay legs. One person can do any of these; never force exclusive driver categories.
+PawLift also supports dedicated volunteers who make deliberate trips between pounds, shelters, rescues, vets and foster carers. One person can do any of these; never force exclusive driver categories.
 
 **Principle:** find opportunities that fit people's journeys rather than requiring everyone to make special journeys.
 
@@ -37,7 +37,7 @@ PawLift is **not** an adoption site, social network, rideshare, pet-taxi marketp
 
 - Launch: Western Melbourne. Later: Victoria, then Australia.
 - Audience: rescue organisations, registered charities, independent groups, council pounds, shelters, transport coordinators, existing volunteers, foster carers, the public.
-- **Must work for organisations that already have volunteer networks:** bring existing volunteers on, organise requests, fill gaps, run relays — while they keep their current messaging tools. Complement, don't replace.
+- **Must work for organisations that already have volunteer networks:** bring existing volunteers on, organise requests, fill gaps — while they keep their current messaging tools. Complement, don't replace.
 - PawLift is a technology and coordination platform. It is not automatically a charity, rescue, shelter, pound or foster provider, and must not claim charitable or DGR status. It doesn't own or control partners' animals, volunteers, facilities or foster networks.
 - Free for community volunteers. Supports nonprofit and appropriately authorised commercial partners. Don't assume any organisation is a charity or has DGR status.
 - The organisation arranging a transfer is responsible for authorising release and confirming the destination. PawLift is not responsible for release, foster placement, medical decisions or rescue eligibility.
@@ -81,13 +81,13 @@ Gradients, glassmorphism, glowing or coloured shadows, emoji as icons, purple/in
 
 - Foster carers can be confirmed receiving destinations, authorised receiving contacts, transport volunteers, or several of these.
 - An authorised coordinator invites or links a foster carer; the approving organisation is recorded. Approval is the organisation's — PawLift never implies it registers or certifies foster carers.
-- Coordinators can designate an approved foster carer as a receiving contact or destination. The assigned volunteer receives delivery and handover instructions.
+- Coordinators can designate an approved foster carer as a receiving contact or destination. The assigned volunteer receives delivery instructions. An approved foster carer with the receipt right, or the coordinator, confirms the animal arrived.
 - Foster identities, addresses and contacts stay private; exact receiving address visible only to authorised coordinators and the confirmed volunteer for that leg. Never visible to unrelated organisations or volunteers.
 - Foster carers may confirm receipt when the organisation permits. They cannot publish requests without separate coordinator permissions.
 
 ## 7. Organisation portal and requests
 
-- Dashboard: register and submit for verification, invite and manage volunteers, view availability, create/edit requests, assign volunteers, monitor progress, manage cancellations, coordinate relays, view completed history. Requests still needing drivers are the most obvious thing on screen.
+- Dashboard: register and submit for verification, invite and manage volunteers, view availability, create/edit requests, assign volunteers, monitor progress, manage cancellations, view completed history. Requests still needing drivers are the most obvious thing on screen.
 - **Request form:** animal name or reference, type (cat, dog, other), optional photo, pickup location, destination, required date, pickup window, delivery deadline, urgency, special handling, carrier/restraint requirements, medical or mobility considerations, authorised contact instructions.
 - **Publishing requires:** a confirmed, authorised destination (receiving facility, rescue, vet or approved foster home); the organisation's recorded authority to release and transport the animal; transport requirements; a verified organisation account.
 - Exact private addresses are disclosed only to authorised people after assignment.
@@ -101,13 +101,11 @@ Gradients, glassmorphism, glowing or coloured shadows, emoji as icons, purple/in
 - Coordinators: monitor, confirm, reassign safely, cancel, confirm completion.
 - Every important action is audited.
 
-## 9. Multi-leg relays
+## 9. Relays: not in the MVP (PLAN D37)
 
-- One volunteer may cover only part of a trip, e.g. Melton pound → Sunshine → Footscray → Geelong rescue.
-- Coordinators split a request into ordered legs, each with pickup, drop-off, time window, assigned volunteer, confirmation status and handover confirmation. A normal transport is one leg.
-- Validate chronology and endpoint continuity. Record each handover's actors and time. Define who acknowledges transfers and how disagreements escalate (PLAN §7).
-- The parent completes only after all legs and handovers are complete. Reassignment or cancellation preserves history and flags downstream disruption.
-- A rescue coordinator must understand the relay screen without training.
+- No volunteer-to-volunteer handovers and no multi-driver relays. Animals are handed over by professionals at pickup, driven by one volunteer, and received by a professional or an approved foster carer at the destination.
+- Reason: animal welfare. A non-professional handover can strand an animal if a driver does not turn up.
+- Every request has exactly one leg (enforced in the database). The leg table is kept as the unit of assignment and progress. Final-destination receipt: PLAN §7. Relays could return after the MVP only with a new product decision.
 
 ## 10. Matching and maps
 
@@ -138,19 +136,19 @@ Match active, unclaimed requests or legs against private journeys, considering: 
 - Isolated demo environment with fictional organisations, people, animals, contacts and non-sensitive locations. Every fictional request marked **DEMO**. Never seed production by default. Never present demo approvals as real verification. Repeatable setup and reset. (Data set: PLAN §11.)
 - **Volunteer story:** open home → see nearby requests → enter a destination → see a route match → view extra travel time → accept → organisation confirms → confirm pickup → confirm delivery → completed request appears on the organisation dashboard.
 - **Organisation story:** organisation registers → admin approves → organisation invites existing volunteers → volunteers join → coordinator creates a request → selects a confirmed destination → request visible to suitable volunteers → volunteer accepts → coordinator confirms → volunteer completes → organisation records completion.
-- Also demonstrate an authorised foster carer receiving an animal and a separate multi-driver relay.
+- Also demonstrate an authorised foster carer receiving an animal.
 - The demo must show PawLift organising existing volunteer networks while adding new transport capacity.
 
 ## 14. Pages (share screens where sensible; not all equally prominent)
 
 - **Public:** Home, About, How it works, Transport safety, Sign in/registration, Terms and Privacy drafts.
 - **Volunteer:** Home (map), Nearby, Journey planner, Route matches, Request detail, My assignments, History, Profile and verification.
-- **Organisation:** Dashboard, Registration and verification, Create request, Manage requests, Request detail, Volunteer directory, Invitations, Assignments, Relay management, Foster carers and receiving contacts, Completed history, Settings.
+- **Organisation:** Dashboard, Registration and verification, Create request, Manage requests, Request detail, Volunteer directory, Invitations, Assignments, Foster carers and receiving contacts, Completed history, Settings.
 - **Admin:** Dashboard, Organisation verification, Volunteer verification, Request oversight, Incidents, Audit log.
 
 ## 15. Definition of success
 
-A volunteer can register and join an organisation. An organisation can invite existing volunteers and create and manage requests. A volunteer sees nearby requests, enters a destination, gets a suitable route match with an estimated detour, and accepts. The organisation confirms assignments, and existing volunteers receive dedicated assignments. A foster carer is associated with an approving organisation and receives an animal through an approved handover. Pickup and delivery are recorded. Multi-leg transport is coordinated. Admins verify organisations and volunteers. Sensitive information is protected. The full demo runs without live rescue data. Never declare success with a broken core flow.
+A volunteer can register and join an organisation. An organisation can invite existing volunteers and create and manage requests. A volunteer sees nearby requests, enters a destination, gets a suitable route match with an estimated detour, and accepts. The organisation confirms assignments, and existing volunteers receive dedicated assignments. A foster carer is associated with an approving organisation and receives an animal through an approved handover. Pickup and delivery are recorded. Admins verify organisations and volunteers. Sensitive information is protected. The full demo runs without live rescue data. Never declare success with a broken core flow.
 
 ## 16. Delivery
 

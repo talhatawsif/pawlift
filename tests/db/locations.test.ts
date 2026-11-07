@@ -134,11 +134,10 @@ describe("create/update location", () => {
     expect(l.suburb).toBe("Geelong");
   });
 
-  it("a handover point cannot be a destination; other orgs cannot edit", async () => {
-    const { data: hp } = await newLoc(coord, orgId, { p_kind: "handover_point", p_label_public: "Servo car park" });
-    expect((await rpc(coord, "confirm_destination", { p_location_id: hp, p_confirm: true })).error?.code).toBe("55000");
+  it("handover points are not a location kind; other orgs cannot edit", async () => {
+    expect((await newLoc(coord, orgId, { p_kind: "handover_point", p_label_public: "Servo car park" })).error?.code).toBe("22023");
     const r = await rpc(otherCoord, "update_location", {
-      p_location_id: hp, p_label_public: "Hijack", p_suburb_id: suburbA.id,
+      p_location_id: locId, p_label_public: "Hijack", p_suburb_id: suburbA.id,
       p_exact_address: "1 Evil Road", p_contact_name: "", p_contact_phone: "", p_instructions: "",
     });
     expect(r.error?.code).toBe("42501");

@@ -10,7 +10,7 @@ import { formatMelbourne } from "@/lib/org";
 import { urgencyLabel } from "@/lib/requests";
 import type { MemberItem } from "@/lib/membership";
 import {
-  CompleteForm, ConfirmButton, OfferForm, ReassignForm, ReceiptForms, ReleaseButton, ResolveForm, WithdrawOfferButton, type Volunteer,
+  CompleteForm, ConfirmButton, OfferForm, ReassignForm, ReleaseButton, ResolveForm, WithdrawOfferButton, type Volunteer,
 } from "@/components/DashboardActions";
 
 export const metadata = { title: "Dashboard · PawLift" };
@@ -35,7 +35,6 @@ function RowCard({ r, orgId, volunteers }: { r: OrgRow; orgId: string; volunteer
       </p>
       <p className="flex items-center gap-1 text-sm text-muted">{r.origin_suburb} <ArrowRight size={14} aria-hidden /> {r.destination_suburb}</p>
       <p className="text-sm text-muted">{windowLabel(r.window_start, r.window_end)} · {urgencyLabel(r.urgency)}</p>
-      {(!r.is_last_leg || r.seq > 1) && <p className="text-sm text-muted">Relay leg {r.seq}</p>}
       <p className="mt-1 text-sm">
         {r.volunteer_name ? <>Volunteer: <strong>{r.volunteer_name}</strong> · </> : null}
         {r.request_status === "completed" ? `Completed ${r.completed_at ? formatMelbourne(r.completed_at) : ""}` : legLabel(r.leg_status)}
@@ -53,7 +52,6 @@ function RowCard({ r, orgId, volunteers }: { r: OrgRow; orgId: string; volunteer
           <WithdrawOfferButton orgId={orgId} assignmentId={r.assignment_id} />
         )}
         {b === "confirmed" && r.assignment_id && <ReassignForm orgId={orgId} assignmentId={r.assignment_id} volunteers={volunteers} />}
-        {b === "to_complete" && r.receiver_outcome !== "ok" && <ReceiptForms orgId={orgId} requestId={r.request_id} />}
         {b === "to_complete" && <CompleteForm orgId={orgId} requestId={r.request_id} />}
         <Link href={`/org/${orgId}/audit?request=${r.request_id}`} className="text-sm font-medium text-brand underline">History for this request</Link>
       </div>

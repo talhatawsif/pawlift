@@ -49,7 +49,6 @@ export type RequestDetail = RequestSummary & {
   origin_label: string;
   destination_label: string;
   leg_status: string;
-  leg_count: number;
   version: number;
   is_demo: boolean;
   cancel_reason: string | null;
@@ -98,17 +97,3 @@ export function requestError(error: { code?: string; message?: string } | null |
     default: return fallback;
   }
 }
-
-export type LegRow = {
-  id: string;
-  seq: number;
-  status: string;
-  from_id: string;
-  from_label: string;
-  from_suburb: string;
-  to_id: string;
-  to_label: string;
-  to_suburb: string;
-  window_start: string;
-  window_end: string;
-};

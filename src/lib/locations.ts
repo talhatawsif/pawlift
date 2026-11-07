@@ -3,7 +3,6 @@ export const LOCATION_KINDS = [
   { value: "shelter", label: "Shelter" },
   { value: "rescue_facility", label: "Rescue facility" },
   { value: "vet", label: "Vet" },
-  { value: "handover_point", label: "Handover point" },
   { value: "other", label: "Other" },
 ] as const;
 

@@ -49,15 +49,13 @@ async function LocationsContent({ params }: { params: Promise<{ id: string }> })
                 {kindLabel(l.kind)} · {l.suburb} {l.postcode} ·{" "}
                 {l.is_confirmed_destination ? "Confirmed destination" : "Not confirmed"}
               </p>
-              {l.kind !== "handover_point" && (
-                <form action={confirmDestination} className="mt-2">
-                  <input type="hidden" name="org_id" value={id} />
-                  <input type="hidden" name="location_id" value={l.id} />
-                  <button name="confirm" value={l.is_confirmed_destination ? "false" : "true"} disabled={!verified && !l.is_confirmed_destination} className={btn}>
-                    {l.is_confirmed_destination ? "Remove confirmation" : "Confirm as destination"}
-                  </button>
-                </form>
-              )}
+              <form action={confirmDestination} className="mt-2">
+                <input type="hidden" name="org_id" value={id} />
+                <input type="hidden" name="location_id" value={l.id} />
+                <button name="confirm" value={l.is_confirmed_destination ? "false" : "true"} disabled={!verified && !l.is_confirmed_destination} className={btn}>
+                  {l.is_confirmed_destination ? "Remove confirmation" : "Confirm as destination"}
+                </button>
+              </form>
               {l.kind !== "foster_home" && (
                 <GeocodeButton action={geocodeLocation} orgId={id} locationId={l.id} />
               )}

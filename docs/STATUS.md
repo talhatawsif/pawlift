@@ -1,10 +1,10 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 5b done (handover flow). Batch 5 in progress.
+Updated: 2026-11-08 · Relays removed (D37). Batch 5 no longer exists. Batches 1–4 done.
 
 ## Current
-- Batches 1–4 DONE. Checkpoints 5a (leg editor) and 5b (handover flow) DONE.
-- Next: checkpoint **5c**.
+- Batches 1–4 DONE. Batch 5 (relays) removed by product decision D37; one leg per request, enforced in the database.
+- Next: checkpoint **6a**.
 
 ## Done
 - Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D34), data model, lifecycle, batch gates → `docs/PLAN.md`
@@ -18,19 +18,15 @@ Updated: 2026-11-08 · Checkpoint 5b done (handover flow). Batch 5 in progress.
 None.
 
 ## Exact next action
-Checkpoint **5c** (PLAN §12, §7): downstream disruption notices (`upstream_change`), reconfirmation on edits, parent completion rule (every leg delivered, all receipts confirmed, no unresolved dispute), splitting a collected leg via an incident. Plan mode first (touches RPCs). Relay matching is still one pickup → drop-off (D30).
+Checkpoint **6a** (PLAN §12, §10): notifications UI and preferences, pg_cron reminders and sweeps (assignment expiry, journey deletion). Plan mode first (touches database). There is no `upstream_change` notification any more.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM, so read all `main` elements. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
 
-## 5b summary
-- Implemented: migration `...000020` (`refresh_progress_status`, relay-aware `progress_lock_internal`/`start_leg`/`confirm_pickup`/`confirm_delivery`, new `dispute_handover` and `confirm_receipt`, `complete_request` insert-if-missing, `list_my_assignments`/`list_org_assignments`/`get_request_detail` extended); D36. UI: relay label and "I've received the animal" / "Something's not right" on `/assignments/[id]`; "Animal arrived safely" / "Something's not right" on the coordinator dashboard (last leg only). Types regenerated.
-- Tested: `npm run test:db` 220/220 (12 new in `tests/db/handover.test.ts`: two-driver relay, early pickup refused, dispute blocks and unblocks leg 2, completion blocked by dispute, receipt authorisation for coordinator/other org/foster with and without the right/wrong home, disputed receipt re-confirm, relay reads, claim screen shows next open leg); `npm test` 36/36; lint, typecheck, build pass.
-- Unverified: **relay and handover UI not exercised in a browser** (demo seed has no handover point); mobile layout and keyboard use; foster receipt has no UI (6b); `complete_request` still allowed without an explicit receipt (rule tightening is 5c); intermediate delivered legs now appear under "On the way" on the dashboard; relays are not matched leg by leg (D30); a request that has started (leg 1 en_route) is no longer `open`, so later unclaimed legs cannot be claimed after that.
-
-## 5a summary
-- Implemented: migration `...000019` (`validate_leg_chain`, `leg_edit_guard`, `split_leg`, `merge_legs`, `update_leg`, `list_request_legs`; `publish_request`, `update_request`, `get_request_for_coordinator` made multi-leg aware; `leg_count` added); D35 in PLAN. UI: "Legs" section on `/org/[id]/requests/[requestId]` via `src/components/LegEditor.tsx`, actions `splitLeg`/`mergeLegs`/`updateLeg` in `src/app/org/[id]/requests/actions.ts`. Types regenerated.
-- Tested: `npm run test:db` 208/208 (17 new in `tests/db/legs.test.ts`: split/merge round trip, renumbering, 5-leg cap, handover-kind and cross-org rejection, chronology, deadline, access denial, stale version, blocked once a leg is not open, audit rows, relay publish, `update_request` refusal); `npm test` 36/36; lint, typecheck, build pass.
-- Unverified: **the Legs UI was not exercised in a browser** (demo seed has no handover points; add one on the locations page first); mobile layout and keyboard use; `update_request` compares the first leg's window exactly, so a relay seeded with sub-minute times would need the leg editor; relay requests are not matched leg by leg (D30); relays cannot yet be driven (5b).
+## Relays removed (D37)
+- Reverted the code, UI and tests of commits `8607d29` (5a leg editor) and `20eeb1c` (5b handovers) with `git revert --no-commit`; migrations `...000019` and `...000020` stay in the repo because they were applied, and migration `...000021_single_leg.sql` undoes them. Removed files: `src/components/LegEditor.tsx`, `tests/db/legs.test.ts`, `tests/db/handover.test.ts`; split/merge/update-leg actions, the Legs section, `dispute_handover` and relay/handover UI and fields.
+- Database: `transport_legs` has `unique (request_id)` and `check (seq = 1)`; dropped `split_leg`, `merge_legs`, `update_leg`, `list_request_legs`, `validate_leg_chain`, `leg_edit_guard`, `dispute_handover`, `refresh_progress_status`; single-leg bodies restored for publish/update/progress/read RPCs; `handover_point` location kind, `handover_dispute` incident type and disputed confirmations removed. Kept `confirm_receipt(request, note)` (foster carer with receipt right at the destination, or owning coordinator on behalf); `complete_request` records receipt if missing. No new incident rules.
+- Tested: `npm run test:db` 199/199 (new `tests/db/single-leg.test.ts`: second leg refused by the database, removed RPCs gone, `handover_point` rejected, receipt authorisation); `npm test` 36/36; lint, typecheck, build pass.
+- Unverified: no browser check (the only UI change is removal); `confirm_receipt` has no screen yet (foster receiving workflow is 6b; coordinators use "mark complete"); relay-era demo seed rows do not exist.
 
 ## 4c summary
 - Implemented: migrations `...000015` (RPCs `start_leg`, `confirm_pickup`, `confirm_delivery`, `complete_request`, `report_incident`, `resolve_incident`, `get_leg_private_details`, `list_my_assignments`, `get_request_detail`, `list_org_assignments`, `list_org_incidents`, `list_org_audit`), `...000016` (audit by request matches leg events), `...000017` (claims allowed until `window_end`, D34), `...000018` (private details left-join `request_private`); D33, D34 in PLAN. Pages: `/requests/[id]` (claim, idempotency key), `/assignments`, `/assignments/[id]` (private details, nav links, start/pickup/delivery/withdraw/report), `/org/[id]/dashboard` (needs-a-driver first; confirm, turn down, offer, withdraw offer, reassign, complete, resolve incident), `/org/[id]/audit`. Links from the map detail panel, route matches, account menu, org page. `scripts/demo-reset.mjs` now seeds contacts and `request_private` and clears audit rows.
