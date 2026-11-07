@@ -1,10 +1,10 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Relays removed (D37). Batch 5 no longer exists. Batches 1–4 done.
+Updated: 2026-11-08 · Checkpoint 6a done (notifications). Batch 6 in progress.
 
 ## Current
-- Batches 1–4 DONE. Batch 5 (relays) removed by product decision D37; one leg per request, enforced in the database.
-- Next: checkpoint **6a**.
+- Batches 1–4 DONE. Batch 5 removed (D37, one leg per request). Checkpoint 6a DONE.
+- Next: checkpoint **6b**.
 
 ## Done
 - Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D34), data model, lifecycle, batch gates → `docs/PLAN.md`
@@ -18,9 +18,14 @@ Updated: 2026-11-08 · Relays removed (D37). Batch 5 no longer exists. Batches 1
 None.
 
 ## Exact next action
-Checkpoint **6a** (PLAN §12, §10): notifications UI and preferences, pg_cron reminders and sweeps (assignment expiry, journey deletion). Plan mode first (touches database). There is no `upstream_change` notification any more.
+Checkpoint **6b** (PLAN §12, §8): foster receiving workflow (a foster carer sees incoming deliveries and uses `confirm_receipt`, which has no screen yet), transport history, org settings, admin oversight (incidents, audit log, logged private access). Plan mode first (database and permissions). Saved journeys with `nearby_request` / `route_match` notifications are not built; schedule as its own checkpoint.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM, so read all `main` elements. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## 6a summary
+- Implemented: migration `...000022` (inbox RPCs, reminder preference, `send_assignment_reminders`, `delete_expired_journeys`, pg_cron enabled and three jobs scheduled); D38. UI: `/notifications` (inbox, mark read, reminder toggle), unread count and dot in the account menu. Types regenerated.
+- Tested: `npm run test:db` 207/207 (8 new in `tests/db/notifications.test.ts`: recipient isolation, mark read, suspended user, preferences, reminder timing with a fixed clock, dedupe, opt-out, cleanup, scheduled functions not callable by clients); `npm test` 36/36; lint, typecheck, build pass. Browser (Sam, DEMO): two temporary rows showed in the inbox, the account menu showed 2 unread, "Mark all as read" cleared it; rows removed afterwards.
+- Unverified: **cron jobs not observed running** (the CLI refused a read of `cron.job` without consent; the migration applied without error); inbox links for each notification type; mobile layout and keyboard use; Priya's side (volunteer notifications) not clicked through.
 
 ## Relays removed (D37)
 - Reverted the code, UI and tests of commits `8607d29` (5a leg editor) and `20eeb1c` (5b handovers) with `git revert --no-commit`; migrations `...000019` and `...000020` stay in the repo because they were applied, and migration `...000021_single_leg.sql` undoes them. Removed files: `src/components/LegEditor.tsx`, `tests/db/legs.test.ts`, `tests/db/handover.test.ts`; split/merge/update-leg actions, the Legs section, `dispute_handover` and relay/handover UI and fields.

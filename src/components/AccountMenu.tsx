@@ -5,6 +5,7 @@ import { signOut } from "@/app/auth/actions";
 import { getMyContext, roleLabels } from "@/lib/session";
 import { DemoSwitcher } from "@/components/DemoSwitcher";
 import { isDemoEnv } from "@/lib/demo/personas";
+import { createClient } from "@/lib/supabase/server";
 
 /** Account control for the shell: sign-in link when signed out, role-aware menu when signed in. */
 export async function AccountMenu({
@@ -16,6 +17,12 @@ export async function AccountMenu({
   const { demo: demoNotice } = await searchParams;
   const ctx = await getMyContext();
   const demo = isDemoEnv();
+  let unread = 0;
+  if (ctx) {
+    const supabase = await createClient();
+    const { data } = await supabase.rpc("count_my_unread_notifications");
+    unread = typeof data === "number" ? data : 0;
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -31,9 +38,15 @@ export async function AccountMenu({
         <details className="relative">
           <summary
             aria-label="Account menu"
-            className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-border bg-background"
+            className="relative flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-border bg-background"
           >
             <User size={18} aria-hidden />
+            {unread > 0 && (
+              <>
+                <span aria-hidden className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-background bg-brand" />
+                <span className="sr-only"> {unread} unread notifications</span>
+              </>
+            )}
           </summary>
           <div className="absolute right-0 top-11 z-30 w-64 rounded-xl border border-border bg-surface p-3 text-sm shadow-md">
             <p className="font-semibold">{ctx.display_name ?? "Your account"}</p>
@@ -59,6 +72,11 @@ export async function AccountMenu({
                     </Link>
                   </li>
                 ))}
+              <li>
+                <Link href="/notifications" className="flex h-10 items-center font-medium">
+                  Notifications{unread > 0 && <span className="ml-2 rounded-full bg-brand px-2 text-xs font-semibold text-brand-foreground">{unread > 99 ? "99+" : unread}</span>}
+                </Link>
+              </li>
               <li>
                 <Link href="/assignments" className="flex h-10 items-center font-medium">
                   My assignments

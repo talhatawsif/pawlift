@@ -1366,6 +1366,7 @@ export type Database = {
         Args: { p_note: string; p_request_id: string }
         Returns: undefined
       }
+      count_my_unread_notifications: { Args: never; Returns: number }
       create_invitation: {
         Args: {
           p_email: string
@@ -1419,6 +1420,7 @@ export type Database = {
         Args: { p_assignment_id: string; p_reason: string }
         Returns: undefined
       }
+      delete_expired_journeys: { Args: { p_now?: string }; Returns: number }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
         | {
@@ -1554,6 +1556,7 @@ export type Database = {
       get_leg_private_details: { Args: { p_leg_id: string }; Returns: Json }
       get_my_context: { Args: never; Returns: Json }
       get_my_foster_homes: { Args: never; Returns: Json }
+      get_my_notification_preferences: { Args: never; Returns: Json }
       get_my_volunteer_profile: { Args: never; Returns: Json }
       get_org_for_coordinator: { Args: { p_org_id: string }; Returns: Json }
       get_request_detail: { Args: { p_request_id: string }; Returns: Json }
@@ -1577,6 +1580,7 @@ export type Database = {
       list_invitations: { Args: { p_org_id: string }; Returns: Json }
       list_joinable_organisations: { Args: never; Returns: Json }
       list_my_assignments: { Args: never; Returns: Json }
+      list_my_notifications: { Args: { p_limit?: number }; Returns: Json }
       list_org_assignments: { Args: { p_org_id: string }; Returns: Json }
       list_org_audit: {
         Args: { p_limit?: number; p_org_id: string; p_request_id?: string }
@@ -1599,6 +1603,7 @@ export type Database = {
         Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
       notify_coordinators: {
         Args: {
           p_exclude: string
@@ -1761,6 +1766,7 @@ export type Database = {
         Args: { p_invitation_id: string }
         Returns: undefined
       }
+      send_assignment_reminders: { Args: { p_now?: string }; Returns: number }
       set_foster_status: {
         Args: {
           p_can_confirm_receipt: boolean
@@ -1771,6 +1777,10 @@ export type Database = {
       }
       set_location_exact_point: {
         Args: { p_lat: number; p_lng: number; p_location_id: string }
+        Returns: undefined
+      }
+      set_my_notification_preferences: {
+        Args: { p_reminders_enabled: boolean }
         Returns: undefined
       }
       set_request_photo: {
