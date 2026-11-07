@@ -29,6 +29,8 @@ export type RequestSummary = {
   photo_path: string | null;
   origin_suburb: string;
   destination_suburb: string;
+  origin_lat: number | null;
+  origin_lng: number | null;
   window_start: string;
   window_end: string;
   created_at: string;
@@ -69,6 +71,8 @@ export type PublicRequest = {
   origin_suburb: string;
   destination_label: string;
   destination_suburb: string;
+  origin_lat: number | null;
+  origin_lng: number | null;
   window_start: string | null;
   window_end: string | null;
 };

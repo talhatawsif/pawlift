@@ -1535,6 +1535,7 @@ export type Database = {
       list_org_locations: { Args: { p_org_id: string }; Returns: Json }
       list_org_members: { Args: { p_org_id: string }; Returns: Json }
       list_org_requests: { Args: { p_org_id: string }; Returns: Json }
+      list_public_suburbs: { Args: { p_query: string }; Returns: Json }
       list_suburbs: { Args: { p_query: string }; Returns: Json }
       loc_check_text: {
         Args: {

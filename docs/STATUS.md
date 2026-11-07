@@ -1,6 +1,6 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 2d done (Batch 2 complete).
+Updated: 2026-11-08 · Checkpoint 3a done.
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
@@ -11,7 +11,8 @@ Updated: 2026-11-08 · Checkpoint 2d done (Batch 2 complete).
 - Checkpoint **2b** DONE (invitations, join flow, membership requests, volunteer profile, guidelines, admin volunteer verification).
 - Checkpoint **2c** DONE (locations, confirmed destinations, foster approval and foster home).
 - Checkpoint **2d** DONE (requests, photo sanitising, publish guards, public listing).
-- Next: Batch 3, checkpoint **3a** (map home, bottom sheet, nearby ordering).
+- Checkpoint **3a** DONE (map home, bottom sheet, nearby ordering, location explainer, suburb fallback).
+- Next: Batch 3, checkpoint **3b** (routing adapter, cache, geocoding).
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -26,9 +27,14 @@ Updated: 2026-11-08 · Checkpoint 2d done (Batch 2 complete).
 None.
 
 ## Exact next action
-Batch 3, checkpoint 3a (PLAN §12): map home, bottom sheet, nearby ordering, location explainer + manual suburb fallback, "Showing Western Melbourne" state. Read `/requests` (`src/app/requests/page.tsx`) and `public_requests` for the data. The demo seed/`demo:reset` is still not written; do it before demo-dependent work (3c at the latest).
+Batch 3, checkpoint 3b (PLAN §12 and §9): routing adapter (`ors`, `demo`), cache, honest setup/error states; coordinator address geocoding. No ORS key exists yet, so everything must be labelled DEMO and nothing may claim to be live. The demo seed/`demo:reset` is still not written; do it before 3c at the latest (3c gate needs St Albans → Geelong with Biscuit labelled DEMO).
 
-Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>`; see `src/app/org/[id]/page.tsx`. Browser pane must be *shown* (`show_pane preview`) or Suspense pages stay on "Loading…". Generated RPC types make nullable args non-null; cast at the call site.
+Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>`; see `src/app/page.tsx`. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server (use static SVG, see `MapView.tsx`). Dev server often already runs on :3000.
+
+## 3a summary
+- Implemented: migration `...000009_public_suburbs.sql` (`list_public_suburbs`, anon-callable); `src/lib/geo/distance.ts`; `HomeClient`, `BottomSheet` (peek/half/full, drag + keyboard), `RequestCard`, `LocationExplainer`, `SearchCard` (origin chip), `MapView` (paw pins, selected enlarges, urgent amber), `src/app/suburbs/actions.ts`; D28 in PLAN. Home reads `public_requests`.
+- Tested: `npm run test:db` 124/124 (3 new in `tests/db/suburbs.test.ts`); `npm test` 7/7 (3 new distance); lint, typecheck, build pass. Browser (real pawlift-dev, 3 throwaway published requests, since deleted): list and pins render, suburb picker works signed out, choosing Williamstown re-sorts nearest-first and flies the map, card opens detail in the sheet.
+- Unverified: real browser geolocation grant/deny (only the suburb path was run); pin click → card; sheet drag gesture and keyboard arrows; desktop layout (sheet is max-w-md, not the left-panel layout); focus trap in the explainer; suburb centroids are approximate; destination field and search button are disabled until 3c.
 
 ## 2d summary
 - Implemented: migrations `...000007_requests.sql` (RPCs `create_request`, `update_request`, `set_request_photo`, `publish_request`, `cancel_request`, `get_request_for_coordinator`, `list_org_requests`; storage buckets and policies; `public_requests` demo isolation) and `...000008` (conflict code); `src/lib/requests.ts`, `src/lib/time/melbourne.ts`; pages `/org/[id]/requests[/new|/id]`, public `/requests`; `RequestForm`, `RequestActions`; sharp photo pipeline; D26, D27 in PLAN.
@@ -51,18 +57,3 @@ Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Con
 - Tested: `npm run test:db` 63/63 (10 new: registration, cap, suspended, admin-only, guards, transitions, immutability, resubmission). lint, typecheck, `npm test` 2/2, build pass. Browser (real pawlift-dev, throwaway users, since deleted): register → pending page; non-admin gets 404 on `/admin`; admin rejects (empty reason refused, then with reason); coordinator sees reason, resubmits, status returns to pending.
 - Unverified: admin "Verify" and suspend/reinstate buttons in the browser (covered by db tests only); mobile layout; keyboard navigation; `suburbs` read policy still not needed.
 - `.claude/launch.json` (dev server config) and `AGENTS.md` left untracked.
-
-## 1d summary
-- Implemented: `vitest.db.config.ts`, `tests/db/helpers.ts` (refuses unless project ref is in `DEMO_PROJECT_REFS`; creates/cleans up throwaway users and orgs), `tests/db/rls.test.ts`, `tests/unit/no-service-role-in-src.test.ts`, script `test:db`.
-- Tested: `npm run test:db` 53/53 pass against pawlift-dev (anon and signed-in users denied select/insert/update/delete on all 21 tables; no self-grant of admin, coordinator, org verification, volunteer verification or account status; `get_my_context` isolates orgs; `public_requests` readable, private columns absent). `npm test` 2/2, lint, typecheck, build pass. Cleanup verified (0 leftover test users/orgs).
-- Unverified: positive-path RLS (no policies exist yet); the `public_requests` private-column check probes a few guessed names and a `select *` only (no rows seeded).
-
-## 1c summary
-- Implemented: migration `...000003` (profile trigger, `get_my_context()` RPC), `@supabase/ssr` clients (`src/lib/supabase/server.ts`, `src/proxy.ts`), sign-in/sign-up pages and actions (`src/app/auth/actions.ts`), `AccountMenu` (role labels from memberships, sign out), `DemoSwitcher` (server-checked `APP_ENV=demo`).
-- Tested: lint, typecheck, test, build pass. Sign-in with a service-role-created confirmed user worked in the browser; trigger created the profile (`is_demo=false`); sign-out works; switcher absent with `APP_ENV=production`, present with `demo`; persona click redirects with a "not seeded" notice. Test user deleted.
-- Unverified: sign-up end to end (Confirm email is on, no email read); persona sign-in (demo users arrive with the seed); role menu with real memberships; mobile layout. Menu has no links to `/org` or `/admin` yet (routes don't exist).
-- Untracked `AGENTS.md` (appeared from a package install) left uncommitted.
-
-## Last session log
-- 1a: scaffolded via create-next-app (in scratchpad, copied in), added maplibre-gl, lucide-react, vitest (D17). Ran lint/typecheck/test/build: all pass.
-- 1b (partial): wrote `supabase/migrations/20261108000001_core_tables.sql` (all §3 tables + `suburbs`, RLS enabled and all grants revoked, no policies) and `...000002_public_requests_view.sql`. `db push --remote` clean; dry-run shows up to date; anon REST gets 42501 on profiles/location_private/audit_logs, `public_requests` returns []. typecheck/lint/test/build pass. Dated placeholders; `suburbs` table added (PLAN §3 references suburb_id but doesn't list it) — add to PLAN once confirmed.
