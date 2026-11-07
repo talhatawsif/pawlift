@@ -5,7 +5,8 @@ import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getMyContext } from "@/lib/session";
 import type { OrgLocation } from "@/lib/locations";
-import { publicPhotoUrl, statusLabel, type RequestDetail } from "@/lib/requests";
+import { publicPhotoUrl, statusLabel, type LegRow, type RequestDetail } from "@/lib/requests";
+import { LegEditor } from "@/components/LegEditor";
 import { RequestForm } from "@/components/RequestForm";
 import { CancelForm, PhotoForm, PublishForm } from "@/components/RequestActions";
 import { removePhoto, updateRequest } from "../actions";
@@ -26,7 +27,13 @@ async function RequestContent({ params }: { params: Promise<{ id: string; reques
   const r = data as unknown as RequestDetail;
   if (r.org_id !== id) notFound();
   const locations = (locData ?? []) as unknown as OrgLocation[];
-  const editable = (r.status === "draft" || r.status === "open") && r.leg_status === "open";
+  const { data: legData } = await supabase.rpc("list_request_legs", { p_request_id: requestId });
+  const legs = (legData ?? []) as unknown as LegRow[];
+  const allOpen = legs.length > 0 && legs.every((g) => g.status === "open");
+  const editable = (r.status === "draft" || r.status === "open") && allOpen;
+  const handovers = locations
+    .filter((l) => l.kind === "handover_point")
+    .map((l) => ({ id: l.id, label: l.label_public, suburb: l.suburb }));
 
   let photoUrl: string | null = null;
   if (r.photo_path) {
@@ -71,6 +78,12 @@ async function RequestContent({ params }: { params: Promise<{ id: string; reques
         <p className="text-sm text-muted">{r.origin_label} ({r.origin_suburb}) to {r.destination_label} ({r.destination_suburb}). This request can no longer be edited here.</p>
       )}
 
+      <h2 className="mb-2 mt-8 text-lg font-semibold">Legs</h2>
+      {r.leg_count > 1 && editable && (
+        <p className="mb-2 text-sm text-muted">Pickup, destination and the first leg&apos;s times above are managed here for relays.</p>
+      )}
+      <LegEditor orgId={id} requestId={r.id} version={r.version} legs={legs} handovers={handovers} editable={editable} />
+
       {r.status === "draft" && (
         <>
           <h2 className="mb-2 mt-8 text-lg font-semibold">Photo</h2>
@@ -80,7 +93,7 @@ async function RequestContent({ params }: { params: Promise<{ id: string; reques
           <PublishForm orgId={id} requestId={r.id} />
         </>
       )}
-      {(r.status === "draft" || r.status === "open") && r.leg_status === "open" && (
+      {editable && (
         <>
           <h2 className="mb-2 mt-8 text-lg font-semibold">Cancel</h2>
           <CancelForm orgId={id} requestId={r.id} needsReason={r.status === "open"} />

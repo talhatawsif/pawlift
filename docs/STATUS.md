@@ -1,10 +1,10 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 4c done. Batch 4 gate met (demo milestone).
+Updated: 2026-11-08 · Checkpoint 5a done (leg editor). Batch 5 in progress.
 
 ## Current
-- Batches 1–3 DONE (foundation, supply, journeys). Checkpoints 4a, 4b, 4c DONE (claim, offers, progress, UI).
-- Next: checkpoint **5a** (leg editor). Then 5b must be started manually in plan mode with the full checkpoint prompt.
+- Batches 1–4 DONE. Checkpoint 5a DONE (leg editor).
+- Next: checkpoint **5b** (handover flow). It must be started manually in plan mode with the full checkpoint prompt.
 
 ## Done
 - Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D34), data model, lifecycle, batch gates → `docs/PLAN.md`
@@ -18,9 +18,14 @@ Updated: 2026-11-08 · Checkpoint 4c done. Batch 4 gate met (demo milestone).
 None.
 
 ## Exact next action
-Checkpoint **5a** (PLAN §12): leg editor (split/merge, handover points, chronology and continuity validation, PLAN §7). Needs a plan first (database work). Gate for Batch 5 is in PLAN §12. `confirm_pickup`/`confirm_delivery` and `progress_lock_internal` currently refuse requests with more than one non-cancelled leg ("Multi-driver relays are not available yet"); 5b replaces that.
+Checkpoint **5b** (PLAN §12, §7): handover flow, receipt confirmation, dispute → incident. Start manually in plan mode. `confirm_pickup`/`confirm_delivery` and `progress_lock_internal` still refuse requests with more than one non-cancelled leg ("Multi-driver relays are not available yet"); 5b replaces that. Volunteer claim/matching of multi-leg requests (matcher treats a relay as one pickup → drop-off, D30) also needs a look.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM, so read all `main` elements. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## 5a summary
+- Implemented: migration `...000019` (`validate_leg_chain`, `leg_edit_guard`, `split_leg`, `merge_legs`, `update_leg`, `list_request_legs`; `publish_request`, `update_request`, `get_request_for_coordinator` made multi-leg aware; `leg_count` added); D35 in PLAN. UI: "Legs" section on `/org/[id]/requests/[requestId]` via `src/components/LegEditor.tsx`, actions `splitLeg`/`mergeLegs`/`updateLeg` in `src/app/org/[id]/requests/actions.ts`. Types regenerated.
+- Tested: `npm run test:db` 208/208 (17 new in `tests/db/legs.test.ts`: split/merge round trip, renumbering, 5-leg cap, handover-kind and cross-org rejection, chronology, deadline, access denial, stale version, blocked once a leg is not open, audit rows, relay publish, `update_request` refusal); `npm test` 36/36; lint, typecheck, build pass.
+- Unverified: **the Legs UI was not exercised in a browser** (demo seed has no handover points; add one on the locations page first); mobile layout and keyboard use; `update_request` compares the first leg's window exactly, so a relay seeded with sub-minute times would need the leg editor; relay requests are not matched leg by leg (D30); relays cannot yet be driven (5b).
 
 ## 4c summary
 - Implemented: migrations `...000015` (RPCs `start_leg`, `confirm_pickup`, `confirm_delivery`, `complete_request`, `report_incident`, `resolve_incident`, `get_leg_private_details`, `list_my_assignments`, `get_request_detail`, `list_org_assignments`, `list_org_incidents`, `list_org_audit`), `...000016` (audit by request matches leg events), `...000017` (claims allowed until `window_end`, D34), `...000018` (private details left-join `request_private`); D33, D34 in PLAN. Pages: `/requests/[id]` (claim, idempotency key), `/assignments`, `/assignments/[id]` (private details, nav links, start/pickup/delivery/withdraw/report), `/org/[id]/dashboard` (needs-a-driver first; confirm, turn down, offer, withdraw offer, reassign, complete, resolve incident), `/org/[id]/audit`. Links from the map detail panel, route matches, account menu, org page. `scripts/demo-reset.mjs` now seeds contacts and `request_private` and clears audit rows.
