@@ -53,6 +53,14 @@ export async function completeRequest(_: DashState, f: FormData): Promise<DashSt
   return finish(error, s(f, "org_id"));
 }
 
+export async function confirmReceipt(_: DashState, f: FormData): Promise<DashState> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("confirm_receipt", {
+    p_request_id: s(f, "request_id"), p_outcome: s(f, "outcome"), p_note: s(f, "text"),
+  });
+  return finish(error, s(f, "org_id"));
+}
+
 export async function resolveIncident(_: DashState, f: FormData): Promise<DashState> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("resolve_incident", { p_incident_id: s(f, "incident_id"), p_resolution: s(f, "text") });

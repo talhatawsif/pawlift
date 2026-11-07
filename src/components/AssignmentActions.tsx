@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import {
-  acceptOffer, confirmDelivery, confirmPickup, declineOffer, releaseAssignment, reportIncident,
+  acceptOffer, confirmDelivery, confirmPickup, declineOffer, disputeHandover, releaseAssignment, reportIncident,
   startLeg, withdrawAssignment, type ActionState,
 } from "@/app/assignments/actions";
 import { INCIDENT_TYPES } from "@/lib/assignments";
@@ -42,7 +42,9 @@ function One({ id, cfg }: { id: string; cfg: Cfg }) {
 }
 
 /** The actions that make sense for the assignment and leg state; the database re-checks every one. */
-export function AssignmentActions({ id, status, legStatus }: { id: string; status: string; legStatus: string }) {
+export function AssignmentActions({
+  id, status, legStatus, seq = 1, previousLegStatus = null, handoverBlocked = false,
+}: { id: string; status: string; legStatus: string; seq?: number; previousLegStatus?: string | null; handoverBlocked?: boolean }) {
   if (status === "offered") {
     return (
       <div className="flex flex-col gap-4">
@@ -55,10 +57,23 @@ export function AssignmentActions({ id, status, legStatus }: { id: string; statu
     return <One id={id} cfg={{ action: releaseAssignment, label: "Let someone else take it", style: "secondary", field: { label: "Reason (optional)" } }} />;
   }
   if (status !== "confirmed") return null;
+  const isHandover = seq > 1 && previousLegStatus !== null;
+  const waitingForGiver = legStatus === "en_route" && isHandover && previousLegStatus !== "delivered";
   return (
     <div className="flex flex-col gap-4">
+      {handoverBlocked && (
+        <p role="alert" className="rounded-xl border border-danger p-3 text-sm">A handover is being reviewed by the coordinator. Wait for them to get in touch before you collect the animal.</p>
+      )}
+      {waitingForGiver && (
+        <p role="status" className="rounded-xl border border-border p-3 text-sm">Waiting for the previous driver to hand the animal over.</p>
+      )}
       {legStatus === "confirmed" && <One id={id} cfg={{ action: startLeg, label: "Start trip" }} />}
-      {legStatus === "en_route" && <One id={id} cfg={{ action: confirmPickup, label: "I've collected the animal", field: { label: "Note (optional)" } }} />}
+      {legStatus === "en_route" && !waitingForGiver && !handoverBlocked && (
+        <One id={id} cfg={{ action: confirmPickup, label: isHandover ? "I've received the animal" : "I've collected the animal", field: { label: "Note (optional)" } }} />
+      )}
+      {legStatus === "en_route" && isHandover && !waitingForGiver && !handoverBlocked && (
+        <One id={id} cfg={{ action: disputeHandover, label: "Something's not right", style: "danger", field: { label: "What is not right? (required)", required: true } }} />
+      )}
       {legStatus === "collected" && <One id={id} cfg={{ action: confirmDelivery, label: "I've delivered the animal", field: { label: "Note (optional)" } }} />}
       {(legStatus === "confirmed" || legStatus === "en_route") && (
         <One id={id} cfg={{ action: withdrawAssignment, label: "Withdraw from this transport", style: "danger", field: { label: "Reason (required)", required: true } }} />

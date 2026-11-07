@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import {
-  completeRequest, confirmAssignment, offerLeg, reassignLeg, releaseReserved, resolveIncident, withdrawOffer,
+  completeRequest, confirmAssignment, confirmReceipt, offerLeg, reassignLeg, releaseReserved, resolveIncident, withdrawOffer,
   type DashState,
 } from "@/app/org/[id]/dashboard/actions";
 
@@ -69,6 +69,14 @@ export function ReassignForm({ orgId, assignmentId, volunteers }: { orgId: strin
 }
 export function CompleteForm({ orgId, requestId }: { orgId: string; requestId: string }) {
   return <Form orgId={orgId} action={completeRequest} label="Animal received: mark complete" hidden={{ request_id: requestId }} text={{ label: "Note (optional)" }} />;
+}
+export function ReceiptForms({ orgId, requestId }: { orgId: string; requestId: string }) {
+  return (
+    <>
+      <Form orgId={orgId} action={confirmReceipt} label="Animal arrived safely" hidden={{ request_id: requestId, outcome: "ok" }} text={{ label: "Note (optional)" }} />
+      <Form orgId={orgId} action={confirmReceipt} label="Something's not right" style="secondary" hidden={{ request_id: requestId, outcome: "disputed" }} text={{ label: "What is not right? (required)", required: true }} />
+    </>
+  );
 }
 export function ResolveForm({ orgId, incidentId }: { orgId: string; incidentId: string }) {
   return <Form orgId={orgId} action={resolveIncident} label="Mark resolved" style="secondary" hidden={{ incident_id: incidentId }} text={{ label: "How was it resolved?", required: true }} />;

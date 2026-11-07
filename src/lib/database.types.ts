@@ -1362,6 +1362,10 @@ export type Database = {
         Args: { p_assignment_id: string; p_note: string }
         Returns: undefined
       }
+      confirm_receipt: {
+        Args: { p_note: string; p_outcome: string; p_request_id: string }
+        Returns: undefined
+      }
       create_invitation: {
         Args: {
           p_email: string
@@ -1416,6 +1420,10 @@ export type Database = {
         Returns: undefined
       }
       disablelongtransactions: { Args: never; Returns: string }
+      dispute_handover: {
+        Args: { p_assignment_id: string; p_description: string }
+        Returns: string
+      }
       dropgeometrycolumn:
         | {
             Args: {
@@ -1731,6 +1739,10 @@ export type Database = {
           p_reason: string
         }
         Returns: string
+      }
+      refresh_progress_status: {
+        Args: { p_request_id: string }
+        Returns: undefined
       }
       refresh_request_status: {
         Args: { p_request_id: string }

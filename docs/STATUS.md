@@ -1,10 +1,10 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 5a done (leg editor). Batch 5 in progress.
+Updated: 2026-11-08 · Checkpoint 5b done (handover flow). Batch 5 in progress.
 
 ## Current
-- Batches 1–4 DONE. Checkpoint 5a DONE (leg editor).
-- Next: checkpoint **5b** (handover flow). It must be started manually in plan mode with the full checkpoint prompt.
+- Batches 1–4 DONE. Checkpoints 5a (leg editor) and 5b (handover flow) DONE.
+- Next: checkpoint **5c**.
 
 ## Done
 - Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D34), data model, lifecycle, batch gates → `docs/PLAN.md`
@@ -18,9 +18,14 @@ Updated: 2026-11-08 · Checkpoint 5a done (leg editor). Batch 5 in progress.
 None.
 
 ## Exact next action
-Checkpoint **5b** (PLAN §12, §7): handover flow, receipt confirmation, dispute → incident. Start manually in plan mode. `confirm_pickup`/`confirm_delivery` and `progress_lock_internal` still refuse requests with more than one non-cancelled leg ("Multi-driver relays are not available yet"); 5b replaces that. Volunteer claim/matching of multi-leg requests (matcher treats a relay as one pickup → drop-off, D30) also needs a look.
+Checkpoint **5c** (PLAN §12, §7): downstream disruption notices (`upstream_change`), reconfirmation on edits, parent completion rule (every leg delivered, all receipts confirmed, no unresolved dispute), splitting a collected leg via an incident. Plan mode first (touches RPCs). Relay matching is still one pickup → drop-off (D30).
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM, so read all `main` elements. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## 5b summary
+- Implemented: migration `...000020` (`refresh_progress_status`, relay-aware `progress_lock_internal`/`start_leg`/`confirm_pickup`/`confirm_delivery`, new `dispute_handover` and `confirm_receipt`, `complete_request` insert-if-missing, `list_my_assignments`/`list_org_assignments`/`get_request_detail` extended); D36. UI: relay label and "I've received the animal" / "Something's not right" on `/assignments/[id]`; "Animal arrived safely" / "Something's not right" on the coordinator dashboard (last leg only). Types regenerated.
+- Tested: `npm run test:db` 220/220 (12 new in `tests/db/handover.test.ts`: two-driver relay, early pickup refused, dispute blocks and unblocks leg 2, completion blocked by dispute, receipt authorisation for coordinator/other org/foster with and without the right/wrong home, disputed receipt re-confirm, relay reads, claim screen shows next open leg); `npm test` 36/36; lint, typecheck, build pass.
+- Unverified: **relay and handover UI not exercised in a browser** (demo seed has no handover point); mobile layout and keyboard use; foster receipt has no UI (6b); `complete_request` still allowed without an explicit receipt (rule tightening is 5c); intermediate delivered legs now appear under "On the way" on the dashboard; relays are not matched leg by leg (D30); a request that has started (leg 1 en_route) is no longer `open`, so later unclaimed legs cannot be claimed after that.
 
 ## 5a summary
 - Implemented: migration `...000019` (`validate_leg_chain`, `leg_edit_guard`, `split_leg`, `merge_legs`, `update_leg`, `list_request_legs`; `publish_request`, `update_request`, `get_request_for_coordinator` made multi-leg aware; `leg_count` added); D35 in PLAN. UI: "Legs" section on `/org/[id]/requests/[requestId]` via `src/components/LegEditor.tsx`, actions `splitLeg`/`mergeLegs`/`updateLeg` in `src/app/org/[id]/requests/actions.ts`. Types regenerated.

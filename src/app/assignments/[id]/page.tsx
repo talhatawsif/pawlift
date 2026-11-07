@@ -71,6 +71,7 @@ async function Content({ params, searchParams }: { params: Promise<{ id: string 
       <p className="mt-3 flex items-center gap-2 text-lg font-medium">
         {a.origin_suburb} <ArrowRight size={18} aria-hidden /> {a.destination_suburb}
       </p>
+      {a.leg_count > 1 && <p className="text-sm font-medium">Relay: leg {a.seq} of {a.leg_count}</p>}
       <p className="text-sm text-muted">Pickup between {windowLabel(a.window_start, a.window_end)}</p>
       <p role="status" className="mt-3 rounded-xl border border-border bg-surface p-3 text-sm font-medium">
         {a.assignment_status === "confirmed" ? legLabel(a.leg_status) : assignmentLabel(a.assignment_status)}
@@ -99,7 +100,10 @@ async function Content({ params, searchParams }: { params: Promise<{ id: string 
       )}
 
       <div className="mt-6 flex flex-col gap-4">
-        <AssignmentActions id={a.assignment_id} status={a.assignment_status} legStatus={a.leg_status} />
+        <AssignmentActions
+          id={a.assignment_id} status={a.assignment_status} legStatus={a.leg_status}
+          seq={a.seq} previousLegStatus={a.previous_leg_status} handoverBlocked={a.handover_blocked}
+        />
         {active && <IncidentForm requestId={a.request_id} legId={a.leg_id} />}
       </div>
       {a.assignment_status === "completed" && (
