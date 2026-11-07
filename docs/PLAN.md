@@ -70,6 +70,8 @@ Product requirements live in `docs/BRIEF.md`; this file records how we build the
 | D40 | **Foster carers see the driver's first name and phone only while the leg is confirmed, en route or collected** (`list_my_incoming_deliveries`); after delivery both are null. Incoming rows carry the origin suburb only, never an exact address. Volunteer history reuses the existing History section of `/assignments` (no new RPC). No new dependency. | Scope agreed for 6b |
 | D41 | **Route cache is per user** (migration 000024). `route_cache` key is `(user_id, cache_key)`; `get_cached_route`/`put_cached_route` read and write only the caller's rows. Supersedes D29's known limit: a user can no longer plant a wrong "live" estimate that others see. Cost: less ORS quota sharing between users. | 7a security review |
 | D42 | **Admin request oversight is read-only and public-level** (`admin_list_requests`, `/admin`, `/admin/requests`): status, org, suburbs, window, driver display name; never addresses, contacts, medical notes or instructions (those stay behind D39's logged access). Baseline security headers in `next.config.ts` (no framing, nosniff, referrer policy, permissions policy); a full CSP is a launch item. No new dependency. | 7a review: BRIEF §14 admin pages |
+| D43 | **An organisation inherits its registrant's demo flag** (migration 000025, `register_organisation`). Before, a demo persona registering an organisation created a real one (and through it real locations and requests), breaking demo/real isolation. `demo:reset` also clears verification records for demo organisations and decisions by or about demo users, so a reset works after any admin decision in the demo. | 7b: found by the organisation e2e story |
+| D44 | **Playwright e2e** (`@playwright/test`, dev; Chromium only) for the three demo stories, plus **`@axe-core/playwright`** (dev) for automated WCAG 2.1 A/AA scans: both needed for the 7b gate, no runtime dependency. `npm run test:e2e` reseeds DEMO data, creates one `@demo.pawlift.invalid` organisation-story user (removed by the next reset), signs each persona in once and runs serially. Badge text on the amber tint uses `--urgent-strong` (#92400e) for 4.5:1 contrast. | 7b |
 
 Add new decisions here with a one-line reason (including any new dependency).
 
@@ -274,7 +276,7 @@ One checkpoint per session. Commit and push after each passing checkpoint.
 
 **Batch 7 — Release**
 - 7a Review of requirement coverage (BRIEF §15) and security; fixes (done: D41, D42).
-- 7b Accessibility pass (keyboard, focus, labels, contrast), responsive polish, Playwright e2e for both demo stories plus the foster demo.
+- 7b Accessibility pass (keyboard, focus, labels, contrast), responsive polish, Playwright e2e for both demo stories plus the foster demo (done: D43, D44).
 - 7c README complete; Vercel preview prepared (public deploy only with explicit OK); Batch 7 gate and launch report.
 - *Launch prerequisites (from 7a, not code):* Supabase leaked-password protection on; email confirmation on with custom SMTP; a demo deployment uses a demo-only Supabase project (the persona switcher signs anyone in as Demo Admin, a real platform admin); `ORS_API_KEY` set and ORS shapes checked live; full Content-Security-Policy; Terms/Privacy/safety copy professionally reviewed. Accepted: PostGIS in `public` and `spatial_ref_sys` without RLS (public reference data).
 - *Gate:* all suites green; demo reset succeeds twice; report verified capabilities, blockers and launch prerequisites.

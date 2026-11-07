@@ -43,3 +43,8 @@ next-env.d.ts
 
 # copied from node_modules by scripts/copy-maplibre-worker.mjs
 /public/maplibre/
+
+# playwright
+/test-results
+/playwright-report
+/tests/e2e/.auth/

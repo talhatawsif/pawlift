@@ -66,15 +66,6 @@ export function HomeClient({ requests, error, account }: Props) {
 
   return (
     <>
-      <MapView
-        pins={pins}
-        selectedId={selectedId}
-        focus={loc}
-        onSelect={(id) => {
-          setSelectedId(id);
-          setSnap((s) => (s === "peek" ? "half" : s));
-        }}
-      />
       <SearchCard
         account={account}
         originLabel={originLabel}
@@ -107,6 +98,17 @@ export function HomeClient({ requests, error, account }: Props) {
         onSelect={(id) => {
           setSelectedId(id);
           if (id) setSnap((s) => (s === "peek" ? "half" : s));
+        }}
+      />
+      {/* The map comes after the search card and list in the DOM so keyboard focus reaches them first;
+          both float above it with z-index, so the order does not change the layout. */}
+      <MapView
+        pins={pins}
+        selectedId={selectedId}
+        focus={loc}
+        onSelect={(id) => {
+          setSelectedId(id);
+          setSnap((s) => (s === "peek" ? "half" : s));
         }}
       />
       {explainer && (

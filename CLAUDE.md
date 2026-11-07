@@ -34,6 +34,7 @@ Check installed versions before writing code that depends on an API.
 ## Commands (keep this list accurate)
 - `npm run dev` · `npm run build` · `npm run lint` · `npm run typecheck` · `npm test`
 - `npm run test:db` — RLS and RPC tests against the dev Supabase project
+- `npm run test:e2e` — Playwright: reseeds DEMO data, then the volunteer, organisation and foster stories, keyboard and axe (WCAG A/AA) checks; uses the dev server on :3000 (starts one if none)
 - `npm run demo:reset` — reseed DEMO data; refuses unless `APP_ENV=demo` and the project ref is in `DEMO_PROJECT_REFS`
 - `npx supabase db push --remote` — apply migrations to the linked dev project
 - `npx supabase gen types typescript --remote > src/lib/database.types.ts`

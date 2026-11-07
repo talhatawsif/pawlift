@@ -76,7 +76,7 @@ function MatchCard({ m, origin, destination, onSelect }: { m: MatchView; origin:
         <span className="flex min-w-0 flex-col gap-0.5">
           <span className="font-medium">
             {m.animalName} <span className="text-sm font-normal text-muted">· {speciesLabel(m.species)}</span>
-            {m.isDemo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}
+            {m.isDemo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}
           </span>
           <span className="flex items-center gap-1 text-sm text-muted">{m.originSuburb} <ArrowRight size={14} aria-hidden /> {m.destinationSuburb}</span>
           <span className="text-sm font-medium">

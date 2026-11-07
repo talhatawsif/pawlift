@@ -35,7 +35,7 @@ async function AdminVolunteersContent({ searchParams }: { searchParams: Promise<
           {items.map((v) => (
             <li key={v.user_id}>
               <Link href={`/admin/volunteers/${v.user_id}`} className="block rounded-xl border border-border bg-surface p-3">
-                <p className="font-medium">{v.display_name ?? "Unnamed"}{v.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}</p>
+                <p className="font-medium">{v.display_name ?? "Unnamed"}{v.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}</p>
                 <p className="text-sm text-muted">{volunteerLabel(v.verification_status)} · guidelines {v.guidelines_accepted ? "accepted" : "not accepted"} · updated {formatMelbourne(v.updated_at)}</p>
               </Link>
             </li>

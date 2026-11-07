@@ -29,7 +29,7 @@ async function OrgPageContent({ params }: { params: Promise<{ id: string }> }) {
       <p className="mt-1 flex items-center gap-1 text-muted">
         {org.verification_status === "verified" && <BadgeCheck size={16} className="text-brand" aria-hidden />}
         {typeLabel(org.type)} · {verificationLabel(org.verification_status)}
-        {org.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}
+        {org.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}
       </p>
 
       <Link href={`/org/${org.id}/dashboard`} className="mt-4 flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">

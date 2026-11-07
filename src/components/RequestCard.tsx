@@ -24,7 +24,7 @@ export function Photo({ r }: { r: PublicRequest }) {
 export function Chips({ r }: { r: PublicRequest }) {
   return (
     <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-      <span className={`rounded-full px-2 py-0.5 font-semibold ${r.urgency === "urgent" ? "bg-urgent/10 text-urgent" : "bg-background text-muted"}`}>
+      <span className={`rounded-full px-2 py-0.5 font-semibold ${r.urgency === "urgent" ? "bg-urgent/10 text-urgent-strong" : "bg-background text-muted"}`}>
         {urgencyLabel(r.urgency)}
       </span>
       {r.carrier_requirements && (
@@ -33,7 +33,7 @@ export function Chips({ r }: { r: PublicRequest }) {
       {r.handling_requirements && (
         <span className="flex items-center gap-1 text-muted"><HandHelping size={14} aria-hidden />Special handling</span>
       )}
-      {r.is_demo && <span className="rounded bg-urgent/10 px-1.5 font-semibold text-urgent">DEMO</span>}
+      {r.is_demo && <span className="rounded bg-urgent/10 px-1.5 font-semibold text-urgent-strong">DEMO</span>}
     </span>
   );
 }

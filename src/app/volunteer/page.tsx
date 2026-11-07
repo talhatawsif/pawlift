@@ -49,7 +49,7 @@ async function VolunteerContent({ searchParams }: { searchParams: Promise<{ join
       <VolunteerForm profile={profile} />
 
       <section className="mt-10">
-        <h2 className="mb-1 text-lg font-semibold">Transport guidelines <span className="rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DRAFT</span></h2>
+        <h2 className="mb-1 text-lg font-semibold">Transport guidelines <span className="rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DRAFT</span></h2>
         <ul className="mb-4 flex flex-col gap-2 text-sm">
           {GUIDELINES.map((g) => (
             <li key={g.title} className="rounded-xl border border-border bg-surface p-3"><p className="font-medium">{g.title}</p><p className="text-muted">{g.body}</p></li>

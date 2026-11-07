@@ -44,7 +44,7 @@ async function RequestContent({ params }: { params: Promise<{ id: string; reques
       <h1 className="mt-4 text-2xl font-semibold">{r.animal_name}</h1>
       <p className="mb-4 text-muted">
         {r.reference} · {statusLabel(r.status)}
-        {r.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}
+        {r.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}
       </p>
       {r.status === "cancelled" && r.cancel_reason && <p className="mb-4 text-sm">Cancelled: {r.cancel_reason}</p>}
 

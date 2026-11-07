@@ -24,6 +24,9 @@ export function LocationExplainer({ onChoose, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const firstRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Recorded during the first render, before the effect below moves focus into the dialog.
+  const openerRef = useRef<HTMLElement | null>(typeof document === "undefined" ? null : (document.activeElement as HTMLElement | null));
 
   useEffect(() => {
     (mode === "suburb" ? inputRef.current : firstRef.current)?.focus();
@@ -34,6 +37,33 @@ export function LocationExplainer({ onChoose, onClose }: Props) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  // Modal dialog: keep Tab inside it, and give focus back to whatever opened it on close.
+  useEffect(() => {
+    const opener = openerRef.current;
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const items = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>("button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex='-1'])"),
+      );
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = dialogRef.current.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === first || !inside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onTab);
+    return () => {
+      window.removeEventListener("keydown", onTab);
+      if (opener?.isConnected) opener.focus();
+    };
+  }, []);
 
   useEffect(() => {
     if (mode !== "suburb") return;
@@ -72,6 +102,7 @@ export function LocationExplainer({ onChoose, onClose }: Props) {
   return (
     <div className="absolute inset-0 z-30 flex items-end justify-center bg-foreground/30 p-4 sm:items-center">
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="loc-title"

@@ -63,7 +63,7 @@ async function Content({ params, searchParams }: { params: Promise<{ id: string 
       <h1 className="mt-4 text-2xl font-semibold">{a.animal_name}</h1>
       <p className="text-muted">
         {a.reference} · {a.org_name}
-        {a.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}
+        {a.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}
       </p>
       {sp.claimed && a.assignment_status === "reserved" && (
         <p role="status" className="mt-3 rounded-xl border border-border bg-surface p-3 text-sm">Reserved for you. The organisation will confirm shortly.</p>

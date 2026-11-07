@@ -28,7 +28,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
       <p className="mb-4 text-muted">
         {speciesLabel(r.species)} · {urgencyLabel(r.urgency)} · {r.org_name}
         {r.org_verification_status === "verified" && " (verified)"}
-        {r.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}
+        {r.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}
       </p>
       {r.photo_path && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -49,7 +49,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
             Open your assignment
           </Link>
         ) : (
-          <ClaimForm legId={r.leg_id} blocked={r.claim_block} />
+          <ClaimForm legId={r.leg_id} blocked={r.claim_block} animalName={r.animal_name} />
         )}
       </section>
     </main>

@@ -32,7 +32,7 @@ async function ListContent() {
           <div className="min-w-0">
             <p className="font-medium">
               {r.animal_name} <span className="text-sm font-normal text-muted">· {speciesLabel(r.species)} · {urgencyLabel(r.urgency)}</span>
-              {r.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}
+              {r.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}
             </p>
             <p className="text-sm text-muted">{r.origin_suburb} to {r.destination_suburb}</p>
             {r.window_start && <p className="text-sm text-muted">Pickup from {formatMelbourne(r.window_start)}</p>}
@@ -40,6 +40,9 @@ async function ListContent() {
               {r.org_verification_status === "verified" && <BadgeCheck size={14} className="text-brand" aria-hidden />}
               {r.org_name}
             </p>
+            <Link href={`/requests/${r.id}`} className="mt-1 inline-block text-sm font-medium text-brand underline">
+              View details<span className="sr-only"> for {r.animal_name}</span>
+            </Link>
           </div>
         </li>
       ))}

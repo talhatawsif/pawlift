@@ -1,13 +1,13 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 7a done (release review and fixes).
+Updated: 2026-11-08 · Checkpoint 7b done (Playwright e2e, accessibility and responsive pass).
 
 ## Current
-- Batches 1–4, 6 DONE. Batch 5 removed (D37). Batch 7 split into 7a/7b/7c (PLAN §12); 7a DONE.
-- Next: 7b (accessibility, responsive polish, Playwright e2e). Saved journeys with notifications still unbuilt (optional).
+- Batches 1–4, 6 DONE. Batch 5 removed (D37). Batch 7 split into 7a/7b/7c (PLAN §12); 7a, 7b DONE.
+- Next: 7c (README, Vercel preview, Batch 7 gate and launch report). Saved journeys with notifications still unbuilt (optional).
 
 ## Done
-- Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D34), data model, lifecycle, batch gates → `docs/PLAN.md`
+- Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D44), data model, lifecycle, batch gates → `docs/PLAN.md`
 
 ## Environment (verified 2026-11-08)
 - macOS; node v26.13.0, npm 11.20.0, git 2.50.1, gh 2.103.3 (logged in as talhatawsif).
@@ -18,9 +18,14 @@ Updated: 2026-11-08 · Checkpoint 7a done (release review and fixes).
 None.
 
 ## Exact next action
-Start 7b in plan mode: add Playwright (new dependency — add its one-line reason to PLAN §2 first), e2e for the volunteer, organisation and foster demo stories (BRIEF §13), then the keyboard/focus/labels/contrast and mobile-layout pass. Launch prerequisites from 7a are listed under PLAN §12 Batch 7.
+Start 7c in plan mode: complete README (setup, env vars by name only, commands, demo, known limits); prepare a Vercel preview (no public deploy without the user's explicit OK; preview must point at a demo-only Supabase project or be access-protected, PLAN §12 launch prerequisites); run the Batch 7 gate (all suites, `demo:reset` twice) and write the launch report (verified capabilities, blockers, prerequisites).
 
-Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM, so read all `main` elements. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM and Next keeps the previous page mounted but hidden, so read the *visible* `main` (`tests/e2e/helpers.ts` `main()`). Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## 7b summary
+- Implemented: migration `...000025` (D43: organisations inherit the registrant's demo flag; a demo persona used to create a real organisation). `scripts/demo-reset.mjs` now clears verification records of demo orgs and by/about demo users (a reset failed after any demo admin decision). Playwright + axe (D44): `playwright.config.ts`, `tests/e2e/` (setup reseeds and signs each persona in once; volunteer, organisation and foster stories; keyboard; axe WCAG 2.1 A/AA at 1280 px and 375 px on 41 page visits incl. detail pages, plus no sideways scroll). Fixes: amber badge text contrast via `--urgent-strong`; starting-point dialog keeps focus inside and returns it to the opener; map moved after search card and list in Tab order; claim button says "I can take <name>" (BRIEF §3); `/requests` rows link to details.
+- Tested: `npm run test:e2e` 7/7 twice in a row (each run reseeds); `npm run test:db` 223/223 (new: demo org registration); `npm test` 36/36; lint, typecheck, build pass.
+- Unverified: real phones and screen readers (only emulated 375 px and axe); account menu does not close on Escape (native `<details>`); axe checks serious/critical only; dynamic states (route results, open dialogs, errors) scanned only through the stories, not by axe; offers, reassign, withdraw, incidents still db-tested only.
 
 ## 7a summary
 - Reviewed: BRIEF §14/§15 coverage; Supabase security advisors and read-only catalog queries on pawlift-dev (RLS on every app table with no client policies, internal functions not executable by clients, definer functions pin search_path, storage policies, public view columns, hashed invite tokens); code scan (service role, redirects, logging, persona guard).

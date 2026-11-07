@@ -28,7 +28,7 @@ async function JoinListContent() {
           {orgs.map((o) => (
             <li key={o.id} className="rounded-xl border border-border bg-surface p-3">
               <p className="flex items-center gap-1 font-medium"><BadgeCheck size={16} className="text-brand" aria-hidden />{o.name}
-                {o.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}</p>
+                {o.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}</p>
               <p className="text-sm text-muted">{typeLabel(o.type)} · {o.operating_area ?? "Area not given"}</p>
               {o.my_status === null ? (
                 <form action={requestMembership} className="mt-2">

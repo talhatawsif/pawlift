@@ -63,6 +63,14 @@ describe("registration", () => {
     expect(audit?.map((a) => a.action)).toContain("organisation.register");
   });
 
+  it("a demo user's organisation is a demo organisation (D43)", async () => {
+    await admin.from("profiles").update({ is_demo: true }).eq("id", owner.id);
+    const { id, error } = await register(owner, "DBTEST Demo Reg");
+    expect(error).toBeNull();
+    const { data: org } = await admin.from("organisations").select("is_demo").eq("id", id!).single();
+    expect(org?.is_demo).toBe(true);
+  });
+
   it("the coordinator can read the org with contacts; an unrelated user and anon cannot", async () => {
     const { id } = await register(owner, "DBTEST Read");
     const mine = await owner.client.rpc("get_org_for_coordinator", { p_org_id: id! });

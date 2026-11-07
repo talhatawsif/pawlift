@@ -17,7 +17,7 @@ function Row({ a }: { a: MyAssignment }) {
       <Link href={`/assignments/${a.assignment_id}`} className="block rounded-xl border border-border bg-surface p-3">
         <span className="font-medium">
           {a.animal_name}
-          {a.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}
+          {a.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}
         </span>
         <span className="flex items-center gap-1 text-sm text-muted">{a.origin_suburb} <ArrowRight size={14} aria-hidden /> {a.destination_suburb}</span>
         <span className="block text-sm text-muted">{windowLabel(a.window_start, a.window_end)}</span>
@@ -41,7 +41,7 @@ async function Content() {
       <Link href="/" className="text-sm font-medium text-brand underline">Back to map</Link>
       <h1 className="mb-4 mt-4 text-2xl font-semibold">My assignments</h1>
       {current.length === 0 ? (
-        <p className="text-muted">Nothing right now. Find an animal on the map and tap &ldquo;I can take this&rdquo;.</p>
+        <p className="text-muted">Nothing right now. Find an animal on the map and choose &ldquo;View details and take this&rdquo;.</p>
       ) : (
         <ul className="flex flex-col gap-2">{current.map((a) => <Row key={a.assignment_id} a={a} />)}</ul>
       )}

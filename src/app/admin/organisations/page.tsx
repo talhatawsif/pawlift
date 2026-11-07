@@ -39,7 +39,7 @@ async function AdminOrgsPageContent({ searchParams }: { searchParams: Promise<{ 
           {orgs.map((o) => (
             <li key={o.id}>
               <Link href={`/admin/organisations/${o.id}`} className="block rounded-xl border border-border bg-surface p-3">
-                <p className="font-medium">{o.name}{o.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}</p>
+                <p className="font-medium">{o.name}{o.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}</p>
                 <p className="text-sm text-muted">
                   {typeLabel(o.type)} · {verificationLabel(o.verification_status)} · {o.operating_area ?? "Area not given"} · updated {formatMelbourne(o.updated_at)}
                 </p>

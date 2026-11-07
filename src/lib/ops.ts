@@ -106,7 +106,7 @@ export type PrivateDetails = {
   destination: PrivatePlace;
 };
 
-export const DEMO_BADGE = "ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent";
+export const DEMO_BADGE = "ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong";
 
 const STATUS: Record<string, string> = {
   confirmed: "Driver confirmed",

@@ -33,7 +33,11 @@ must("delete requests", await db.from("transport_requests").delete().eq("is_demo
 must("delete locations", await db.from("locations").delete().eq("is_demo", true));
 // audit rows reference demo orgs and users; clear them first (demo data only)
 const demoOrgs = must("demo orgs", await db.from("organisations").select("id").eq("is_demo", true));
-if (demoOrgs.length) must("delete audit (orgs)", await db.from("audit_logs").delete().in("org_id", demoOrgs.map((o) => o.id)));
+if (demoOrgs.length) {
+  const ids = demoOrgs.map((o) => o.id);
+  must("delete audit (orgs)", await db.from("audit_logs").delete().in("org_id", ids));
+  must("delete verification records (orgs)", await db.from("verification_records").delete().in("subject_id", ids));
+}
 must("delete organisations", await db.from("organisations").delete().eq("is_demo", true));
 let page = 1;
 for (;;) {
@@ -42,6 +46,8 @@ for (;;) {
   for (const u of data.users) {
     if (u.email?.endsWith("@demo.pawlift.invalid")) {
       must("delete audit (actor)", await db.from("audit_logs").delete().eq("actor_id", u.id));
+      // Admin decisions made during a demo (e.g. by Demo Admin) and decisions about demo volunteers.
+      must("delete verification records (user)", await db.from("verification_records").delete().or(`decided_by.eq.${u.id},subject_id.eq.${u.id}`));
       must("delete user", await db.auth.admin.deleteUser(u.id));
     }
   }

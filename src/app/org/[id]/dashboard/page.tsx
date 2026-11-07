@@ -30,7 +30,7 @@ function RowCard({ r, orgId, volunteers }: { r: OrgRow; orgId: string; volunteer
     <li className="rounded-xl border border-border bg-surface p-3">
       <p className="font-medium">
         {r.animal_name} <span className="text-sm font-normal text-muted">· {r.reference}</span>
-        {r.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}
+        {r.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}
         {r.open_incidents > 0 && <span className="ml-2 rounded bg-danger/10 px-1.5 text-xs font-semibold text-danger">Needs attention</span>}
       </p>
       <p className="flex items-center gap-1 text-sm text-muted">{r.origin_suburb} <ArrowRight size={14} aria-hidden /> {r.destination_suburb}</p>
