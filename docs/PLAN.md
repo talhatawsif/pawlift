@@ -277,7 +277,7 @@ One checkpoint per session. Commit and push after each passing checkpoint.
 **Batch 7 — Release**
 - 7a Review of requirement coverage (BRIEF §15) and security; fixes (done: D41, D42).
 - 7b Accessibility pass (keyboard, focus, labels, contrast), responsive polish, Playwright e2e for both demo stories plus the foster demo (done: D43, D44).
-- 7c README complete; Vercel preview prepared (public deploy only with explicit OK); Batch 7 gate and launch report.
+- 7c README complete; Vercel preview prepared (public deploy only with explicit OK); Batch 7 gate and launch report (done: `docs/LAUNCH_REPORT.md`; Vercel import needs the owner's account).
 - *Launch prerequisites (from 7a, not code):* Supabase leaked-password protection on; email confirmation on with custom SMTP; a demo deployment uses a demo-only Supabase project (the persona switcher signs anyone in as Demo Admin, a real platform admin); `ORS_API_KEY` set and ORS shapes checked live; full Content-Security-Policy; Terms/Privacy/safety copy professionally reviewed. Accepted: PostGIS in `public` and `spatial_ref_sys` without RLS (public reference data).
 - *Gate:* all suites green; demo reset succeeds twice; report verified capabilities, blockers and launch prerequisites.
 

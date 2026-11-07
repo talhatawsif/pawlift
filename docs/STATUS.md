@@ -1,10 +1,10 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 7b done (Playwright e2e, accessibility and responsive pass).
+Updated: 2026-11-08 · Checkpoint 7c done. Batch 7 gate passed. MVP demo-ready, not launch-ready.
 
 ## Current
-- Batches 1–4, 6 DONE. Batch 5 removed (D37). Batch 7 split into 7a/7b/7c (PLAN §12); 7a, 7b DONE.
-- Next: 7c (README, Vercel preview, Batch 7 gate and launch report). Saved journeys with notifications still unbuilt (optional).
+- Batches 1–4, 6 DONE. Batch 5 removed (D37). Batch 7 (7a–7c) DONE. All planned batches complete.
+- Launch status and prerequisites: `docs/LAUNCH_REPORT.md`. Saved journeys with notifications still unbuilt (optional).
 
 ## Done
 - Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D44), data model, lifecycle, batch gates → `docs/PLAN.md`
@@ -18,9 +18,14 @@ Updated: 2026-11-08 · Checkpoint 7b done (Playwright e2e, accessibility and res
 None.
 
 ## Exact next action
-Start 7c in plan mode: complete README (setup, env vars by name only, commands, demo, known limits); prepare a Vercel preview (no public deploy without the user's explicit OK; preview must point at a demo-only Supabase project or be access-protected, PLAN §12 launch prerequisites); run the Batch 7 gate (all suites, `demo:reset` twice) and write the launch report (verified capabilities, blockers, prerequisites).
+Owner decisions (see `docs/LAUNCH_REPORT.md`): import the repo into Vercel with Deployment Protection and preview env vars per README, then say whether to check the preview; add an openrouteservice key to verify live routing. Optional next checkpoint: saved journeys with `nearby_request` / `route_match` notifications.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM and Next keeps the previous page mounted but hidden, so read the *visible* `main` (`tests/e2e/helpers.ts` `main()`). Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## 7c summary
+- Implemented: complete `README.md` (architecture rules, env var names, setup, commands, demo personas and stories, Vercel preview steps with protection and no service-role key, layout); `docs/LAUNCH_REPORT.md` (gate results, BRIEF §15 evidence, not verified, launch prerequisites, known limits).
+- Tested (gate): `demo:reset` twice PASS; lint, typecheck PASS; `npm test` 36/36; `npm run test:db` 223/223; `npm run test:e2e` 7/7; `npm run build` + `next start` smoke test (pages 200, 404, anonymous admin not found, headers, map renders, no console errors).
+- Unverified: no Vercel deployment (needs the owner's account and OK); everything in the launch report's "Not verified" list.
 
 ## 7b summary
 - Implemented: migration `...000025` (D43: organisations inherit the registrant's demo flag; a demo persona used to create a real organisation). `scripts/demo-reset.mjs` now clears verification records of demo orgs and by/about demo users (a reset failed after any demo admin decision). Playwright + axe (D44): `playwright.config.ts`, `tests/e2e/` (setup reseeds and signs each persona in once; volunteer, organisation and foster stories; keyboard; axe WCAG 2.1 A/AA at 1280 px and 375 px on 41 page visits incl. detail pages, plus no sideways scroll). Fixes: amber badge text contrast via `--urgent-strong`; starting-point dialog keeps focus inside and returns it to the opener; map moved after search card and list in Tab order; claim button says "I can take <name>" (BRIEF §3); `/requests` rows link to details.
@@ -59,22 +64,8 @@ Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email
 - Tested: `npm run test:db` 191/191 (17 new in `tests/db/progress.test.ts`: window guards, order, private-details revocation by withdraw/reassign/cancel/delivery/suspension, no private fields in lists, completion guards, incidents, org isolation, claim window rule); `npm test` 36/36; lint, typecheck, build pass; `demo:reset` ran twice. Browser (pawlift-dev, DEMO personas): Priya claims Biscuit from the map detail panel → Sam confirms on the dashboard → Priya sees addresses, contacts and medical notes → start, pickup, delivery → details disappear → Sam completes → dashboard shows Completed → audit page lists six events. One 4a test changed (hold now caps at window end).
 - Unverified: offer/accept, decline, withdraw, reassign, turn-down, release and incident forms in the browser (db tests only); Sam's notification list (no UI until 6a); mobile layout and keyboard use of new pages; navigation links open correctly (demo seed has addresses only, no exact points); route-match "View details" link (map detail panel link was clicked); `en_route` and `collected` screens were passed through but not inspected visually; `list_org_incidents` shows at most 50; relays and foster receipt not built (Batch 5/6); pg_cron not scheduled (6a); size requirements not enforced.
 
-## 4b summary
-- Implemented: migrations `...000012`–`...000014` (offers, accept/decline, withdraw incl. late, reassign, cancel with assignments); D32 in PLAN.
-- Tested: `test:db` 174/174 at the time (25 new in `tests/db/offers.test.ts`). The 4b "revocation tested only as assignment status" gap is closed by `progress.test.ts`.
-- Unverified: reassign-with-offer is an extension beyond PLAN §5.1.
-
-## 4a summary
-- Implemented: migration `...000011` (`claim_leg`, `confirm_assignment`, `release_assignment`, expiry sweep, helpers); D31.
-- Tested: 20 tests in `tests/db/assignments.test.ts` (5-way parallel claim, idempotent retry, eligibility, overlap, expiry). The db tests share a few volunteers because Supabase auth rate-limits sign-ins.
-- Unverified: pg_cron not scheduled (6a); `db push` target is labelled "production" by the CLI but is the only project, pawlift-dev.
-
-## 3c summary
-- Implemented: `src/lib/matching/`, `src/lib/nav-links/`, `src/app/journey/actions.ts`, `SearchCard`, `RouteMatches`, `scripts/demo-reset.mjs`; D30.
-- Tested: 17 unit tests; browser: Priya, St Albans → Geelong shows Biscuit "+8 min driving", labelled DEMO.
-- Unverified: **ORS request/response shapes never run against a real key** (hand-made bodies only); links open in the three apps; desktop layout; matcher treats relays as one pickup → drop-off.
-
 ## Earlier checkpoints (details in git history)
+- 4b: offers, accept/decline, withdraw (incl. late), reassign, cancel (D32; 25 db tests). 4a: claim, confirm, release, expiry sweep (D31; 5-way parallel claim, idempotent retry). 3c: matching, journey planner, route matches, nav links (D30). Unverified: ORS shapes never run live; nav links not opened in the apps.
 - 3b: routing adapter, cache RPCs, DEMO fixtures, geocoding (D29). 3a: map home, bottom sheet, suburb fallback (D28). Unverified: real browser geolocation; suburb centroids are approximate.
 - 2d: requests, photo sanitising, publish guards (D26, D27). 2c: locations, destinations, foster homes (D24, D25). 2b: invitations, membership, volunteer profile and verification (D21–D23). 2a: org registration and admin verification. 1a–1d: scaffold, migrations, auth, db test harness.
 - Standing unverified: mobile layout and keyboard navigation across pages; foster carers cannot edit their own home; signed-out invite links need sign-in then reopen.
