@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { rpcMessage } from "@/lib/org";
+import { geocodeAddress, GEOCODE_FAILURE_MESSAGE } from "@/lib/routing";
+import type { OrgLocation } from "@/lib/locations";
 
 export type LocationState = { error?: string; ok?: boolean } | undefined;
 
@@ -77,5 +79,23 @@ export async function saveFosterHome(_: LocationState, form: FormData): Promise<
   if (error) return fail(error.code);
   revalidatePath(`/org/${s(form, "org_id")}/members`);
   revalidatePath(`/org/${s(form, "org_id")}/locations`);
+  return { ok: true };
+}
+
+/** Looks up the private address and stores a map point for it. The address is sent to openrouteservice only when a key is configured. */
+export async function geocodeLocation(_: LocationState, form: FormData): Promise<LocationState> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("list_org_locations", { p_org_id: s(form, "org_id") });
+  if (error) return fail(error.code);
+  const loc = ((data ?? []) as unknown as OrgLocation[]).find((l) => l.id === s(form, "location_id"));
+  if (!loc?.exact_address) return { error: "Add an address first." };
+  const res = await geocodeAddress(`${loc.exact_address}, ${loc.suburb} ${loc.postcode} VIC, Australia`);
+  if (!res.ok) return { error: GEOCODE_FAILURE_MESSAGE[res.reason] };
+  const { error: setErr } = await supabase.rpc("set_location_exact_point", {
+    p_location_id: loc.id,
+    p_lat: res.lat,
+    p_lng: res.lng,
+  });
+  if (setErr) return fail(setErr.code);
   return { ok: true };
 }

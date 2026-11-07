@@ -1509,6 +1509,7 @@ export type Database = {
         Returns: boolean
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
+      get_cached_route: { Args: { p_key: string }; Returns: Json }
       get_my_context: { Args: never; Returns: Json }
       get_my_foster_homes: { Args: never; Returns: Json }
       get_my_volunteer_profile: { Args: never; Returns: Json }
@@ -1594,6 +1595,16 @@ export type Database = {
         Args: { p_attest: boolean; p_request_id: string }
         Returns: undefined
       }
+      put_cached_route: {
+        Args: {
+          p_distance_m: number
+          p_duration_s: number
+          p_key: string
+          p_legs: Json
+          p_provider: string
+        }
+        Returns: undefined
+      }
       register_organisation: {
         Args: {
           p_contact_email: string
@@ -1646,6 +1657,10 @@ export type Database = {
           p_is_foster: boolean
           p_member_id: string
         }
+        Returns: undefined
+      }
+      set_location_exact_point: {
+        Args: { p_lat: number; p_lng: number; p_location_id: string }
         Returns: undefined
       }
       set_request_photo: {

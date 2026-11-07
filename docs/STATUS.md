@@ -1,6 +1,6 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 3a done.
+Updated: 2026-11-08 · Checkpoint 3b done.
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
@@ -12,7 +12,8 @@ Updated: 2026-11-08 · Checkpoint 3a done.
 - Checkpoint **2c** DONE (locations, confirmed destinations, foster approval and foster home).
 - Checkpoint **2d** DONE (requests, photo sanitising, publish guards, public listing).
 - Checkpoint **3a** DONE (map home, bottom sheet, nearby ordering, location explainer, suburb fallback).
-- Next: Batch 3, checkpoint **3b** (routing adapter, cache, geocoding).
+- Checkpoint **3b** DONE (routing adapter, cache RPCs, DEMO fixtures, coordinator geocoding).
+- Next: Batch 3, checkpoint **3c** (matching engine, journey planner UI).
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -27,9 +28,14 @@ Updated: 2026-11-08 · Checkpoint 3a done.
 None.
 
 ## Exact next action
-Batch 3, checkpoint 3b (PLAN §12 and §9): routing adapter (`ors`, `demo`), cache, honest setup/error states; coordinator address geocoding. No ORS key exists yet, so everything must be labelled DEMO and nothing may claim to be live. The demo seed/`demo:reset` is still not written; do it before 3c at the latest (3c gate needs St Albans → Geelong with Biscuit labelled DEMO).
+Batch 3, checkpoint 3c (PLAN §12 and §9): matching engine (`src/lib/matching/`), journey planner UI, route-matched section with detour and source labels, navigation deep links. Use `getRoute(supabase, points, new RouteBudget())` from `src/lib/routing` (max 6 provider calls per search). No ORS key exists, so results are DEMO fixtures. The demo seed/`demo:reset` is still not written; do it first in 3c (gate needs St Albans → Geelong with Biscuit labelled DEMO). DEMO fixtures cover only St Albans, Melton, Geelong, Sunshine, Footscray, Werribee centres (within 4 km).
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>`; see `src/app/page.tsx`. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server (use static SVG, see `MapView.tsx`). Dev server often already runs on :3000.
+
+## 3b summary
+- Implemented: migration `...000010_routing_cache_geocode.sql` (`get_cached_route`, `put_cached_route`, `set_location_exact_point`, trigger clearing the point on address change); `src/lib/routing/` (`types`, `demo`, `ors`, `index` with `getRoute`, `RouteBudget`, `geocodeAddress`); `GeocodeButton` and `geocodeLocation` action on `/org/[id]/locations`; D29 in PLAN.
+- Tested: `npm run test:db` 129/129 (5 new in `tests/db/routing.test.ts`); `npm test` 19/19 (12 new in `tests/unit/routing.test.ts`: key rounding, fixtures, no-key = DEMO only, budget, 429/500 mapping, parsing); lint, typecheck, build pass.
+- Unverified: **the ORS request and response shapes were written from memory of the API and never run against a real key** (parsing is unit-tested on hand-made bodies only); geocode button in the browser; DEMO fixture minutes are guesses; no UI shows route estimates yet (3c); the 24 h expiry is checked at read, with no cleanup job.
 
 ## 3a summary
 - Implemented: migration `...000009_public_suburbs.sql` (`list_public_suburbs`, anon-callable); `src/lib/geo/distance.ts`; `HomeClient`, `BottomSheet` (peek/half/full, drag + keyboard), `RequestCard`, `LocationExplainer`, `SearchCard` (origin chip), `MapView` (paw pins, selected enlarges, urgent amber), `src/app/suburbs/actions.ts`; D28 in PLAN. Home reads `public_requests`.

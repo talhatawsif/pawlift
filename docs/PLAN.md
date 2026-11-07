@@ -56,6 +56,8 @@ Product requirements live in `docs/BRIEF.md`; this file records how we build the
 | D27 | `public_requests` shows only rows whose `is_demo` matches the caller's profile (anon = real). Stale-version conflicts use SQLSTATE 55006, not 40001, because the API layer retries 40001 until timeout. Requests are editable and cancellable only while every leg is `open`; later changes arrive with Batch 4 | Demo/real isolation in the public listing; avoids a hang; keeps 2d inside its scope |
 | D28 | `list_public_suburbs(text)` RPC is callable by `anon` and returns suburb name, postcode and approximate centroid only; the `suburbs` table stays deny-all. Home nearby ordering is client-side straight-line distance from the public approximate origin point, labelled as such. No new dependency | Manual suburb fallback must work signed out; no extra routing call before 3b |
 
+| D29 | Routing adapter in `src/lib/routing` (no new dependency; plain `fetch`). No `ORS_API_KEY` → DEMO hand-typed suburb-pair fixtures only, never straight-line times. Cache goes through `get_cached_route`/`put_cached_route` RPCs (24 h, rounded ~100 m key, `ors` results only); known limit: any active user could store a wrong estimate for a key. Geocoding via ORS `geocode/search` stores `exact_point` through `set_location_exact_point` (coordinator only, audited; cleared by trigger when the address changes). |
+
 Add new decisions here with a one-line reason (including any new dependency).
 
 ## 3. Data model (key columns only)

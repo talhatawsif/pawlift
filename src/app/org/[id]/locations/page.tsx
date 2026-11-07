@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getMyContext } from "@/lib/session";
 import type { OrgDetail } from "@/lib/org";
 import { kindLabel, type OrgLocation, type Suburb } from "@/lib/locations";
-import { confirmDestination, createLocation, updateLocation } from "./actions";
+import { confirmDestination, createLocation, geocodeLocation, updateLocation } from "./actions";
+import { GeocodeButton } from "@/components/GeocodeButton";
 import { LocationForm } from "@/components/LocationForm";
 
 export const metadata = { title: "Locations · PawLift" };
@@ -56,6 +57,9 @@ async function LocationsContent({ params }: { params: Promise<{ id: string }> })
                     {l.is_confirmed_destination ? "Remove confirmation" : "Confirm as destination"}
                   </button>
                 </form>
+              )}
+              {l.kind !== "foster_home" && (
+                <GeocodeButton action={geocodeLocation} orgId={id} locationId={l.id} />
               )}
               {l.kind === "foster_home" ? (
                 <p className="mt-2 text-xs text-muted">Edit foster homes from the volunteers page.</p>
