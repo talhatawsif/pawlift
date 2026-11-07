@@ -1264,6 +1264,7 @@ export type Database = {
       _st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       accept_guidelines: { Args: { p_version: string }; Returns: undefined }
       accept_invitation: { Args: { p_token: string }; Returns: string }
+      accept_offer: { Args: { p_assignment_id: string }; Returns: undefined }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
         | {
@@ -1371,6 +1372,10 @@ export type Database = {
         }
         Returns: string
       }
+      create_offer_internal: {
+        Args: { p_actor: string; p_leg_id: string; p_volunteer_id: string }
+        Returns: string
+      }
       create_request: {
         Args: {
           p_animal_name: string
@@ -1392,6 +1397,10 @@ export type Database = {
       }
       decide_membership: {
         Args: { p_decision: string; p_member_id: string }
+        Returns: undefined
+      }
+      decline_offer: {
+        Args: { p_assignment_id: string; p_reason: string }
         Returns: undefined
       }
       disablelongtransactions: { Args: never; Returns: string }
@@ -1586,6 +1595,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      offer_leg: {
+        Args: { p_leg_id: string; p_volunteer_id: string }
+        Returns: string
+      }
       photo_org: { Args: { p_name: string }; Returns: string }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
@@ -1642,6 +1655,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      reassign: {
+        Args: {
+          p_assignment_id: string
+          p_new_volunteer_id?: string
+          p_reason: string
+        }
+        Returns: string
+      }
       refresh_request_status: {
         Args: { p_request_id: string }
         Returns: undefined
@@ -1664,6 +1685,7 @@ export type Database = {
         Args: { p_assignment_id: string; p_reason: string }
         Returns: undefined
       }
+      reopen_leg_internal: { Args: { p_leg_id: string }; Returns: undefined }
       req_check_text: {
         Args: {
           p_carrier: string
@@ -2356,6 +2378,14 @@ export type Database = {
           p_species_ok: string[]
           p_vehicle_notes: string
         }
+        Returns: undefined
+      }
+      withdraw: {
+        Args: { p_assignment_id: string; p_reason: string }
+        Returns: undefined
+      }
+      withdraw_offer: {
+        Args: { p_assignment_id: string; p_reason: string }
         Returns: undefined
       }
     }

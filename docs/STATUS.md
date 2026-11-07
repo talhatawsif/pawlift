@@ -1,6 +1,6 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 4a done.
+Updated: 2026-11-08 · Checkpoint 4b done.
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
@@ -15,7 +15,8 @@ Updated: 2026-11-08 · Checkpoint 4a done.
 - Checkpoint **3b** DONE (routing adapter, cache RPCs, DEMO fixtures, coordinator geocoding).
 - Checkpoint **3c** DONE (matching engine, journey planner UI, nav links, `demo:reset` seed). Batch 3 gate met.
 - Checkpoint **4a** DONE (claim, confirm, release, expiry sweep; DB only).
-- Next: checkpoint **4b**: touches assignments, so start manually in plan mode.
+- Checkpoint **4b** DONE (offers, accept/decline, withdraw incl. late, reassign, cancel with assignments; DB only).
+- Next: checkpoint **4c** (UI; reads private details, so plan first).
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -30,9 +31,14 @@ Updated: 2026-11-08 · Checkpoint 4a done.
 None.
 
 ## Exact next action
-Checkpoint **4b** (PLAN §12): `offer_leg`, `accept_offer`, `decline_offer`, `withdraw_offer`, `withdraw` (incl. late → incident), `reassign`, cancel with active assignments, access-revocation and suspended-account tests. Reuse `assignment_eligibility_error`, `sweep_expired_assignments` (already handles `offered`), `refresh_request_status`, `notify_user`/`notify_coordinators` from migration 000011. Start in plan mode.
+Checkpoint **4c** (PLAN §12): volunteer assignment screens (start, pickup, delivery, incident, navigation buttons), coordinator dashboard (needs-a-driver first), confirm/complete, audit trail view; needs `start_leg`, `confirm_pickup`, `confirm_delivery`, `complete_request`, `get_leg_private_details`. Gate: BRIEF §13 volunteer story steps 1–10 by clicking. Start in plan mode.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>`; see `src/app/page.tsx`. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server (use static SVG, see `MapView.tsx`). Dev server often already runs on :3000. Demo rows are visible only to demo personas (sign in via the DEMO switcher, e.g. Priya); `npm run demo:reset` refreshes request windows (they run seed time → +7 days).
+
+## 4b summary
+- Implemented: migrations `...000012` (RPCs `offer_leg`, `accept_offer`, `decline_offer`, `withdraw_offer`, `withdraw`, `reassign`, replacement `cancel_request`; internal `create_offer_internal`, `reopen_leg_internal`), `...000013` (offers need a server-made idempotency key), `...000014` (offer_leg conflict error); D32 in PLAN. Applied to pawlift-dev; types regenerated.
+- Tested: `npm run test:db` 174/174 (25 new in `tests/db/offers.test.ts`: permissions, eligibility, expiry, parallel offer and accept-vs-withdraw races, late-withdrawal incident, reassign with rollback, cancel with assignments, suspended accounts, status-level revocation); `npm test` 36/36; lint, typecheck, build pass. One old test in `requests.test.ts` changed: cancelling with a volunteer involved is now allowed.
+- Unverified: no UI (4c); **access revocation is tested only as assignment status** because `get_leg_private_details` does not exist yet; pg_cron not scheduled (6a); size not enforced; reassign-with-offer is an extension beyond PLAN §5.1; `en_route` paths tested by setting statuses directly (`start_leg` is 4c).
 
 ## 4a summary
 - Implemented: migration `...000011_claim_confirm_release.sql` (RPCs `claim_leg`, `confirm_assignment`, `release_assignment`; internal `assignment_eligibility_error`, `sweep_expired_assignments`, `refresh_request_status`, `notify_user`, `notify_coordinators`); D31 in PLAN. Applied to pawlift-dev; types regenerated.

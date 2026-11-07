@@ -268,7 +268,8 @@ describe("update_request", () => {
     await admin.from("transport_legs").update({ status: "reserved" }).eq("request_id", id);
     const blocked = await rpc(coord, "update_request", updArgs(id, v!.version));
     expect(blocked.error?.code).toBe("55000");
-    expect((await rpc(coord, "cancel_request", { p_request_id: id, p_reason: "no longer needed" })).error?.code).toBe("55000");
+    // 4b: cancelling with a volunteer involved is now allowed (assignments end as cancelled).
+    expect((await rpc(coord, "cancel_request", { p_request_id: id, p_reason: "no longer needed" })).error).toBeNull();
   });
 });
 
