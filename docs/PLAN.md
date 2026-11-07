@@ -50,6 +50,9 @@ Product requirements live in `docs/BRIEF.md`; this file records how we build the
 | D22 | Accepting an invitation makes the user an active volunteer member at once (the coordinator vouched); self-service requests need coordinator approval; removed users cannot re-request (must be re-invited); coordinators cannot be removed via `decide_membership`; demo and real users cannot see or join each other's orgs | Simple, abuse-resistant; matches Access rules |
 | D23 | Volunteer verification mirrors D20 (pending→verified/rejected, verified↔suspended, rejected→pending via `resubmit_volunteer`); `verified` needs recorded checks and accepted guidelines (`v1`, DRAFT text in `src/lib/guidelines.ts`); admins see no phone numbers; `is_verified_volunteer()` is the internal recheck for later checkpoints | Honest verification; no implied background checks |
 
+| D24 | `suburbs` seeded with ~40 Western Melbourne/Geelong suburbs using hand-typed APPROXIMATE centroids (unverified); read via `list_suburbs` RPC. Location `approx_point` is always the suburb centroid; `exact_point` stays null until geocoding (3b) | Public screens must never carry exact coordinates; replace seed with an official dataset before launch |
+| D25 | Confirmed destinations: coordinator of a verified org only; handover points can't be destinations; changing suburb or address clears confirmation; a foster home can be confirmed only while its carer is approved, and revoking approval unconfirms it. One foster_home location per carer per org, edited only via `upsert_foster_home` | Prevents stale or unapproved destinations (PLAN §8) |
+
 Add new decisions here with a one-line reason (including any new dependency).
 
 ## 3. Data model (key columns only)

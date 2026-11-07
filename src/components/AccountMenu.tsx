@@ -61,6 +61,13 @@ export async function AccountMenu({
                   Volunteer profile
                 </Link>
               </li>
+              {ctx.memberships.some((m) => m.status === "active" && m.is_foster_carer) && (
+                <li>
+                  <Link href="/foster" className="flex h-10 items-center font-medium">
+                    My foster home
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link href="/join" className="flex h-10 items-center font-medium">
                   Find an organisation

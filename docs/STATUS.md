@@ -1,6 +1,6 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 2b done.
+Updated: 2026-11-08 · Checkpoint 2c done.
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
@@ -9,7 +9,8 @@ Updated: 2026-11-08 · Checkpoint 2b done.
 - Checkpoint **1d** DONE (`npm run test:db` harness + RLS tests; Batch 1 gate met).
 - Checkpoint **2a** DONE (org registration, admin verification, resubmission).
 - Checkpoint **2b** DONE (invitations, join flow, membership requests, volunteer profile, guidelines, admin volunteer verification).
-- Next: Batch 2, checkpoint **2c**.
+- Checkpoint **2c** DONE (locations, confirmed destinations, foster approval and foster home).
+- Next: Batch 2, checkpoint **2d**.
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -24,7 +25,7 @@ Updated: 2026-11-08 · Checkpoint 2b done.
 None.
 
 ## Exact next action
-Batch 2, checkpoint 2c (PLAN.md §12): locations (public/private split), confirmed destinations, foster association and foster home. Reuse `is_active_coordinator()`, `require_active_user()` and the audit pattern from migrations `...000004`/`...000005`. Foster flags on `organisation_members` already exist; invitations currently grant only the volunteer role. The demo seed/`demo:reset` is still not written; do it before demo-dependent work (3c at the latest).
+Batch 2, checkpoint 2d (PLAN §12): request create/edit (single leg auto-created), photo sanitising (D12), publish guards (verified org, confirmed destination, release attestation), `public_requests` view and listing. Reuse `is_active_coordinator()`, `require_active_user()`, `locations` (confirmed destinations via `list_org_locations`) and the audit pattern. The demo seed/`demo:reset` is still not written; do it before demo-dependent work (3c at the latest).
 
 Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>` (build fails otherwise); see `src/app/org/[id]/page.tsx`.
 
@@ -33,6 +34,11 @@ Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Con
 - Tested: lint, typecheck, test, build all pass; map renders in the browser pane (OpenFreeMap, attribution shown).
 - Unverified: mobile layout and keyboard navigation (placeholder controls are disabled); contrast not formally checked.
 - Notes: MapLibre 6 worker is copied to `public/maplibre/` by `scripts/copy-maplibre-worker.mjs` (predev/prebuild; gitignored) because Turbopack can't bundle it. A single map `error` event currently shows the "couldn't load" alert; refine in 3a.
+
+## 2c summary
+- Implemented: migration `20261108000006_locations_fosters.sql` (RPCs `list_suburbs`, `create_location`, `update_location`, `confirm_destination`, `list_org_locations`, `set_foster_status`, `upsert_foster_home`, `get_my_foster_homes`; ~40 seeded suburbs); `src/lib/locations.ts`; `/org/[id]/locations`, `/foster`, foster controls on `/org/[id]/members`; `LocationForm`; account-menu link; D24, D25 in PLAN.
+- Tested: `npm run test:db` 102/102 (19 new in `tests/db/locations.test.ts`: coordinator/verified guards, centroid-only public point, private-field isolation, direct table denial, confirmation cleared on move, handover point refused, foster approve/home/idempotency/revoke, audit, demo flag). lint, typecheck, `npm test` 2/2, build pass.
+- Unverified: browser UI for all new pages (not exercised); mobile layout; keyboard navigation; **suburb centroids are approximate hand-typed values**; foster carers cannot yet edit their own home; `can_confirm_receipt` checkbox is not pre-filled from current state.
 
 ## 2b summary
 - Implemented: migration `20261108000005_membership_volunteers.sql` (16 RPCs: invitations create/revoke/list/preview/accept, joinable orgs, request/decide membership, org member list, volunteer profile upsert, guidelines, resubmit, own profile, admin list/get/decide volunteer; helpers `is_verified_volunteer`, `is_active_coordinator`, `invitation_state`); `src/lib/membership.ts`, `src/lib/guidelines.ts`; pages `/org/[id]/members`, `/join`, `/join/[token]`, `/volunteer`, `/admin/volunteers[/id]`; `InviteForm`, `AcceptInvitation`, `VolunteerForm`; `DecisionForm` generalised (takes the action); D21–D23 in PLAN.

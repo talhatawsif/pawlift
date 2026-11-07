@@ -35,6 +35,9 @@ async function OrgPageContent({ params }: { params: Promise<{ id: string }> }) {
       <Link href={`/org/${org.id}/members`} className="mt-4 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
         Volunteers and invitations
       </Link>
+      <Link href={`/org/${org.id}/locations`} className="mt-2 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
+        Locations and destinations
+      </Link>
 
       {org.verification_status === "pending" && (
         <p role="status" className="mt-4 rounded-xl border border-border bg-surface p-3 text-sm">

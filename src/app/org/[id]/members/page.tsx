@@ -8,6 +8,9 @@ import { formatMelbourne, type OrgDetail } from "@/lib/org";
 import { speciesLabel, volunteerLabel, type InvitationItem, type MemberItem } from "@/lib/membership";
 import { decideMembership, revokeInvitation } from "./actions";
 import { InviteForm } from "@/components/InviteForm";
+import { LocationForm } from "@/components/LocationForm";
+import { saveFosterHome, setFosterStatus } from "../locations/actions";
+import type { OrgLocation, Suburb } from "@/lib/locations";
 
 export const metadata = { title: "Volunteers · PawLift" };
 
@@ -19,11 +22,15 @@ async function MembersContent({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await getMyContext();
   if (!ctx) redirect("/sign-in");
   const supabase = await createClient();
-  const [{ data: orgData }, { data: memberData, error }, { data: invData }] = await Promise.all([
+  const [{ data: orgData }, { data: memberData, error }, { data: invData }, { data: locData }, { data: subData }] = await Promise.all([
     supabase.rpc("get_org_for_coordinator", { p_org_id: id }),
     supabase.rpc("list_org_members", { p_org_id: id }),
     supabase.rpc("list_invitations", { p_org_id: id }),
+    supabase.rpc("list_org_locations", { p_org_id: id }),
+    supabase.rpc("list_suburbs", { p_query: "" }),
   ]);
+  const locations = (locData ?? []) as unknown as OrgLocation[];
+  const suburbs = (subData ?? []) as unknown as Suburb[];
   if (error || !orgData) notFound();
   const org = orgData as unknown as OrgDetail;
   const members = (memberData ?? []) as unknown as MemberItem[];
@@ -71,6 +78,38 @@ async function MembersContent({ params }: { params: Promise<{ id: string }> }) {
                     {m.species_ok && m.species_ok.length > 0 && ` · ${m.species_ok.map(speciesLabel).join(", ")}`}
                     {m.availability?.days && m.availability.days.length > 0 && ` · ${m.availability.days.join(", ")}`}
                   </p>
+                )}
+                {org.verification_status === "verified" && (
+                  <div className="mt-2">
+                    <form action={setFosterStatus} className="flex flex-wrap items-center gap-3">
+                      <input type="hidden" name="org_id" value={id} /><input type="hidden" name="member_id" value={m.id} />
+                      {m.is_foster_carer && (
+                        <label className="flex h-10 items-center gap-2 text-sm">
+                          <input type="checkbox" name="can_confirm_receipt" className="h-5 w-5" /> Can confirm receipt
+                        </label>
+                      )}
+                      <button name="is_foster" value={m.is_foster_carer ? "false" : "true"} className={btn}>
+                        {m.is_foster_carer ? "Remove foster approval" : "Approve as foster carer"}
+                      </button>
+                    </form>
+                    {m.is_foster_carer && (
+                      <details className="mt-2">
+                        <summary className="cursor-pointer text-sm font-medium text-brand">
+                          Foster carer approved by {org.name} · foster home
+                        </summary>
+                        <div className="mt-3">
+                          <LocationForm
+                            action={saveFosterHome}
+                            suburbs={suburbs}
+                            withKind={false}
+                            location={locations.find((l) => l.kind === "foster_home" && l.linked_user_id === m.user_id)}
+                            hidden={{ org_id: id, member_id: m.id }}
+                            submitLabel="Save foster home"
+                          />
+                        </div>
+                      </details>
+                    )}
+                  </div>
                 )}
                 {!m.is_coordinator && (
                   <form action={decideMembership} className="mt-2">

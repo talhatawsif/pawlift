@@ -1323,12 +1323,29 @@ export type Database = {
       admin_get_volunteer: { Args: { p_user_id: string }; Returns: Json }
       admin_list_organisations: { Args: { p_status?: string }; Returns: Json }
       admin_list_volunteers: { Args: { p_status?: string }; Returns: Json }
+      confirm_destination: {
+        Args: { p_confirm: boolean; p_location_id: string }
+        Returns: undefined
+      }
       create_invitation: {
         Args: {
           p_email: string
           p_expires_days: number
           p_max_uses: number
           p_org_id: string
+        }
+        Returns: string
+      }
+      create_location: {
+        Args: {
+          p_contact_name: string
+          p_contact_phone: string
+          p_exact_address: string
+          p_instructions: string
+          p_kind: string
+          p_label_public: string
+          p_org_id: string
+          p_suburb_id: string
         }
         Returns: string
       }
@@ -1468,6 +1485,7 @@ export type Database = {
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
       get_my_context: { Args: never; Returns: Json }
+      get_my_foster_homes: { Args: never; Returns: Json }
       get_my_volunteer_profile: { Args: never; Returns: Json }
       get_org_for_coordinator: { Args: { p_org_id: string }; Returns: Json }
       gettransactionid: { Args: never; Returns: unknown }
@@ -1485,7 +1503,19 @@ export type Database = {
       is_verified_volunteer: { Args: { p_uid: string }; Returns: boolean }
       list_invitations: { Args: { p_org_id: string }; Returns: Json }
       list_joinable_organisations: { Args: never; Returns: Json }
+      list_org_locations: { Args: { p_org_id: string }; Returns: Json }
       list_org_members: { Args: { p_org_id: string }; Returns: Json }
+      list_suburbs: { Args: { p_query: string }; Returns: Json }
+      loc_check_text: {
+        Args: {
+          p_address: string
+          p_instr: string
+          p_label: string
+          p_name: string
+          p_phone: string
+        }
+        Returns: undefined
+      }
       longtransactionsenabled: { Args: never; Returns: boolean }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
@@ -1562,6 +1592,14 @@ export type Database = {
       resubmit_volunteer: { Args: never; Returns: undefined }
       revoke_invitation: {
         Args: { p_invitation_id: string }
+        Returns: undefined
+      }
+      set_foster_status: {
+        Args: {
+          p_can_confirm_receipt: boolean
+          p_is_foster: boolean
+          p_member_id: string
+        }
         Returns: undefined
       }
       st_3dclosestpoint: {
@@ -2146,6 +2184,18 @@ export type Database = {
         Returns: unknown
       }
       unlockrows: { Args: { "": string }; Returns: number }
+      update_location: {
+        Args: {
+          p_contact_name: string
+          p_contact_phone: string
+          p_exact_address: string
+          p_instructions: string
+          p_label_public: string
+          p_location_id: string
+          p_suburb_id: string
+        }
+        Returns: undefined
+      }
       updategeometrysrid: {
         Args: {
           catalogn_name: string
@@ -2153,6 +2203,17 @@ export type Database = {
           new_srid_in: number
           schema_name: string
           table_name: string
+        }
+        Returns: string
+      }
+      upsert_foster_home: {
+        Args: {
+          p_contact_name: string
+          p_contact_phone: string
+          p_exact_address: string
+          p_instructions: string
+          p_member_id: string
+          p_suburb_id: string
         }
         Returns: string
       }
