@@ -1,12 +1,13 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 1c done.
+Updated: 2026-11-08 · Checkpoint 1d done (Batch 1 complete).
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
 - Checkpoint **1b** DONE (migrations applied to pawlift-dev, types generated).
 - Checkpoint **1c** DONE (auth, profile trigger, role-aware shell, demo persona switcher).
-- Next: checkpoint **1d**.
+- Checkpoint **1d** DONE (`npm run test:db` harness + RLS tests; Batch 1 gate met).
+- Next: Batch 2, checkpoint **2a**.
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -21,15 +22,20 @@ Updated: 2026-11-08 · Checkpoint 1c done.
 None.
 
 ## Exact next action
-Batch 1, checkpoint 1d (PLAN.md §12): `test:db` harness and first RLS tests (anon can't read private tables; users can't self-grant admin/coordinator/verified; cross-org isolation; service role not imported in `src/`). Also add a read policy for `suburbs` when first needed.
+Batch 2, checkpoint 2a (PLAN.md §12): org registration; admin verification with recorded checks and reasons; resubmission path. Needs RPCs (security definer, audit in same transaction). Also add a read policy for `suburbs` when first needed. Consider writing the demo seed/`demo:reset` before demo-dependent work.
 
-Notes: `db push --remote` needs `--yes` in agent mode (user approved for 1c). Supabase "Confirm email" is still ON in pawlift-dev; sign-up shows "check your email". User may turn it off for dev convenience.
+Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Confirm email" still ON in pawlift-dev.
 
 ## Implemented / tested / unverified
 - Implemented: Next.js app, design tokens (`src/app/globals.css`), static shell (`SearchCard`, `BottomSheet`, `MapView`), `.env.example`, README, Vitest config + 1 unit test.
 - Tested: lint, typecheck, test, build all pass; map renders in the browser pane (OpenFreeMap, attribution shown).
 - Unverified: mobile layout and keyboard navigation (placeholder controls are disabled); contrast not formally checked.
 - Notes: MapLibre 6 worker is copied to `public/maplibre/` by `scripts/copy-maplibre-worker.mjs` (predev/prebuild; gitignored) because Turbopack can't bundle it. A single map `error` event currently shows the "couldn't load" alert; refine in 3a.
+
+## 1d summary
+- Implemented: `vitest.db.config.ts`, `tests/db/helpers.ts` (refuses unless project ref is in `DEMO_PROJECT_REFS`; creates/cleans up throwaway users and orgs), `tests/db/rls.test.ts`, `tests/unit/no-service-role-in-src.test.ts`, script `test:db`.
+- Tested: `npm run test:db` 53/53 pass against pawlift-dev (anon and signed-in users denied select/insert/update/delete on all 21 tables; no self-grant of admin, coordinator, org verification, volunteer verification or account status; `get_my_context` isolates orgs; `public_requests` readable, private columns absent). `npm test` 2/2, lint, typecheck, build pass. Cleanup verified (0 leftover test users/orgs).
+- Unverified: positive-path RLS (no policies exist yet); the `public_requests` private-column check probes a few guessed names and a `select *` only (no rows seeded).
 
 ## 1c summary
 - Implemented: migration `...000003` (profile trigger, `get_my_context()` RPC), `@supabase/ssr` clients (`src/lib/supabase/server.ts`, `src/proxy.ts`), sign-in/sign-up pages and actions (`src/app/auth/actions.ts`), `AccountMenu` (role labels from memberships, sign out), `DemoSwitcher` (server-checked `APP_ENV=demo`).
