@@ -169,6 +169,8 @@ const ACTION_LABEL: Record<string, string> = {
   "request.publish": "Request published",
   "incident.report": "Problem reported",
   "incident.resolve": "Problem resolved",
+  "organisation.settings": "Organisation settings changed",
+  "admin.private_access": "Platform admin viewed private details",
 };
 export const auditLabel = (a: string) => ACTION_LABEL[a] ?? a;
 

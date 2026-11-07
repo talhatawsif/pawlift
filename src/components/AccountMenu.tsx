@@ -118,6 +118,27 @@ export async function AccountMenu({
                   </Link>
                 </li>
               )}
+              {ctx.is_admin && (
+                <li>
+                  <Link href="/admin/incidents" className="flex h-10 items-center font-medium">
+                    Incidents
+                  </Link>
+                </li>
+              )}
+              {ctx.is_admin && (
+                <li>
+                  <Link href="/admin/audit" className="flex h-10 items-center font-medium">
+                    Audit log
+                  </Link>
+                </li>
+              )}
+              {ctx.is_admin && (
+                <li>
+                  <Link href="/admin/private-access" className="flex h-10 items-center font-medium">
+                    Private access log
+                  </Link>
+                </li>
+              )}
             </ul>
             <form action={signOut} className="mt-3 border-t border-border pt-3">
               <button type="submit" className="flex h-10 w-full items-center gap-2 text-left font-medium">

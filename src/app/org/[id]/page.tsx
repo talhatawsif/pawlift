@@ -41,6 +41,12 @@ async function OrgPageContent({ params }: { params: Promise<{ id: string }> }) {
       <Link href={`/org/${org.id}/locations`} className="mt-2 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
         Locations and destinations
       </Link>
+      <Link href={`/org/${org.id}/history`} className="mt-2 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
+        Transport history
+      </Link>
+      <Link href={`/org/${org.id}/settings`} className="mt-2 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
+        Settings
+      </Link>
       {org.verification_status !== "suspended" && (
         <Link href={`/org/${org.id}/requests`} className="mt-2 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
           Transport requests

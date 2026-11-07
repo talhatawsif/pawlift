@@ -593,6 +593,61 @@ export type Database = {
         }
         Relationships: []
       }
+      private_access_log: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          org_id: string | null
+          reason: string
+          request_id: string | null
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          org_id?: string | null
+          reason: string
+          request_id?: string | null
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          org_id?: string | null
+          reason?: string
+          request_id?: string | null
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "private_access_log_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "private_access_log_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "public_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "private_access_log_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "transport_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           account_status: string
@@ -1322,8 +1377,18 @@ export type Database = {
         Returns: undefined
       }
       admin_get_volunteer: { Args: { p_user_id: string }; Returns: Json }
+      admin_list_audit: {
+        Args: { p_before?: string; p_limit?: number; p_org_id?: string }
+        Returns: Json
+      }
+      admin_list_incidents: { Args: { p_status?: string }; Returns: Json }
       admin_list_organisations: { Args: { p_status?: string }; Returns: Json }
+      admin_list_private_access: { Args: { p_limit?: number }; Returns: Json }
       admin_list_volunteers: { Args: { p_status?: string }; Returns: Json }
+      admin_view_private_details: {
+        Args: { p_reason: string; p_request_id: string }
+        Returns: Json
+      }
       assignment_eligibility_error: {
         Args: { p_leg_id: string; p_uid: string }
         Returns: string
@@ -1580,6 +1645,8 @@ export type Database = {
       list_invitations: { Args: { p_org_id: string }; Returns: Json }
       list_joinable_organisations: { Args: never; Returns: Json }
       list_my_assignments: { Args: never; Returns: Json }
+      list_my_foster_history: { Args: never; Returns: Json }
+      list_my_incoming_deliveries: { Args: never; Returns: Json }
       list_my_notifications: { Args: { p_limit?: number }; Returns: Json }
       list_org_assignments: { Args: { p_org_id: string }; Returns: Json }
       list_org_audit: {
@@ -1592,6 +1659,10 @@ export type Database = {
       list_org_requests: { Args: { p_org_id: string }; Returns: Json }
       list_public_suburbs: { Args: { p_query: string }; Returns: Json }
       list_suburbs: { Args: { p_query: string }; Returns: Json }
+      list_transport_history: {
+        Args: { p_before?: string; p_limit?: number; p_org_id: string }
+        Returns: Json
+      }
       loc_check_text: {
         Args: {
           p_address: string
@@ -1742,6 +1813,7 @@ export type Database = {
       }
       request_membership: { Args: { p_org_id: string }; Returns: undefined }
       require_active_user: { Args: never; Returns: string }
+      require_admin: { Args: never; Returns: string }
       resolve_incident: {
         Args: { p_incident_id: string; p_resolution: string }
         Returns: undefined
@@ -2380,6 +2452,18 @@ export type Database = {
           p_label_public: string
           p_location_id: string
           p_suburb_id: string
+        }
+        Returns: undefined
+      }
+      update_org_settings: {
+        Args: {
+          p_contact_email: string
+          p_contact_name: string
+          p_contact_phone: string
+          p_description: string
+          p_operating_area: string
+          p_org_id: string
+          p_website: string
         }
         Returns: undefined
       }

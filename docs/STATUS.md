@@ -1,10 +1,10 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 6a done (notifications). Batch 6 in progress.
+Updated: 2026-11-08 · Checkpoint 6b done (foster receiving, history, settings, admin oversight). Batch 6 in progress.
 
 ## Current
-- Batches 1–4 DONE. Batch 5 removed (D37, one leg per request). Checkpoint 6a DONE.
-- Next: checkpoint **6b**.
+- Batches 1–4 DONE. Batch 5 removed (D37, one leg per request). Checkpoints 6a, 6b DONE.
+- Next: checkpoint **6c**.
 
 ## Done
 - Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D34), data model, lifecycle, batch gates → `docs/PLAN.md`
@@ -18,9 +18,14 @@ Updated: 2026-11-08 · Checkpoint 6a done (notifications). Batch 6 in progress.
 None.
 
 ## Exact next action
-Checkpoint **6b** (PLAN §12, §8): foster receiving workflow (a foster carer sees incoming deliveries and uses `confirm_receipt`, which has no screen yet), transport history, org settings, admin oversight (incidents, audit log, logged private access). Plan mode first (database and permissions). Saved journeys with `nearby_request` / `route_match` notifications are not built; schedule as its own checkpoint.
+Checkpoint **6c** (PLAN §12): public pages About, How it works, Transport safety, Terms and Privacy, each marked DRAFT for professional review. Low-risk UI, no database. Then Batch 6 gate review (dedupe, recipient permission, reminder timing, suspension tests exist from 6a/6b). Saved journeys with `nearby_request` / `route_match` notifications are not built; schedule as its own checkpoint.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM, so read all `main` elements. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## 6b summary
+- Implemented: migration `...000023` (`private_access_log`, `require_admin`, `list_my_incoming_deliveries`, `list_my_foster_history`, `list_transport_history`, `update_org_settings`, `admin_list_incidents`, `admin_list_audit`, `admin_view_private_details`, `admin_list_private_access`); D39, D40. UI: `/foster` incoming animals with "arrived safely" form and past arrivals; `/org/[id]/history`, `/org/[id]/settings`; `/admin/incidents`, `/admin/audit`, `/admin/private-access`; account menu links for admins. Types regenerated. Volunteer history already existed on `/assignments`.
+- Tested: `npm run test:db` 220/220 (11 new in `tests/db/ops6b.test.ts`: foster isolation, driver contact hidden after delivery, receipt right, history isolation, settings guards and audit, admin refusal, reason required, access logged and visible on the org audit, suspended accounts); `npm test` 36/36; lint, typecheck, build pass. Browser: Sam saved and cleared settings (audit rows written), history empty state, Demo Admin incidents/audit/private-access pages, Mia's `/foster` page.
+- Unverified: **"arrived safely" form and admin "View private details" submit not clicked in the browser** (no demo delivery to Mia; one dev-server cookies invariant error appeared during a scripted submit and did not recur on reload); history with real rows; mobile layout and keyboard use; the admin audit showed the raw action name "organisation.settings" (label added in `src/lib/assignments.ts` after the page loaded; not rechecked).
 
 ## 6a summary
 - Implemented: migration `...000022` (inbox RPCs, reminder preference, `send_assignment_reminders`, `delete_expired_journeys`, pg_cron enabled and three jobs scheduled); D38. UI: `/notifications` (inbox, mark read, reminder toggle), unread count and dot in the account menu. Types regenerated.

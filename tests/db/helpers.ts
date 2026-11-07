@@ -101,5 +101,5 @@ export const APP_TABLES = [
   "invitations", "volunteer_profiles", "verification_records", "locations",
   "location_private", "transport_requests", "request_private", "transport_legs",
   "journeys", "transport_assignments", "handover_confirmations", "route_cache",
-  "incidents", "notifications", "notification_preferences", "audit_logs",
+  "incidents", "notifications", "notification_preferences", "audit_logs", "private_access_log",
 ] as const;
