@@ -1323,10 +1323,26 @@ export type Database = {
       admin_get_volunteer: { Args: { p_user_id: string }; Returns: Json }
       admin_list_organisations: { Args: { p_status?: string }; Returns: Json }
       admin_list_volunteers: { Args: { p_status?: string }; Returns: Json }
+      assignment_eligibility_error: {
+        Args: { p_leg_id: string; p_uid: string }
+        Returns: string
+      }
       can_publish_photo: { Args: { p_name: string }; Returns: boolean }
       can_use_draft_photo: { Args: { p_name: string }; Returns: boolean }
       cancel_request: {
         Args: { p_reason: string; p_request_id: string }
+        Returns: undefined
+      }
+      claim_leg: {
+        Args: {
+          p_idempotency_key: string
+          p_journey_id?: string
+          p_leg_id: string
+        }
+        Returns: string
+      }
+      confirm_assignment: {
+        Args: { p_assignment_id: string }
         Returns: undefined
       }
       confirm_destination: {
@@ -1549,6 +1565,27 @@ export type Database = {
         Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      notify_coordinators: {
+        Args: {
+          p_exclude: string
+          p_key: string
+          p_leg_id: string
+          p_org_id: string
+          p_request_id: string
+          p_type: string
+        }
+        Returns: undefined
+      }
+      notify_user: {
+        Args: {
+          p_key: string
+          p_leg_id: string
+          p_request_id: string
+          p_type: string
+          p_user: string
+        }
+        Returns: undefined
+      }
       photo_org: { Args: { p_name: string }; Returns: string }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
@@ -1605,6 +1642,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      refresh_request_status: {
+        Args: { p_request_id: string }
+        Returns: undefined
+      }
       register_organisation: {
         Args: {
           p_contact_email: string
@@ -1618,6 +1659,10 @@ export type Database = {
           p_website: string
         }
         Returns: string
+      }
+      release_assignment: {
+        Args: { p_assignment_id: string; p_reason: string }
+        Returns: undefined
       }
       req_check_text: {
         Args: {
@@ -2248,6 +2293,7 @@ export type Database = {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
       }
+      sweep_expired_assignments: { Args: never; Returns: number }
       unlockrows: { Args: { "": string }; Returns: number }
       update_location: {
         Args: {

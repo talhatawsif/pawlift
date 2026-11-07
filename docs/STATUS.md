@@ -1,6 +1,6 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 3c done (Batch 3 complete).
+Updated: 2026-11-08 · Checkpoint 4a done.
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
@@ -14,7 +14,8 @@ Updated: 2026-11-08 · Checkpoint 3c done (Batch 3 complete).
 - Checkpoint **3a** DONE (map home, bottom sheet, nearby ordering, location explainer, suburb fallback).
 - Checkpoint **3b** DONE (routing adapter, cache RPCs, DEMO fixtures, coordinator geocoding).
 - Checkpoint **3c** DONE (matching engine, journey planner UI, nav links, `demo:reset` seed). Batch 3 gate met.
-- Next: Batch 4, checkpoint **4a**: do NOT build via /next; start manually in plan mode.
+- Checkpoint **4a** DONE (claim, confirm, release, expiry sweep; DB only).
+- Next: checkpoint **4b**: touches assignments, so start manually in plan mode.
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -29,9 +30,14 @@ Updated: 2026-11-08 · Checkpoint 3c done (Batch 3 complete).
 None.
 
 ## Exact next action
-Checkpoint **4a** (PLAN §12): `claim_leg`, `confirm_assignment`, `release_assignment`, expiry sweep, concurrency test (parallel claims → exactly one succeeds), idempotent retry test. It touches assignments, so start it manually in plan mode with the full checkpoint prompt.
+Checkpoint **4b** (PLAN §12): `offer_leg`, `accept_offer`, `decline_offer`, `withdraw_offer`, `withdraw` (incl. late → incident), `reassign`, cancel with active assignments, access-revocation and suspended-account tests. Reuse `assignment_eligibility_error`, `sweep_expired_assignments` (already handles `offered`), `refresh_request_status`, `notify_user`/`notify_coordinators` from migration 000011. Start in plan mode.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>`; see `src/app/page.tsx`. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server (use static SVG, see `MapView.tsx`). Dev server often already runs on :3000. Demo rows are visible only to demo personas (sign in via the DEMO switcher, e.g. Priya); `npm run demo:reset` refreshes request windows (they run seed time → +7 days).
+
+## 4a summary
+- Implemented: migration `...000011_claim_confirm_release.sql` (RPCs `claim_leg`, `confirm_assignment`, `release_assignment`; internal `assignment_eligibility_error`, `sweep_expired_assignments`, `refresh_request_status`, `notify_user`, `notify_coordinators`); D31 in PLAN. Applied to pawlift-dev; types regenerated.
+- Tested: `npm run test:db` 149/149 (20 new in `tests/db/assignments.test.ts`: 5-way parallel claim → exactly one wins, sequential and parallel idempotent retry, eligibility refusals, overlap, confirm/release permissions, confirm re-check, expiry incl. lazy sweep, direct writes denied); `npm test` 36/36; lint, typecheck, build pass.
+- Unverified: no UI (4c); pg_cron not scheduled (6a); size requirements not enforced; claims refused once the window has started; the db tests share a few volunteers because Supabase auth rate-limits sign-ins (a larger suite may need fewer users or a higher limit); `db push` target is labelled "production" by the CLI but is the only project, pawlift-dev.
 
 ## 3c summary
 - Implemented: `src/lib/matching/` (`prefilter`, `evaluate`, `orderMatches`, `matchJourney`; wait ≤20 min, 5 min handling at each end, ≤5 routed candidates + baseline = ≤6 calls); `src/lib/nav-links/` (Google, Apple, Waze); `src/app/journey/actions.ts` (`findRouteMatches`, nothing stored); `SearchCard` (suburb destination, depart time, max detour), `RouteMatches` ("On your route" + "Also nearby"), `BottomSheet` `top` slot; `scripts/demo-reset.mjs` + `npm run demo:reset`; DEMO fixtures retuned (St Albans–Melton 16, Melton–Geelong 52, same place 2 min); D30 in PLAN.
