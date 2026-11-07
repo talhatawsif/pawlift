@@ -39,7 +39,7 @@ Check installed versions before writing code that depends on an API.
 - `npx supabase gen types typescript --remote > src/lib/database.types.ts`
 
 ## Layout (update as created)
-- `src/app/` — routes: `(public)`, `(volunteer)`, `org/`, `admin/`
+- `src/app/` — routes: `(public)`, `requests/[id]` (claim), `assignments/` (volunteer), `org/[id]/dashboard|audit`, `admin/`
 - `src/lib/` — `supabase/`, `routing/`, `matching/`, `geo/`, `time/`, `nav-links/`
 - `src/components/` — UI; `map/` for MapLibre pieces
 - `supabase/migrations/` — versioned SQL; `scripts/` — seed/reset; `tests/` — unit, db, e2e

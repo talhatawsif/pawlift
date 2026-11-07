@@ -1342,12 +1342,24 @@ export type Database = {
         }
         Returns: string
       }
+      complete_request: {
+        Args: { p_note: string; p_request_id: string }
+        Returns: undefined
+      }
       confirm_assignment: {
         Args: { p_assignment_id: string }
         Returns: undefined
       }
+      confirm_delivery: {
+        Args: { p_assignment_id: string; p_note: string }
+        Returns: undefined
+      }
       confirm_destination: {
         Args: { p_confirm: boolean; p_location_id: string }
+        Returns: undefined
+      }
+      confirm_pickup: {
+        Args: { p_assignment_id: string; p_note: string }
         Returns: undefined
       }
       create_invitation: {
@@ -1535,10 +1547,12 @@ export type Database = {
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
       get_cached_route: { Args: { p_key: string }; Returns: Json }
+      get_leg_private_details: { Args: { p_leg_id: string }; Returns: Json }
       get_my_context: { Args: never; Returns: Json }
       get_my_foster_homes: { Args: never; Returns: Json }
       get_my_volunteer_profile: { Args: never; Returns: Json }
       get_org_for_coordinator: { Args: { p_org_id: string }; Returns: Json }
+      get_request_detail: { Args: { p_request_id: string }; Returns: Json }
       get_request_for_coordinator: {
         Args: { p_request_id: string }
         Returns: Json
@@ -1558,6 +1572,13 @@ export type Database = {
       is_verified_volunteer: { Args: { p_uid: string }; Returns: boolean }
       list_invitations: { Args: { p_org_id: string }; Returns: Json }
       list_joinable_organisations: { Args: never; Returns: Json }
+      list_my_assignments: { Args: never; Returns: Json }
+      list_org_assignments: { Args: { p_org_id: string }; Returns: Json }
+      list_org_audit: {
+        Args: { p_limit?: number; p_org_id: string; p_request_id?: string }
+        Returns: Json
+      }
+      list_org_incidents: { Args: { p_org_id: string }; Returns: Json }
       list_org_locations: { Args: { p_org_id: string }; Returns: Json }
       list_org_members: { Args: { p_org_id: string }; Returns: Json }
       list_org_requests: { Args: { p_org_id: string }; Returns: Json }
@@ -1641,6 +1662,10 @@ export type Database = {
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
       preview_invitation: { Args: { p_token: string }; Returns: Json }
+      progress_lock_internal: {
+        Args: { p_assignment_id: string; p_uid: string }
+        Returns: undefined
+      }
       publish_request: {
         Args: { p_attest: boolean; p_request_id: string }
         Returns: undefined
@@ -1686,6 +1711,16 @@ export type Database = {
         Returns: undefined
       }
       reopen_leg_internal: { Args: { p_leg_id: string }; Returns: undefined }
+      report_incident: {
+        Args: {
+          p_description: string
+          p_leg_id: string
+          p_request_id: string
+          p_severity: string
+          p_type: string
+        }
+        Returns: string
+      }
       req_check_text: {
         Args: {
           p_carrier: string
@@ -1698,6 +1733,10 @@ export type Database = {
       }
       request_membership: { Args: { p_org_id: string }; Returns: undefined }
       require_active_user: { Args: never; Returns: string }
+      resolve_incident: {
+        Args: { p_incident_id: string; p_resolution: string }
+        Returns: undefined
+      }
       resubmit_organisation: {
         Args: {
           p_contact_email: string
@@ -2315,6 +2354,7 @@ export type Database = {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
       }
+      start_leg: { Args: { p_assignment_id: string }; Returns: undefined }
       sweep_expired_assignments: { Args: never; Returns: number }
       unlockrows: { Args: { "": string }; Returns: number }
       update_location: {

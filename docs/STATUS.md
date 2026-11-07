@@ -1,26 +1,13 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 4b done.
+Updated: 2026-11-08 · Checkpoint 4c done. Batch 4 gate met (demo milestone).
 
 ## Current
-- Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
-- Checkpoint **1b** DONE (migrations applied to pawlift-dev, types generated).
-- Checkpoint **1c** DONE (auth, profile trigger, role-aware shell, demo persona switcher).
-- Checkpoint **1d** DONE (`npm run test:db` harness + RLS tests; Batch 1 gate met).
-- Checkpoint **2a** DONE (org registration, admin verification, resubmission).
-- Checkpoint **2b** DONE (invitations, join flow, membership requests, volunteer profile, guidelines, admin volunteer verification).
-- Checkpoint **2c** DONE (locations, confirmed destinations, foster approval and foster home).
-- Checkpoint **2d** DONE (requests, photo sanitising, publish guards, public listing).
-- Checkpoint **3a** DONE (map home, bottom sheet, nearby ordering, location explainer, suburb fallback).
-- Checkpoint **3b** DONE (routing adapter, cache RPCs, DEMO fixtures, coordinator geocoding).
-- Checkpoint **3c** DONE (matching engine, journey planner UI, nav links, `demo:reset` seed). Batch 3 gate met.
-- Checkpoint **4a** DONE (claim, confirm, release, expiry sweep; DB only).
-- Checkpoint **4b** DONE (offers, accept/decline, withdraw incl. late, reassign, cancel with assignments; DB only).
-- Next: checkpoint **4c** (UI; reads private details, so plan first).
+- Batches 1–3 DONE (foundation, supply, journeys). Checkpoints 4a, 4b, 4c DONE (claim, offers, progress, UI).
+- Next: checkpoint **5a** (leg editor). Then 5b must be started manually in plan mode with the full checkpoint prompt.
 
 ## Done
-- Revised product brief → `docs/BRIEF.md`
-- Architecture, decisions, data model, access matrix, lifecycle, claim/relay/foster rules, matching, notifications, demo strategy, batch gates → `docs/PLAN.md`
+- Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D34), data model, lifecycle, batch gates → `docs/PLAN.md`
 
 ## Environment (verified 2026-11-08)
 - macOS; node v26.13.0, npm 11.20.0, git 2.50.1, gh 2.103.3 (logged in as talhatawsif).
@@ -31,47 +18,31 @@ Updated: 2026-11-08 · Checkpoint 4b done.
 None.
 
 ## Exact next action
-Checkpoint **4c** (PLAN §12): volunteer assignment screens (start, pickup, delivery, incident, navigation buttons), coordinator dashboard (needs-a-driver first), confirm/complete, audit trail view; needs `start_leg`, `confirm_pickup`, `confirm_delivery`, `complete_request`, `get_leg_private_details`. Gate: BRIEF §13 volunteer story steps 1–10 by clicking. Start in plan mode.
+Checkpoint **5a** (PLAN §12): leg editor (split/merge, handover points, chronology and continuity validation, PLAN §7). Needs a plan first (database work). Gate for Batch 5 is in PLAN §12. `confirm_pickup`/`confirm_delivery` and `progress_lock_internal` currently refuse requests with more than one non-cancelled leg ("Multi-driver relays are not available yet"); 5b replaces that.
 
-Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>`; see `src/app/page.tsx`. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server (use static SVG, see `MapView.tsx`). Dev server often already runs on :3000. Demo rows are visible only to demo personas (sign in via the DEMO switcher, e.g. Priya); `npm run demo:reset` refreshes request windows (they run seed time → +7 days).
+Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM, so read all `main` elements. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## 4c summary
+- Implemented: migrations `...000015` (RPCs `start_leg`, `confirm_pickup`, `confirm_delivery`, `complete_request`, `report_incident`, `resolve_incident`, `get_leg_private_details`, `list_my_assignments`, `get_request_detail`, `list_org_assignments`, `list_org_incidents`, `list_org_audit`), `...000016` (audit by request matches leg events), `...000017` (claims allowed until `window_end`, D34), `...000018` (private details left-join `request_private`); D33, D34 in PLAN. Pages: `/requests/[id]` (claim, idempotency key), `/assignments`, `/assignments/[id]` (private details, nav links, start/pickup/delivery/withdraw/report), `/org/[id]/dashboard` (needs-a-driver first; confirm, turn down, offer, withdraw offer, reassign, complete, resolve incident), `/org/[id]/audit`. Links from the map detail panel, route matches, account menu, org page. `scripts/demo-reset.mjs` now seeds contacts and `request_private` and clears audit rows.
+- Tested: `npm run test:db` 191/191 (17 new in `tests/db/progress.test.ts`: window guards, order, private-details revocation by withdraw/reassign/cancel/delivery/suspension, no private fields in lists, completion guards, incidents, org isolation, claim window rule); `npm test` 36/36; lint, typecheck, build pass; `demo:reset` ran twice. Browser (pawlift-dev, DEMO personas): Priya claims Biscuit from the map detail panel → Sam confirms on the dashboard → Priya sees addresses, contacts and medical notes → start, pickup, delivery → details disappear → Sam completes → dashboard shows Completed → audit page lists six events. One 4a test changed (hold now caps at window end).
+- Unverified: offer/accept, decline, withdraw, reassign, turn-down, release and incident forms in the browser (db tests only); Sam's notification list (no UI until 6a); mobile layout and keyboard use of new pages; navigation links open correctly (demo seed has addresses only, no exact points); route-match "View details" link (map detail panel link was clicked); `en_route` and `collected` screens were passed through but not inspected visually; `list_org_incidents` shows at most 50; relays and foster receipt not built (Batch 5/6); pg_cron not scheduled (6a); size requirements not enforced.
 
 ## 4b summary
-- Implemented: migrations `...000012` (RPCs `offer_leg`, `accept_offer`, `decline_offer`, `withdraw_offer`, `withdraw`, `reassign`, replacement `cancel_request`; internal `create_offer_internal`, `reopen_leg_internal`), `...000013` (offers need a server-made idempotency key), `...000014` (offer_leg conflict error); D32 in PLAN. Applied to pawlift-dev; types regenerated.
-- Tested: `npm run test:db` 174/174 (25 new in `tests/db/offers.test.ts`: permissions, eligibility, expiry, parallel offer and accept-vs-withdraw races, late-withdrawal incident, reassign with rollback, cancel with assignments, suspended accounts, status-level revocation); `npm test` 36/36; lint, typecheck, build pass. One old test in `requests.test.ts` changed: cancelling with a volunteer involved is now allowed.
-- Unverified: no UI (4c); **access revocation is tested only as assignment status** because `get_leg_private_details` does not exist yet; pg_cron not scheduled (6a); size not enforced; reassign-with-offer is an extension beyond PLAN §5.1; `en_route` paths tested by setting statuses directly (`start_leg` is 4c).
+- Implemented: migrations `...000012`–`...000014` (offers, accept/decline, withdraw incl. late, reassign, cancel with assignments); D32 in PLAN.
+- Tested: `test:db` 174/174 at the time (25 new in `tests/db/offers.test.ts`). The 4b "revocation tested only as assignment status" gap is closed by `progress.test.ts`.
+- Unverified: reassign-with-offer is an extension beyond PLAN §5.1.
 
 ## 4a summary
-- Implemented: migration `...000011_claim_confirm_release.sql` (RPCs `claim_leg`, `confirm_assignment`, `release_assignment`; internal `assignment_eligibility_error`, `sweep_expired_assignments`, `refresh_request_status`, `notify_user`, `notify_coordinators`); D31 in PLAN. Applied to pawlift-dev; types regenerated.
-- Tested: `npm run test:db` 149/149 (20 new in `tests/db/assignments.test.ts`: 5-way parallel claim → exactly one wins, sequential and parallel idempotent retry, eligibility refusals, overlap, confirm/release permissions, confirm re-check, expiry incl. lazy sweep, direct writes denied); `npm test` 36/36; lint, typecheck, build pass.
-- Unverified: no UI (4c); pg_cron not scheduled (6a); size requirements not enforced; claims refused once the window has started; the db tests share a few volunteers because Supabase auth rate-limits sign-ins (a larger suite may need fewer users or a higher limit); `db push` target is labelled "production" by the CLI but is the only project, pawlift-dev.
+- Implemented: migration `...000011` (`claim_leg`, `confirm_assignment`, `release_assignment`, expiry sweep, helpers); D31.
+- Tested: 20 tests in `tests/db/assignments.test.ts` (5-way parallel claim, idempotent retry, eligibility, overlap, expiry). The db tests share a few volunteers because Supabase auth rate-limits sign-ins.
+- Unverified: pg_cron not scheduled (6a); `db push` target is labelled "production" by the CLI but is the only project, pawlift-dev.
 
 ## 3c summary
-- Implemented: `src/lib/matching/` (`prefilter`, `evaluate`, `orderMatches`, `matchJourney`; wait ≤20 min, 5 min handling at each end, ≤5 routed candidates + baseline = ≤6 calls); `src/lib/nav-links/` (Google, Apple, Waze); `src/app/journey/actions.ts` (`findRouteMatches`, nothing stored); `SearchCard` (suburb destination, depart time, max detour), `RouteMatches` ("On your route" + "Also nearby"), `BottomSheet` `top` slot; `scripts/demo-reset.mjs` + `npm run demo:reset`; DEMO fixtures retuned (St Albans–Melton 16, Melton–Geelong 52, same place 2 min); D30 in PLAN.
-- Tested: `npm test` 36/36 (17 new in `tests/unit/matching.test.ts`: detour arithmetic, pickup before drop-off, window, 20 min wait, deadline, capability filter, max detour, prefilter, ordering, DEMO match, no-fixture failure); `test:db` 129/129; lint, typecheck, build pass; `demo:reset` succeeded twice. Browser (pawlift-dev, Priya persona): St Albans → Geelong shows Biscuit "+8 min driving · about 10 min", labelled DEMO, no live claim.
-- Unverified: ORS path of the matcher (no key; request/response shapes still untested); links open correctly in the three apps; keyboard use of the destination combobox; desktop layout; matcher treats relays as one pickup → drop-off; capability filter in the UI (only the unfiltered path was run); `findRouteMatches` has no rate limit beyond the 6-call budget. `demo:reset` seeds people, orgs, locations, 4 requests only; offers, relay, completed transport and verification records wait for Batch 4+ tables; seeded Priya's UI path for cat-with-carrier filter not checked.
+- Implemented: `src/lib/matching/`, `src/lib/nav-links/`, `src/app/journey/actions.ts`, `SearchCard`, `RouteMatches`, `scripts/demo-reset.mjs`; D30.
+- Tested: 17 unit tests; browser: Priya, St Albans → Geelong shows Biscuit "+8 min driving", labelled DEMO.
+- Unverified: **ORS request/response shapes never run against a real key** (hand-made bodies only); links open in the three apps; desktop layout; matcher treats relays as one pickup → drop-off.
 
-## 3b summary
-- Implemented: migration `...000010_routing_cache_geocode.sql` (`get_cached_route`, `put_cached_route`, `set_location_exact_point`, trigger clearing the point on address change); `src/lib/routing/` (`types`, `demo`, `ors`, `index` with `getRoute`, `RouteBudget`, `geocodeAddress`); `GeocodeButton` and `geocodeLocation` action on `/org/[id]/locations`; D29 in PLAN.
-- Tested: `npm run test:db` 129/129 (5 new in `tests/db/routing.test.ts`); `npm test` 19/19 (12 new in `tests/unit/routing.test.ts`: key rounding, fixtures, no-key = DEMO only, budget, 429/500 mapping, parsing); lint, typecheck, build pass.
-- Unverified: **the ORS request and response shapes were written from memory of the API and never run against a real key** (parsing is unit-tested on hand-made bodies only); geocode button in the browser; DEMO fixture minutes are guesses; no UI shows route estimates yet (3c); the 24 h expiry is checked at read, with no cleanup job.
-
-## 3a summary
-- Implemented: migration `...000009_public_suburbs.sql` (`list_public_suburbs`, anon-callable); `src/lib/geo/distance.ts`; `HomeClient`, `BottomSheet` (peek/half/full, drag + keyboard), `RequestCard`, `LocationExplainer`, `SearchCard` (origin chip), `MapView` (paw pins, selected enlarges, urgent amber), `src/app/suburbs/actions.ts`; D28 in PLAN. Home reads `public_requests`.
-- Tested: `npm run test:db` 124/124 (3 new in `tests/db/suburbs.test.ts`); `npm test` 7/7 (3 new distance); lint, typecheck, build pass. Browser (real pawlift-dev, 3 throwaway published requests, since deleted): list and pins render, suburb picker works signed out, choosing Williamstown re-sorts nearest-first and flies the map, card opens detail in the sheet.
-- Unverified: real browser geolocation grant/deny (only the suburb path was run); pin click → card; sheet drag gesture and keyboard arrows; desktop layout (sheet is max-w-md, not the left-panel layout); focus trap in the explainer; suburb centroids are approximate; destination field and search button are disabled until 3c.
-
-## 2d summary
-- Implemented: migrations `...000007_requests.sql` (RPCs `create_request`, `update_request`, `set_request_photo`, `publish_request`, `cancel_request`, `get_request_for_coordinator`, `list_org_requests`; storage buckets and policies; `public_requests` demo isolation) and `...000008` (conflict code); `src/lib/requests.ts`, `src/lib/time/melbourne.ts`; pages `/org/[id]/requests[/new|/id]`, public `/requests`; `RequestForm`, `RequestActions`; sharp photo pipeline; D26, D27 in PLAN.
-- Tested: `npm run test:db` 121/121 (19 new in `tests/db/requests.test.ts`); `npm test` 4/4; lint, typecheck, build pass. Browser (real pawlift-dev, throwaway user/org, since deleted): create draft, upload photo (draft photo not publicly fetchable), publish, request appears on `/requests` with suburbs only, photo public after publish. EXIF/GPS stripped confirmed with a synthetic JPEG.
-- Unverified: edit/cancel/remove-photo buttons in the browser; mobile layout beyond a narrow pane; keyboard navigation; a failed photo copy at publish only shows a note (no retry); public copy of a photo stays after cancel; `/requests` has no link from the map home yet; windows entered in Melbourne time tested only by unit test.
-- Test helpers now delete requests before orgs and null `release_authority_attested_by` before deleting users.
-
-## 2c summary
-- Implemented: migration `20261108000006_locations_fosters.sql` (RPCs `list_suburbs`, `create_location`, `update_location`, `confirm_destination`, `list_org_locations`, `set_foster_status`, `upsert_foster_home`, `get_my_foster_homes`; ~40 seeded suburbs); `src/lib/locations.ts`; `/org/[id]/locations`, `/foster`, foster controls on `/org/[id]/members`; `LocationForm`; account-menu link; D24, D25 in PLAN.
-- Tested: `npm run test:db` 102/102 (19 new in `tests/db/locations.test.ts`: coordinator/verified guards, centroid-only public point, private-field isolation, direct table denial, confirmation cleared on move, handover point refused, foster approve/home/idempotency/revoke, audit, demo flag). lint, typecheck, `npm test` 2/2, build pass.
-- Unverified: browser UI for all new pages (not exercised); mobile layout; keyboard navigation; **suburb centroids are approximate hand-typed values**; foster carers cannot yet edit their own home; `can_confirm_receipt` checkbox is not pre-filled from current state.
-
-## 2b summary
-- Implemented: migration `20261108000005_membership_volunteers.sql` (16 RPCs: invitations create/revoke/list/preview/accept, joinable orgs, request/decide membership, org member list, volunteer profile upsert, guidelines, resubmit, own profile, admin list/get/decide volunteer; helpers `is_verified_volunteer`, `is_active_coordinator`, `invitation_state`); `src/lib/membership.ts`, `src/lib/guidelines.ts`; pages `/org/[id]/members`, `/join`, `/join/[token]`, `/volunteer`, `/admin/volunteers[/id]`; `InviteForm`, `AcceptInvitation`, `VolunteerForm`; `DecisionForm` generalised (takes the action); D21–D23 in PLAN.
-- Tested: `npm run test:db` 83/83 (20 new in `tests/db/membership.test.ts`: invite guards, max uses, email-bound, revoke/expiry, org-suspended, request/approve/remove, coordinator guard, demo isolation, profile validation, guidelines, verification transitions, admin-only). lint, typecheck, `npm test` 2/2, build pass. Browser (real pawlift-dev, throwaway users, since deleted): coordinator creates open link → volunteer accepts → saves profile → accepts guidelines → admin verifies; DB confirmed.
-- Unverified: browser UI for requests/approve/remove, email-bound invites and mailto link, revoke, rejection/resubmission and suspend (db tests only); mobile layout; keyboard navigation; clipboard copy button. Signed-out users opening an invite must sign in then reopen the link (sign-in has no return-path yet).
+## Earlier checkpoints (details in git history)
+- 3b: routing adapter, cache RPCs, DEMO fixtures, geocoding (D29). 3a: map home, bottom sheet, suburb fallback (D28). Unverified: real browser geolocation; suburb centroids are approximate.
+- 2d: requests, photo sanitising, publish guards (D26, D27). 2c: locations, destinations, foster homes (D24, D25). 2b: invitations, membership, volunteer profile and verification (D21–D23). 2a: org registration and admin verification. 1a–1d: scaffold, migrations, auth, db test harness.
+- Standing unverified: mobile layout and keyboard navigation across pages; foster carers cannot edit their own home; signed-out invite links need sign-in then reopen.

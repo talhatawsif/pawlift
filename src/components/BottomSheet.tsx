@@ -153,6 +153,9 @@ function Detail({ r, onBack }: { r: NearbyRequest; onBack: () => void }) {
       {r.carrier_requirements && <p className="mt-2 text-sm"><span className="font-medium">Carrier:</span> {r.carrier_requirements}</p>}
       {r.handling_requirements && <p className="mt-1 text-sm"><span className="font-medium">Handling:</span> {r.handling_requirements}</p>}
       <p className="mt-3 text-sm text-muted">Exact addresses are shared only with the confirmed volunteer.</p>
+      <Link href={`/requests/${r.id}`} className="mt-3 flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">
+        View details and take this
+      </Link>
     </div>
   );
 }

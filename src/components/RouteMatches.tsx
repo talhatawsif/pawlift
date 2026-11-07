@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight, Clock, ExternalLink } from "lucide-react";
 import type { JourneyResult, MatchView } from "@/app/journey/actions";
 import { SpeciesIcon } from "@/components/RequestCard";
@@ -88,6 +89,9 @@ function MatchCard({ m, origin, destination, onSelect }: { m: MatchView; origin:
           <SourceLabel source={m.source} />
         </span>
       </button>
+      <Link href={`/requests/${m.id}`} className="mt-2 flex h-11 items-center justify-center rounded-xl bg-brand text-sm font-semibold text-brand-foreground">
+        View details and take this
+      </Link>
       {links.length > 0 && origin && destination && (
         <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
           <span className="text-muted">Preview the trip (approximate stops):</span>

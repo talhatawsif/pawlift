@@ -31,13 +31,19 @@ const EMAIL = (k) => `${k}@demo.pawlift.invalid`;
 // ---- delete previous demo data (only is_demo rows and demo users)
 must("delete requests", await db.from("transport_requests").delete().eq("is_demo", true));
 must("delete locations", await db.from("locations").delete().eq("is_demo", true));
+// audit rows reference demo orgs and users; clear them first (demo data only)
+const demoOrgs = must("demo orgs", await db.from("organisations").select("id").eq("is_demo", true));
+if (demoOrgs.length) must("delete audit (orgs)", await db.from("audit_logs").delete().in("org_id", demoOrgs.map((o) => o.id)));
 must("delete organisations", await db.from("organisations").delete().eq("is_demo", true));
 let page = 1;
 for (;;) {
   const { data, error } = await db.auth.admin.listUsers({ page, perPage: 200 });
   if (error) throw new Error(`list users: ${error.message}`);
   for (const u of data.users) {
-    if (u.email?.endsWith("@demo.pawlift.invalid")) must("delete user", await db.auth.admin.deleteUser(u.id));
+    if (u.email?.endsWith("@demo.pawlift.invalid")) {
+      must("delete audit (actor)", await db.from("audit_logs").delete().eq("actor_id", u.id));
+      must("delete user", await db.auth.admin.deleteUser(u.id));
+    }
   }
   if (data.users.length < 200) break;
   page += 1;
@@ -135,7 +141,7 @@ for (const [k, kind, label, suburb, point, addr, confirmed] of LOCS) {
     linked_user_id: k === "foster_mia" ? uid.mia : null,
   }).select("id").single());
   loc[k] = row.id;
-  must(`private ${k}`, await db.from("location_private").insert({ location_id: row.id, exact_address: addr, instructions: "DEMO data: not a real place." }));
+  must(`private ${k}`, await db.from("location_private").insert({ location_id: row.id, exact_address: addr, contact_name: "Demo front desk", contact_phone: "0400 000 000", instructions: "DEMO data: not a real place. Ring the bell." }));
 }
 
 // ---- requests (windows run from seeding time for a week so the demo stays usable; rerun to refresh)
@@ -156,6 +162,9 @@ for (const r of REQS) {
     release_authority_attested_by: open ? uid.sam : null, release_authority_attested_at: open ? now : null,
     origin_location_id: loc[r.from], destination_location_id: loc[r.to], is_demo: true,
   }).select("id").single());
+  must(`private ${r.name}`, await db.from("request_private").insert({
+    request_id: row.id, medical_notes: "DEMO: fictional note. Eats at 6pm.", coordinator_instructions: "DEMO: call the coordinator on arrival.",
+  }));
   must(`leg ${r.name}`, await db.from("transport_legs").insert({
     request_id: row.id, seq: 1, from_location_id: loc[r.from], to_location_id: loc[r.to],
     window_start: now, window_end: in7d, status: "open",

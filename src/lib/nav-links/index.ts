@@ -24,3 +24,14 @@ export function navLink(app: NavApp, origin: Point, stops: Point[], destination:
   const first = stops[0] ?? destination;
   return `https://waze.com/ul?ll=${encodeURIComponent(c(first))}&navigate=yes`;
 }
+
+/** Turn-by-turn link to a single stop, for the confirmed volunteer's own device. Uses the exact point, else the address text. */
+export function stopLink(app: NavApp, stop: { lat: number | null; lng: number | null; address: string | null }): string | null {
+  const q = stop.lat != null && stop.lng != null ? `${stop.lat.toFixed(5)},${stop.lng.toFixed(5)}` : stop.address;
+  if (!q) return null;
+  if (app === "google") return `https://www.google.com/maps/dir/?${new URLSearchParams({ api: "1", destination: q, travelmode: "driving" })}`;
+  if (app === "apple") return `https://maps.apple.com/?${new URLSearchParams({ daddr: q, dirflg: "d" })}`;
+  return stop.lat != null && stop.lng != null
+    ? `https://waze.com/ul?ll=${encodeURIComponent(q)}&navigate=yes`
+    : `https://waze.com/ul?q=${encodeURIComponent(q)}&navigate=yes`;
+}

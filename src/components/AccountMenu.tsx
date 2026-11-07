@@ -54,8 +54,16 @@ export async function AccountMenu({
                     <Link href={`/org/${m.org_id}`} className="flex h-10 items-center font-medium">
                       {m.org_name}
                     </Link>
+                    <Link href={`/org/${m.org_id}/dashboard`} className="flex h-10 items-center pl-3 text-muted">
+                      Dashboard
+                    </Link>
                   </li>
                 ))}
+              <li>
+                <Link href="/assignments" className="flex h-10 items-center font-medium">
+                  My assignments
+                </Link>
+              </li>
               <li>
                 <Link href="/volunteer" className="flex h-10 items-center font-medium">
                   Volunteer profile

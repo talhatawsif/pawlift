@@ -125,12 +125,12 @@ describe("claim_leg", () => {
     expect(n!.map((x) => x.user_id)).toContain(coord.id);
   });
 
-  it("caps the hold at the window start", async () => {
+  it("caps the hold at the window end (4c: claims stay open while the window runs)", async () => {
     const v = vol;
-    const { legId } = await publishedLeg({ p_window_start: hours(2), p_window_end: hours(5) });
+    const { legId } = await publishedLeg({ p_window_start: hours(1), p_window_end: hours(3) });
     const { data: id } = await rpc(v, "claim_leg", { p_leg_id: legId, p_idempotency_key: key() });
     const a = await asnRow(id);
-    expect(Math.abs(new Date(a.reserved_until).getTime() - Date.now() - 2 * 3600_000)).toBeLessThan(60_000);
+    expect(Math.abs(new Date(a.reserved_until).getTime() - Date.now() - 3 * 3600_000)).toBeLessThan(60_000);
   });
 
   it("lets exactly one of five parallel claimers win", async () => {
