@@ -5,6 +5,7 @@ import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getMyContext } from "@/lib/session";
 import { formatMelbourne, typeLabel, verificationLabel, type OrgDetail } from "@/lib/org";
+import { decideOrganisation } from "@/app/admin/actions";
 import { DecisionForm } from "@/components/DecisionForm";
 
 export const metadata = { title: "Review organisation · PawLift" };
@@ -43,7 +44,7 @@ async function AdminOrgPageContent({ params }: { params: Promise<{ id: string }>
       </dl>
       <section className="mt-6">
         <h2 className="mb-3 text-lg font-semibold">Decision</h2>
-        <DecisionForm orgId={org.id} status={org.verification_status} />
+        <DecisionForm action={decideOrganisation} subjectId={org.id} status={org.verification_status} />
       </section>
       {org.history.length > 0 && (
         <section className="mt-8">

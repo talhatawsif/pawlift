@@ -6,7 +6,7 @@ import { rpcMessage } from "@/lib/org";
 import type { FormState } from "@/app/auth/actions";
 
 export async function decideOrganisation(_: FormState, form: FormData): Promise<FormState> {
-  const orgId = String(form.get("org_id") ?? "");
+  const orgId = String(form.get("subject_id") ?? "");
   const decision = String(form.get("decision") ?? "");
   const reason = String(form.get("reason") ?? "").trim();
   const checks = String(form.get("checks") ?? "")
@@ -24,4 +24,32 @@ export async function decideOrganisation(_: FormState, form: FormData): Promise<
   });
   if (error) return { error: rpcMessage(error.code, "We couldn't record that decision.") };
   redirect("/admin/organisations");
+}
+
+export async function decideVolunteer(_: FormState, form: FormData): Promise<FormState> {
+  const userId = String(form.get("subject_id") ?? "");
+  const decision = String(form.get("decision") ?? "");
+  const reason = String(form.get("reason") ?? "").trim();
+  const checks = String(form.get("checks") ?? "")
+    .split("\n")
+    .map((c) => c.trim())
+    .filter(Boolean);
+  if (decision === "verified" && checks.length === 0) return { error: "List at least one check you performed." };
+  if (decision !== "verified" && !reason) return { error: "A reason is required." };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_decide_volunteer", {
+    p_user_id: userId,
+    p_decision: decision,
+    p_checks: checks,
+    p_reason: reason,
+  });
+  if (error) {
+    return {
+      error:
+        error.code === "55000"
+          ? "That isn't possible now. The volunteer may not have accepted the guidelines yet."
+          : rpcMessage(error.code, "We couldn't record that decision."),
+    };
+  }
+  redirect("/admin/volunteers");
 }

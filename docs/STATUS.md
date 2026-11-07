@@ -1,6 +1,6 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 2a done.
+Updated: 2026-11-08 · Checkpoint 2b done.
 
 ## Current
 - Batch 1, checkpoint **1a** DONE (scaffold + static map-first shell, repo pushed).
@@ -8,7 +8,8 @@ Updated: 2026-11-08 · Checkpoint 2a done.
 - Checkpoint **1c** DONE (auth, profile trigger, role-aware shell, demo persona switcher).
 - Checkpoint **1d** DONE (`npm run test:db` harness + RLS tests; Batch 1 gate met).
 - Checkpoint **2a** DONE (org registration, admin verification, resubmission).
-- Next: Batch 2, checkpoint **2b**.
+- Checkpoint **2b** DONE (invitations, join flow, membership requests, volunteer profile, guidelines, admin volunteer verification).
+- Next: Batch 2, checkpoint **2c**.
 
 ## Done
 - Revised product brief → `docs/BRIEF.md`
@@ -23,7 +24,7 @@ Updated: 2026-11-08 · Checkpoint 2a done.
 None.
 
 ## Exact next action
-Batch 2, checkpoint 2b (PLAN.md §12): invitations (open link and email-bound), join flow, membership requests, approve/remove; volunteer profile, guideline acceptance, admin volunteer verification. Reuse `require_active_user()` and the audit pattern from migration `...000004`. Consider writing the demo seed/`demo:reset` before demo-dependent work (still not written).
+Batch 2, checkpoint 2c (PLAN.md §12): locations (public/private split), confirmed destinations, foster association and foster home. Reuse `is_active_coordinator()`, `require_active_user()` and the audit pattern from migrations `...000004`/`...000005`. Foster flags on `organisation_members` already exist; invitations currently grant only the volunteer role. The demo seed/`demo:reset` is still not written; do it before demo-dependent work (3c at the latest).
 
 Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Confirm email" still ON in pawlift-dev. Pages that read cookies must wrap an async content component in `<Suspense>` (build fails otherwise); see `src/app/org/[id]/page.tsx`.
 
@@ -32,6 +33,11 @@ Notes: `db push --remote` needs `--yes` in agent mode (ask the user first). "Con
 - Tested: lint, typecheck, test, build all pass; map renders in the browser pane (OpenFreeMap, attribution shown).
 - Unverified: mobile layout and keyboard navigation (placeholder controls are disabled); contrast not formally checked.
 - Notes: MapLibre 6 worker is copied to `public/maplibre/` by `scripts/copy-maplibre-worker.mjs` (predev/prebuild; gitignored) because Turbopack can't bundle it. A single map `error` event currently shows the "couldn't load" alert; refine in 3a.
+
+## 2b summary
+- Implemented: migration `20261108000005_membership_volunteers.sql` (16 RPCs: invitations create/revoke/list/preview/accept, joinable orgs, request/decide membership, org member list, volunteer profile upsert, guidelines, resubmit, own profile, admin list/get/decide volunteer; helpers `is_verified_volunteer`, `is_active_coordinator`, `invitation_state`); `src/lib/membership.ts`, `src/lib/guidelines.ts`; pages `/org/[id]/members`, `/join`, `/join/[token]`, `/volunteer`, `/admin/volunteers[/id]`; `InviteForm`, `AcceptInvitation`, `VolunteerForm`; `DecisionForm` generalised (takes the action); D21–D23 in PLAN.
+- Tested: `npm run test:db` 83/83 (20 new in `tests/db/membership.test.ts`: invite guards, max uses, email-bound, revoke/expiry, org-suspended, request/approve/remove, coordinator guard, demo isolation, profile validation, guidelines, verification transitions, admin-only). lint, typecheck, `npm test` 2/2, build pass. Browser (real pawlift-dev, throwaway users, since deleted): coordinator creates open link → volunteer accepts → saves profile → accepts guidelines → admin verifies; DB confirmed.
+- Unverified: browser UI for requests/approve/remove, email-bound invites and mailto link, revoke, rejection/resubmission and suspend (db tests only); mobile layout; keyboard navigation; clipboard copy button. Signed-out users opening an invite must sign in then reopen the link (sign-in has no return-path yet).
 
 ## 2a summary
 - Implemented: migration `20261108000004_org_registration_verification.sql` (`register_organisation`, `resubmit_organisation`, `admin_decide_organisation`, `get_org_for_coordinator`, `admin_list_organisations`, `require_active_user`, append-only trigger); `src/lib/org.ts`; actions `src/app/org/actions.ts`, `src/app/admin/actions.ts`; pages `/org/new`, `/org/[id]`, `/admin/organisations`, `/admin/organisations/[id]`; `OrgForm`, `DecisionForm`; account menu links; D19/D20 in PLAN.

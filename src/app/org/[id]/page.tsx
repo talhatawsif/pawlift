@@ -32,6 +32,10 @@ async function OrgPageContent({ params }: { params: Promise<{ id: string }> }) {
         {org.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent">DEMO</span>}
       </p>
 
+      <Link href={`/org/${org.id}/members`} className="mt-4 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
+        Volunteers and invitations
+      </Link>
+
       {org.verification_status === "pending" && (
         <p role="status" className="mt-4 rounded-xl border border-border bg-surface p-3 text-sm">
           We&rsquo;re checking your details. You can&rsquo;t publish transport requests until you&rsquo;re verified.

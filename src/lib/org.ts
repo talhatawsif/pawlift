@@ -43,6 +43,7 @@ export function rpcMessage(code: string | undefined, fallback: string): string {
     case "42501": return "You don't have permission to do that.";
     case "54000": return "You already have 3 organisations awaiting verification.";
     case "55000": return "That isn't possible in the organisation's current state.";
+    case "P0002": return "We couldn't find that, or it's no longer valid.";
     case "22023": return "Please check the details and try again.";
     default: return fallback;
   }

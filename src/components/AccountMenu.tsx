@@ -57,6 +57,16 @@ export async function AccountMenu({
                   </li>
                 ))}
               <li>
+                <Link href="/volunteer" className="flex h-10 items-center font-medium">
+                  Volunteer profile
+                </Link>
+              </li>
+              <li>
+                <Link href="/join" className="flex h-10 items-center font-medium">
+                  Find an organisation
+                </Link>
+              </li>
+              <li>
                 <Link href="/org/new" className="flex h-10 items-center font-medium">
                   Register an organisation
                 </Link>
@@ -65,6 +75,13 @@ export async function AccountMenu({
                 <li>
                   <Link href="/admin/organisations" className="flex h-10 items-center font-medium">
                     Verify organisations
+                  </Link>
+                </li>
+              )}
+              {ctx.is_admin && (
+                <li>
+                  <Link href="/admin/volunteers" className="flex h-10 items-center font-medium">
+                    Verify volunteers
                   </Link>
                 </li>
               )}

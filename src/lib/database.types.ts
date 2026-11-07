@@ -1262,6 +1262,8 @@ export type Database = {
         Returns: unknown
       }
       _st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      accept_guidelines: { Args: { p_version: string }; Returns: undefined }
+      accept_invitation: { Args: { p_token: string }; Returns: string }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
         | {
@@ -1309,7 +1311,31 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_decide_volunteer: {
+        Args: {
+          p_checks: Json
+          p_decision: string
+          p_reason: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      admin_get_volunteer: { Args: { p_user_id: string }; Returns: Json }
       admin_list_organisations: { Args: { p_status?: string }; Returns: Json }
+      admin_list_volunteers: { Args: { p_status?: string }; Returns: Json }
+      create_invitation: {
+        Args: {
+          p_email: string
+          p_expires_days: number
+          p_max_uses: number
+          p_org_id: string
+        }
+        Returns: string
+      }
+      decide_membership: {
+        Args: { p_decision: string; p_member_id: string }
+        Returns: undefined
+      }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
         | {
@@ -1442,8 +1468,24 @@ export type Database = {
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
       get_my_context: { Args: never; Returns: Json }
+      get_my_volunteer_profile: { Args: never; Returns: Json }
       get_org_for_coordinator: { Args: { p_org_id: string }; Returns: Json }
       gettransactionid: { Args: never; Returns: unknown }
+      invitation_state: {
+        Args: { p_token: string }
+        Returns: {
+          inv_id: string
+          reason: string
+        }[]
+      }
+      is_active_coordinator: {
+        Args: { p_org: string; p_uid: string }
+        Returns: boolean
+      }
+      is_verified_volunteer: { Args: { p_uid: string }; Returns: boolean }
+      list_invitations: { Args: { p_org_id: string }; Returns: Json }
+      list_joinable_organisations: { Args: never; Returns: Json }
+      list_org_members: { Args: { p_org_id: string }; Returns: Json }
       longtransactionsenabled: { Args: never; Returns: boolean }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
@@ -1485,6 +1527,7 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      preview_invitation: { Args: { p_token: string }; Returns: Json }
       register_organisation: {
         Args: {
           p_contact_email: string
@@ -1499,6 +1542,7 @@ export type Database = {
         }
         Returns: string
       }
+      request_membership: { Args: { p_org_id: string }; Returns: undefined }
       require_active_user: { Args: never; Returns: string }
       resubmit_organisation: {
         Args: {
@@ -1513,6 +1557,11 @@ export type Database = {
           p_type: string
           p_website: string
         }
+        Returns: undefined
+      }
+      resubmit_volunteer: { Args: never; Returns: undefined }
+      revoke_invitation: {
+        Args: { p_invitation_id: string }
         Returns: undefined
       }
       st_3dclosestpoint: {
@@ -2106,6 +2155,16 @@ export type Database = {
           table_name: string
         }
         Returns: string
+      }
+      upsert_volunteer_profile: {
+        Args: {
+          p_availability: Json
+          p_has_carrier: boolean
+          p_max_size: string
+          p_species_ok: string[]
+          p_vehicle_notes: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
