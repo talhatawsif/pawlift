@@ -39,10 +39,19 @@ describe("route cache RPCs", () => {
   it("stores ors results, returns them, and ignores entries older than 24 h", async () => {
     const put = await rpc(coord.client, "put_cached_route", { p_key: KEY, p_provider: "ors", p_duration_s: 600, p_distance_m: 9000, p_legs: [{ durationS: 600, distanceM: 9000 }] });
     expect(put.error).toBeNull();
-    const got = await rpc(other.client, "get_cached_route", { p_key: KEY });
+    const got = await rpc(coord.client, "get_cached_route", { p_key: KEY });
     expect(got.data).toMatchObject({ provider: "ors", duration_s: 600, distance_m: 9000 });
     await admin.from("route_cache").update({ created_at: new Date(Date.now() - 25 * 3600_000).toISOString() }).eq("cache_key", KEY);
-    expect((await rpc(other.client, "get_cached_route", { p_key: KEY })).data).toBeNull();
+    expect((await rpc(coord.client, "get_cached_route", { p_key: KEY })).data).toBeNull();
+  });
+  it("is per user: another user neither reads nor overwrites an entry (D41)", async () => {
+    const key = KEY + "-iso";
+    expect((await rpc(coord.client, "put_cached_route", { p_key: key, p_provider: "ors", p_duration_s: 600, p_distance_m: 9000, p_legs: null })).error).toBeNull();
+    expect((await rpc(other.client, "get_cached_route", { p_key: key })).data).toBeNull();
+    expect((await rpc(other.client, "put_cached_route", { p_key: key, p_provider: "ors", p_duration_s: 1, p_distance_m: 1, p_legs: null })).error).toBeNull();
+    expect((await rpc(coord.client, "get_cached_route", { p_key: key })).data).toMatchObject({ duration_s: 600, distance_m: 9000 });
+    expect((await rpc(other.client, "get_cached_route", { p_key: key })).data).toMatchObject({ duration_s: 1 });
+    await admin.from("route_cache").delete().eq("cache_key", key);
   });
   it("refuses demo results and out-of-range values", async () => {
     const base = { p_key: KEY + "x", p_duration_s: 10, p_distance_m: 10, p_legs: null };

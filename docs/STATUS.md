@@ -1,10 +1,10 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 6c done (public info pages). Batch 6 gate checked.
+Updated: 2026-11-08 · Checkpoint 7a done (release review and fixes).
 
 ## Current
-- Batches 1–4 DONE. Batch 5 removed (D37, one leg per request). Checkpoints 6a, 6b, 6c DONE.
-- Next: Batch 7 (see PLAN §12); saved journeys with notifications still unbuilt.
+- Batches 1–4, 6 DONE. Batch 5 removed (D37). Batch 7 split into 7a/7b/7c (PLAN §12); 7a DONE.
+- Next: 7b (accessibility, responsive polish, Playwright e2e). Saved journeys with notifications still unbuilt (optional).
 
 ## Done
 - Product brief → `docs/BRIEF.md`; architecture, decisions (D1–D34), data model, lifecycle, batch gates → `docs/PLAN.md`
@@ -18,9 +18,15 @@ Updated: 2026-11-08 · Checkpoint 6c done (public info pages). Batch 6 gate chec
 None.
 
 ## Exact next action
-Start the first Batch 7 checkpoint per PLAN §12 (manually, plan mode if it touches the database). Optional own checkpoint: saved journeys with `nearby_request` / `route_match` notifications.
+Start 7b in plan mode: add Playwright (new dependency — add its one-line reason to PLAN §2 first), e2e for the volunteer, organisation and foster demo stories (BRIEF §13), then the keyboard/focus/labels/contrast and mobile-layout pass. Launch prerequisites from 7a are listed under PLAN §12 Batch 7.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM, so read all `main` elements. Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## 7a summary
+- Reviewed: BRIEF §14/§15 coverage; Supabase security advisors and read-only catalog queries on pawlift-dev (RLS on every app table with no client policies, internal functions not executable by clients, definer functions pin search_path, storage policies, public view columns, hashed invite tokens); code scan (service role, redirects, logging, persona guard).
+- Fixed: migration `...000024` — per-user route cache (D41; any user could previously plant a fake "live" time for everyone), pinned search_path on 4 functions, `admin_list_requests` (D42). New `/admin` dashboard and `/admin/requests` oversight (BRIEF §14 gaps), account menu links, baseline security headers in `next.config.ts`. Types regenerated.
+- Tested: `npm run test:db` 222/222 (new: route cache isolation in `routing.test.ts`; oversight refusal, filters, driver, no private fields in `ops6b.test.ts`); `npm test` 36/36; lint, typecheck, build pass. Advisors re-run: search_path warnings gone, no new findings. Browser: headers present; Demo Admin saw dashboard counts and 3 DEMO active requests; Priya gets not-found on `/admin` pages with no data; map still renders; no console errors.
+- Unverified: new account menu links not clicked; admin pages on mobile; full CSP not added (launch item); not-found admin pages return HTTP 200 when streamed (existing pattern, no data).
 
 ## 6c summary
 - Implemented: static pages `/about`, `/how-it-works`, `/transport-safety` (renders `GUIDELINES`), `/terms`, `/privacy`; shared `src/components/InfoPage.tsx`; "About" links in `AccountMenu`. Terms, Privacy and Transport safety carry a DRAFT notice; no legal, safety or insurance guarantees.

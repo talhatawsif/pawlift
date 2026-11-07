@@ -123,3 +123,26 @@ const INCIDENT_TYPE: Record<string, string> = {
   late_withdrawal: "Late withdrawal", no_show: "No-show", other: "Other",
 };
 export const incidentTypeLabel = (t: string) => INCIDENT_TYPE[t] ?? t;
+
+/** Row from `admin_list_requests` (7a, D42): public-level fields only, never addresses, contacts or notes. */
+export type AdminRequest = {
+  id: string;
+  reference: string;
+  animal_name: string;
+  species: string;
+  urgency: string;
+  status: string;
+  is_demo: boolean;
+  org_id: string;
+  org_name: string;
+  origin_suburb: string | null;
+  destination_suburb: string | null;
+  window_start: string | null;
+  window_end: string | null;
+  published_at: string | null;
+  completed_at: string | null;
+  cancelled_at: string | null;
+  updated_at: string;
+  assignment_status: string | null;
+  volunteer_name: string | null;
+};

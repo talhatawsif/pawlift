@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { admin, cleanup, createTestOrg, createTestUser, makeAdmin, type TestUser } from "./helpers";
+import { admin, anonClient, cleanup, createTestOrg, createTestUser, makeAdmin, type TestUser } from "./helpers";
 
 let coord: TestUser;
 let otherCoord: TestUser;
@@ -239,6 +239,24 @@ describe("admin oversight", () => {
     const logged = await rpc(platformAdmin, "admin_list_private_access");
     expect(logged.data.some((x: any) => x.reference && x.reason === "Welfare complaint 123")).toBe(true);
     expect((await rpc(platformAdmin, "admin_view_private_details", { p_request_id: randomUUID(), p_reason: "Unknown request id" })).error?.code).toBe("42501");
+  }, 90_000);
+
+  it("request oversight (7a, D42): admin only, statuses filter, driver shown, no private fields", async () => {
+    for (const u of [coord, vol, foster, plain]) {
+      expect((await rpc(u, "admin_list_requests", { p_status: "all" })).error?.code).toBe("42501");
+    }
+    expect((await (anonClient().rpc as any)("admin_list_requests", { p_status: "all" })).error).not.toBeNull();
+    const t = await transport(fosterHome, "confirmed");
+    const active = await rpc(platformAdmin, "admin_list_requests", { p_status: "active" });
+    expect(active.error).toBeNull();
+    const row = active.data.find((x: any) => x.id === t.requestId);
+    expect(row).toMatchObject({ animal_name: "Waffle", status: "confirmed", org_id: orgId, assignment_status: "confirmed",
+      volunteer_name: "Dana Driver", origin_suburb: "St Albans", is_demo: true });
+    expect(JSON.stringify(row)).not.toMatch(/Secret|Home Rd|0400|Pat|Fran|exact|contact|medical|instruction/i);
+    const drafts = await rpc(platformAdmin, "admin_list_requests", { p_status: "draft" });
+    expect(drafts.data.some((x: any) => x.id === t.requestId)).toBe(false);
+    expect((await rpc(platformAdmin, "admin_list_requests", { p_status: "all", p_limit: 1 })).data).toHaveLength(1);
+    expect((await rpc(platformAdmin, "admin_list_requests", { p_status: "bogus" })).error?.code).toBe("22023");
   }, 90_000);
 
   it("a suspended admin account is refused", async () => {

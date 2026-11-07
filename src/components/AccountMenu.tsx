@@ -111,6 +111,20 @@ export async function AccountMenu({
               </li>
               {ctx.is_admin && (
                 <li>
+                  <Link href="/admin" className="flex h-10 items-center font-medium">
+                    Admin dashboard
+                  </Link>
+                </li>
+              )}
+              {ctx.is_admin && (
+                <li>
+                  <Link href="/admin/requests" className="flex h-10 items-center font-medium">
+                    All requests
+                  </Link>
+                </li>
+              )}
+              {ctx.is_admin && (
+                <li>
                   <Link href="/admin/organisations" className="flex h-10 items-center font-medium">
                     Verify organisations
                   </Link>

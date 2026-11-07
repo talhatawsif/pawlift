@@ -740,6 +740,7 @@ export type Database = {
           legs: Json | null
           provider: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           cache_key: string
@@ -749,6 +750,7 @@ export type Database = {
           legs?: Json | null
           provider: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           cache_key?: string
@@ -758,6 +760,7 @@ export type Database = {
           legs?: Json | null
           provider?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1384,6 +1387,10 @@ export type Database = {
       admin_list_incidents: { Args: { p_status?: string }; Returns: Json }
       admin_list_organisations: { Args: { p_status?: string }; Returns: Json }
       admin_list_private_access: { Args: { p_limit?: number }; Returns: Json }
+      admin_list_requests: {
+        Args: { p_limit?: number; p_status?: string }
+        Returns: Json
+      }
       admin_list_volunteers: { Args: { p_status?: string }; Returns: Json }
       admin_view_private_details: {
         Args: { p_reason: string; p_request_id: string }
