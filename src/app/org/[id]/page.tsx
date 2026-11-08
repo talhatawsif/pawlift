@@ -32,7 +32,7 @@ async function OrgPageContent({ params }: { params: Promise<{ id: string }> }) {
         {org.is_demo && <span className="ml-2 rounded bg-urgent/10 px-1.5 text-xs font-semibold text-urgent-strong">DEMO</span>}
       </p>
 
-      <Link href={`/org/${org.id}/dashboard`} className="mt-4 flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">
+      <Link href={`/org/${org.id}/dashboard`} className="mt-4 flex h-12 items-center justify-center btn-primary">
         Dashboard: drivers and deliveries
       </Link>
       <Link href={`/org/${org.id}/members`} className="mt-2 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">

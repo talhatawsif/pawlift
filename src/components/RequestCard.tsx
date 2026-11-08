@@ -1,3 +1,4 @@
+import { SpeciesAvatar } from "@/components/SpeciesAvatar";
 import { Box, Cat, Dog, HandHelping, PawPrint } from "lucide-react";
 import { distanceLabel } from "@/lib/geo/distance";
 import { formatMelbourne } from "@/lib/org";
@@ -13,18 +14,16 @@ export function SpeciesIcon({ species, size = 24 }: { species: string; size?: nu
 export function Photo({ r }: { r: PublicRequest }) {
   return r.photo_path ? (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={publicPhotoUrl(r.photo_path)} alt="" className="size-14 shrink-0 rounded-xl object-cover" />
+    <img src={publicPhotoUrl(r.photo_path)} alt="" className="size-[72px] shrink-0 rounded-2xl object-cover" />
   ) : (
-    <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-background text-muted">
-      <SpeciesIcon species={r.species} />
-    </span>
+    <SpeciesAvatar species={r.species} />
   );
 }
 
 export function Chips({ r }: { r: PublicRequest }) {
   return (
     <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-      <span className={`rounded-full px-2 py-0.5 font-semibold ${r.urgency === "urgent" ? "bg-urgent/10 text-urgent-strong" : "bg-background text-muted"}`}>
+      <span className={`chip ${r.urgency === "urgent" ? "!bg-urgent/10 !text-urgent-strong" : ""}`}>
         {urgencyLabel(r.urgency)}
       </span>
       {r.carrier_requirements && (
@@ -45,11 +44,11 @@ export function RequestCard({ r, selected, onSelect }: { r: NearbyRequest; selec
         type="button"
         onClick={onSelect}
         aria-pressed={selected}
-        className={`flex w-full gap-3 rounded-xl border p-3 text-left ${selected ? "border-brand bg-brand/5" : "border-border bg-surface"}`}
+        className={`card flex w-full gap-4 p-4 text-left ${selected ? "!border-brand !bg-brand/5" : ""}`}
       >
         <Photo r={r} />
-        <span className="flex min-w-0 flex-col gap-0.5">
-          <span className="font-medium">
+        <span className="flex min-w-0 flex-col gap-1">
+          <span className="text-lg font-semibold leading-tight">
             {r.animal_name} <span className="text-sm font-normal text-muted">· {speciesLabel(r.species)}</span>
           </span>
           <span className="text-sm text-muted">{r.origin_suburb} → {r.destination_suburb}</span>

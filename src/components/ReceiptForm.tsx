@@ -13,7 +13,7 @@ export function ReceiptForm({ requestId, animalName }: { requestId: string; anim
       <textarea id={id} name="note" rows={2} maxLength={500} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-base" />
       {state?.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
       {state?.notice && <p role="status" className="text-sm text-muted">{state.notice}</p>}
-      <button type="submit" disabled={pending} className="h-12 w-full rounded-xl bg-brand text-base font-semibold text-brand-foreground disabled:opacity-60">
+      <button type="submit" disabled={pending} className="h-12 w-full btn-primary disabled:opacity-60">
         {pending ? "Saving…" : `${animalName} has arrived safely`}
       </button>
     </form>

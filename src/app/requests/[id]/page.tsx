@@ -45,7 +45,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
 
       <section className="mt-6">
         {r.my_assignment_id ? (
-          <Link href={`/assignments/${r.my_assignment_id}`} className="flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">
+          <Link href={`/assignments/${r.my_assignment_id}`} className="flex h-12 items-center justify-center btn-primary">
             Open your assignment
           </Link>
         ) : (

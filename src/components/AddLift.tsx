@@ -8,7 +8,7 @@ import { trapTab } from "@/components/trapTab";
 type Org = { id: string; name: string };
 
 const pill =
-  "absolute left-4 z-10 flex h-12 items-center gap-2 rounded-full border border-border bg-surface px-5 font-semibold text-brand shadow-md";
+  "absolute left-4 z-10 flex h-12 items-center gap-2 rounded-full bg-surface px-5 font-semibold text-brand shadow-[var(--shadow-soft)] ring-1 ring-border";
 
 /** Map button for active coordinators: straight to the new-request form, or a choice of organisation first. */
 export function AddLift({ orgs, bottom }: { orgs: Org[]; bottom: string }) {
@@ -46,7 +46,7 @@ export function AddLift({ orgs, bottom }: { orgs: Org[]; bottom: string }) {
               </li>
             ))}
           </ul>
-          <button type="button" onClick={() => ref.current?.close()} className="mt-2 h-10 w-full rounded-lg text-sm font-medium text-muted">
+          <button type="button" onClick={() => ref.current?.close()} className="mt-2 w-full btn-text !text-muted">
             Cancel
           </button>
         </div>

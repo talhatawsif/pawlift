@@ -46,6 +46,8 @@ PawLift is **not** an adoption site, social network, rideshare, pet-taxi marketp
 ## 3. Design and UX
 
 ### 3.1 Direction: map-first, like Google Maps
+
+Desktop is a centred, wider column of the same phone-first layout, not a separate layout. Styling lives in `docs/DESIGN.md`.
 Looking strikingly similar to Google Maps is intended. Familiar beats novel.
 
 - **Mobile home:** full-screen map. A floating rounded search card at the top: origin chip ("From: Current location", editable) and a destination field "Where are you heading?". Primary button: **Find lifts along my route**. Date, departure time and maximum detour sit behind a small "Options" control.

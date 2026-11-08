@@ -67,7 +67,7 @@ export function AuthForm({ mode, action }: Props) {
         <button
           type="submit"
           disabled={pending}
-          className="h-12 rounded-xl bg-brand text-base font-semibold text-brand-foreground disabled:opacity-60"
+          className="h-12 btn-primary disabled:opacity-60"
         >
           {signUp ? "Create account" : "Sign in"}
         </button>

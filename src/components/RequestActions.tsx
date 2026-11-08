@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { cancelRequest, publishRequest, uploadPhoto, type RequestState } from "@/app/org/[id]/requests/actions";
 
-const btn = "h-12 w-full rounded-xl bg-brand text-base font-semibold text-brand-foreground disabled:opacity-60";
+const btn = "h-12 w-full btn-primary disabled:opacity-60";
 const msg = (s: RequestState) => (
   <>
     {s?.error && <p role="alert" className="text-sm text-danger">{s.error}</p>}

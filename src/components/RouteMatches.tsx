@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, Clock, ExternalLink } from "lucide-react";
 import type { JourneyResult, MatchView } from "@/app/journey/actions";
-import { SpeciesIcon } from "@/components/RequestCard";
+import { SpeciesAvatar } from "@/components/SpeciesAvatar";
 import { formatMelbourne } from "@/lib/org";
 import { navLink } from "@/lib/nav-links";
 import { ROUTE_SOURCE_LABEL } from "@/lib/routing/types";
@@ -68,11 +68,9 @@ export function RouteMatches({ result, origin, destination, onSelect }: Props) {
 function MatchCard({ m, origin, destination, onSelect }: { m: MatchView; origin: Props["origin"]; destination: Props["destination"]; onSelect: () => void }) {
   const links = origin && destination ? (["google", "apple", "waze"] as const) : [];
   return (
-    <li className="rounded-xl border border-border bg-surface p-3">
+    <li className="card p-4">
       <button type="button" onClick={onSelect} className="flex w-full gap-3 text-left">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-background text-muted">
-          <SpeciesIcon species={m.species} />
-        </span>
+        <SpeciesAvatar species={m.species} className="size-14" />
         <span className="flex min-w-0 flex-col gap-0.5">
           <span className="font-medium">
             {m.animalName} <span className="text-sm font-normal text-muted">· {speciesLabel(m.species)}</span>
@@ -89,7 +87,7 @@ function MatchCard({ m, origin, destination, onSelect }: { m: MatchView; origin:
           <SourceLabel source={m.source} />
         </span>
       </button>
-      <Link href={`/requests/${m.id}`} className="mt-2 flex h-11 items-center justify-center rounded-xl bg-brand text-sm font-semibold text-brand-foreground">
+      <Link href={`/requests/${m.id}`} className="mt-2 flex h-11 items-center justify-center btn-primary">
         View details and take this
       </Link>
       {links.length > 0 && origin && destination && (

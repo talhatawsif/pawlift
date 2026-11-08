@@ -47,7 +47,7 @@ export function OrgForm({ action, org, submitLabel }: Props) {
         <textarea id="description" name="description" rows={4} defaultValue={org?.description ?? ""} className={area} />
       </div>
       {state?.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
-      <button type="submit" disabled={pending} className="h-12 rounded-xl bg-brand text-base font-semibold text-brand-foreground disabled:opacity-60">
+      <button type="submit" disabled={pending} className="h-12 btn-primary disabled:opacity-60">
         {submitLabel}
       </button>
     </form>

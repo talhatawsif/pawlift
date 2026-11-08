@@ -28,7 +28,7 @@ async function RequestsContent({ params }: { params: Promise<{ id: string }> }) 
     <main className="mx-auto min-h-dvh max-w-lg px-4 py-8">
       <Link href={`/org/${id}`} className="text-sm font-medium text-brand underline">Back to {org.name}</Link>
       <h1 className="mb-4 mt-4 text-2xl font-semibold">Lifts</h1>
-      <Link href={`/org/${id}/requests/new`} className="mb-6 flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">
+      <Link href={`/org/${id}/requests/new`} className="mb-6 flex h-12 items-center justify-center btn-primary">
         New lift
       </Link>
       {requests.length === 0 ? <p className="text-muted">No lifts yet.</p> : (

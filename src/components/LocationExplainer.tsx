@@ -128,7 +128,7 @@ export function LocationExplainer({ onChoose, onClose }: Props) {
               type="button"
               onClick={useDevice}
               disabled={mode === "asking"}
-              className="mt-4 h-12 w-full rounded-xl bg-brand text-base font-semibold text-brand-foreground disabled:opacity-60"
+              className="mt-4 h-12 w-full btn-primary disabled:opacity-60"
             >
               {mode === "asking" ? "Waiting for your device…" : "Use my location"}
             </button>

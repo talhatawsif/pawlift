@@ -6,8 +6,8 @@ import {
   type DashState,
 } from "@/app/org/[id]/dashboard/actions";
 
-const primary = "h-11 w-full rounded-xl bg-brand text-sm font-semibold text-brand-foreground disabled:opacity-60";
-const secondary = "h-11 w-full rounded-xl border border-border text-sm font-semibold disabled:opacity-60";
+const primary = "h-11 w-full btn-primary disabled:opacity-60";
+const secondary = "h-11 w-full btn-secondary disabled:opacity-60";
 const input = "h-11 w-full rounded-xl border border-border bg-background px-3 text-base";
 
 export type Volunteer = { user_id: string; name: string };

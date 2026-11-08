@@ -45,3 +45,32 @@ body {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
+
+:root {
+  --tile: #f6ebe0;
+  --tile-ink: #9a6a42;
+  --shadow-soft: 0 1px 2px rgb(31 36 33 / 0.06), 0 4px 16px rgb(31 36 33 / 0.06);
+}
+
+@layer components {
+  .btn-primary, .btn-secondary, .btn-text {
+    min-height: 48px;
+    border-radius: 14px;
+    font-weight: 600;
+    transition: transform 120ms ease-out, background-color 120ms ease-out, box-shadow 120ms ease-out;
+  }
+  .btn-primary { background: var(--brand); color: var(--brand-foreground); box-shadow: 0 2px 8px rgb(47 125 85 / 0.28); }
+  .btn-secondary { background: var(--surface); color: var(--brand); border: 1.5px solid var(--brand); }
+  .btn-text { color: var(--brand); padding-inline: 12px; }
+  .btn-primary:active, .btn-secondary:active { transform: scale(0.98); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px; min-height: 24px;
+    border-radius: 9999px; padding: 2px 10px; font-size: 0.75rem; font-weight: 600;
+    background: var(--background); color: var(--muted);
+  }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-soft); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}

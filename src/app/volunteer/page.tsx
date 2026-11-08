@@ -58,7 +58,7 @@ async function VolunteerContent({ searchParams }: { searchParams: Promise<{ join
         {accepted ? (
           <p className="text-sm text-muted">You accepted these guidelines on <time dateTime={profile!.guidelines_accepted_at!}>{formatMelbourne(profile!.guidelines_accepted_at!)}</time>.</p>
         ) : profile ? (
-          <form action={acceptGuidelines}><button className="h-12 w-full rounded-xl bg-brand font-semibold text-brand-foreground">I have read and accept the guidelines</button></form>
+          <form action={acceptGuidelines}><button className="h-12 w-full btn-primary">I have read and accept the guidelines</button></form>
         ) : (
           <p className="text-sm text-muted">Save your profile to accept the guidelines.</p>
         )}

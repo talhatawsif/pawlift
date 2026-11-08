@@ -16,7 +16,7 @@ import {
 export const metadata = { title: "Dashboard · PawLift" };
 
 const SECTIONS: { key: Bucket; title: string; empty: string }[] = [
-  { key: "needs_driver", title: "Needs a driver", empty: "Every open lift has someone lined up." },
+  { key: "needs_driver", title: "Needs a driver", empty: "All caught up. Every open lift has someone lined up." },
   { key: "awaiting", title: "Waiting for you to confirm", empty: "" },
   { key: "to_complete", title: "Delivered: confirm the animal arrived", empty: "" },
   { key: "in_progress", title: "On the way", empty: "" },
@@ -81,8 +81,8 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-4 py-8">
       <Link href={`/org/${id}`} className="text-sm font-medium text-brand underline">Back to organisation</Link>
-      <h1 className="mb-1 mt-4 text-2xl font-semibold">Dashboard</h1>
-      <Link href={`/org/${id}/requests/new`} className="mb-4 flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">
+      <h1 className="mb-1 mt-4 text-3xl font-semibold">Dashboard</h1>
+      <Link href={`/org/${id}/requests/new`} className="mb-4 flex h-12 items-center justify-center btn-primary">
         New lift
       </Link>
 

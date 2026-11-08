@@ -13,7 +13,7 @@ export function ClaimForm({ legId, blocked, animalName }: { legId: string; block
       <input type="hidden" name="key" value={key} />
       {blocked && <p role="status" className="rounded-xl border border-border bg-surface p-3 text-sm">{blocked}</p>}
       {state?.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
-      <button type="submit" disabled={pending || !!blocked} className="h-12 w-full rounded-xl bg-brand text-base font-semibold text-brand-foreground disabled:opacity-60">
+      <button type="submit" disabled={pending || !!blocked} className="h-12 w-full btn-primary disabled:opacity-60">
         {pending ? "Reserving…" : `I can take ${animalName}`}
       </button>
       {!blocked && <p className="text-xs text-muted">This reserves it for you. The organisation confirms before you get the exact addresses.</p>}

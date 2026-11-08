@@ -46,7 +46,7 @@ export function BottomSheet({ requests, loading, error, locationKnown, selectedI
     : error
       ? "Animals needing a lift"
       : n === 0
-        ? "No animals need a lift right now"
+        ? "All quiet. Every animal has a ride for now."
         : `${n} ${n === 1 ? "animal needs" : "animals need"} a lift ${locationKnown ? "nearby" : "in Western Melbourne"}`;
 
   return (
@@ -91,7 +91,7 @@ export function BottomSheet({ requests, loading, error, locationKnown, selectedI
           <Detail r={selected} onBack={() => onSelect(null)} />
         ) : (
           <>
-            <h2 className="text-base font-semibold">{title}</h2>
+            <h2 className="text-xl font-semibold leading-tight">{title}</h2>
             {!locationKnown && !loading && !error && (
               <p className="text-sm text-muted">Showing Western Melbourne. Choose a location to see what&apos;s closest.</p>
             )}
@@ -138,10 +138,10 @@ function Detail({ r, onBack }: { r: NearbyRequest; onBack: () => void }) {
       <button type="button" onClick={onBack} className="mb-3 flex items-center gap-1 text-sm font-medium text-brand">
         <ArrowLeft size={16} aria-hidden />Back to list
       </button>
-      <div className="flex gap-3">
+      <div className="flex items-center gap-4">
         <Photo r={r} />
         <div>
-          <h2 className="text-lg font-semibold">{r.animal_name}</h2>
+          <h2 className="text-2xl font-semibold leading-tight">{r.animal_name}</h2>
           <p className="text-sm text-muted">{speciesLabel(r.species)} · {r.org_name}</p>
         </div>
       </div>
@@ -153,7 +153,7 @@ function Detail({ r, onBack }: { r: NearbyRequest; onBack: () => void }) {
       {r.carrier_requirements && <p className="mt-2 text-sm"><span className="font-medium">Carrier:</span> {r.carrier_requirements}</p>}
       {r.handling_requirements && <p className="mt-1 text-sm"><span className="font-medium">Handling:</span> {r.handling_requirements}</p>}
       <p className="mt-3 text-sm text-muted">Exact addresses are shared only with the confirmed volunteer.</p>
-      <Link href={`/requests/${r.id}`} className="mt-3 flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">
+      <Link href={`/requests/${r.id}`} className="mt-4 flex h-12 items-center justify-center btn-primary">
         View details and take this
       </Link>
     </div>

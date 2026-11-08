@@ -7,7 +7,7 @@ import {
 } from "@/app/assignments/actions";
 import { INCIDENT_TYPES } from "@/lib/assignments";
 
-const primary = "h-12 w-full rounded-xl bg-brand text-base font-semibold text-brand-foreground disabled:opacity-60";
+const primary = "h-12 w-full btn-primary disabled:opacity-60";
 const secondary = "h-12 w-full rounded-xl border border-border text-base font-semibold disabled:opacity-60";
 const input = "h-12 w-full rounded-xl border border-border bg-background px-3 text-base";
 

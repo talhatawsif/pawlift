@@ -33,7 +33,7 @@ export function InviteForm({ orgId, orgName }: { orgId: string; orgName: string 
           </div>
         </div>
         {state?.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
-        <button type="submit" disabled={pending} className="h-12 rounded-xl bg-brand text-base font-semibold text-brand-foreground disabled:opacity-60">
+        <button type="submit" disabled={pending} className="h-12 btn-primary disabled:opacity-60">
           Create invitation
         </button>
       </form>
