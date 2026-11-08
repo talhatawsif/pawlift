@@ -55,3 +55,12 @@ Commit after each passing checkpoint: `b<N>.<checkpoint>: <summary>` (e.g. `b1.a
 - When running checks, show only pass/fail and the first error, never full logs. Don't paste code back to me.
 - Don't re-read files already read this session. Don't read whole docs.
 - Low-risk UI checkpoints can be built in auto-accept mode. Anything touching the database, RLS, permissions, claims, assignments or handovers needs an approved plan first.
+
+## RTK token rules (mirror of the user's global rules; these win over the raw commands and Read/Grep/Glob habits above)
+The RTK hook (`rtk hook claude`, set in the user's global settings) only compresses Bash calls. Built-in Read, Grep and Glob skip it, so the terminal is the default.
+- No Grep or Glob tools: `rtk grep "pattern" <path>`, `rtk find "*.ts" <path>`, `rtk ls <path>`.
+- To read a file you won't edit (including the session-start files above): `rtk read <file>` (`-l aggressive` for signatures, `rtk smart <file>` for a summary). Use the Read tool only right before editing, with a line range.
+- Run dev commands in `rtk` form, including the Commands list above: `rtk git status`, `rtk git diff`, `rtk git log -n 10`, `rtk err <cmd>`, `rtk test <cmd>`, `rtk summary <cmd>` for long output. Never run git, npm or npx raw.
+- Never go around the hook (absolute paths, `command`, `env`, `cat`, `head`, `tail`). Raw output only via `rtk proxy <command>`, with the reason stated. If a command is blocked or filtered, report it and ask.
+- If `rtk` is not installed in this session, say so and ask; don't reroute or install it unasked.
+- Code: check whether the platform, standard library or existing code already does it; smallest correct change; no speculative abstractions, helpers or config. Replies short; don't restate diffs.
