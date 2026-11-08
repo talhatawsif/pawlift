@@ -48,7 +48,7 @@ PawLift is **not** an adoption site, social network, rideshare, pet-taxi marketp
 ### 3.1 Direction: map-first, like Google Maps
 Looking strikingly similar to Google Maps is intended. Familiar beats novel.
 
-- **Mobile home:** full-screen map. A floating rounded search card at the top: origin chip ("From: Current location", editable) and a destination field "Where are you heading?". Primary button: **Find opportunities along my route**. Date, departure time and maximum detour sit behind a small "Options" control.
+- **Mobile home:** full-screen map. A floating rounded search card at the top: origin chip ("From: Current location", editable) and a destination field "Where are you heading?". Primary button: **Find lifts along my route**. Date, departure time and maximum detour sit behind a small "Options" control.
 - **Bottom sheet** with three snap points: peek ("6 animals need a lift nearby"), half, full. It holds the nearby list on open; after a search it shows **On your way** (route matches) above **Nearby** — two clearly separate sections.
 - **Pins:** paw-shaped pickup pins in brand green; urgent in amber; selected pin enlarges and its card highlights (and vice versa). Route drawn as a solid line with A (pickup) and B (drop-off) markers.
 - **Cards:** 56 px rounded photo (species icon if none), name + species, "Melton → Geelong", "about 6 km away", urgency/deadline chip, requirement icons (carrier, large dog, medical care). Route cards add a detour pill: "+8 min · DEMO estimate".
@@ -67,7 +67,7 @@ Gradients, glassmorphism, glowing or coloured shadows, emoji as icons, purple/in
 - Origin defaults to current location when permitted, always editable.
 - **Location permission:** explain why before asking. If denied or unavailable: manual suburb/postcode selection, browsing still works, results labelled "Showing Western Melbourne" until a location is chosen. Never imply results are nearby when location is unknown. No continuous tracking.
 - **Nearby list:** ordered by proximity when location is known. Card fields per §3.1, plus eligibility (e.g. "Needs a cat carrier", "Verified volunteers only"). No exact private addresses.
-- **Route matches:** ordered by feasible timing, suitability, then extra travel. Always show estimated detour and its source. Make it obvious why each opportunity is suggested ("Pickup is 4 km off your route in Melton; drop-off is on your way in Geelong").
+- **Route matches:** ordered by feasible timing, suitability, then extra travel. Always show estimated detour and its source. Make it obvious why each lift is suggested ("Pickup is 4 km off your route in Melton; drop-off is on your way in Geelong").
 - **Navigation:** once confirmed, "Navigate to pickup" and "Navigate to drop-off" open the driver's chosen app (Google Maps, Apple Maps or Waze). PawLift does not read or integrate with live navigation sessions (a future partnership opportunity).
 
 ## 5. Roles, organisations and volunteers

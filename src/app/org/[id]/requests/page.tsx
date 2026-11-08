@@ -8,7 +8,7 @@ import type { OrgDetail } from "@/lib/org";
 import { formatMelbourne } from "@/lib/org";
 import { speciesLabel, statusLabel, urgencyLabel, type RequestSummary } from "@/lib/requests";
 
-export const metadata = { title: "Transport requests · PawLift" };
+export const metadata = { title: "Lifts · PawLift" };
 
 async function RequestsContent({ params }: { params: Promise<{ id: string }> }) {
   await connection();
@@ -27,11 +27,11 @@ async function RequestsContent({ params }: { params: Promise<{ id: string }> }) 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-4 py-8">
       <Link href={`/org/${id}`} className="text-sm font-medium text-brand underline">Back to {org.name}</Link>
-      <h1 className="mb-4 mt-4 text-2xl font-semibold">Transport requests</h1>
+      <h1 className="mb-4 mt-4 text-2xl font-semibold">Lifts</h1>
       <Link href={`/org/${id}/requests/new`} className="mb-6 flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">
-        New request
+        New lift
       </Link>
-      {requests.length === 0 ? <p className="text-muted">No requests yet.</p> : (
+      {requests.length === 0 ? <p className="text-muted">No lifts yet.</p> : (
         <ul className="flex flex-col gap-3">
           {requests.map((r) => (
             <li key={r.id}>

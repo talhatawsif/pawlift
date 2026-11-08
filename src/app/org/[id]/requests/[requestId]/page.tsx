@@ -10,7 +10,7 @@ import { RequestForm } from "@/components/RequestForm";
 import { CancelForm, PhotoForm, PublishForm } from "@/components/RequestActions";
 import { removePhoto, updateRequest } from "../actions";
 
-export const metadata = { title: "Request · PawLift" };
+export const metadata = { title: "Lift · PawLift" };
 
 async function RequestContent({ params }: { params: Promise<{ id: string; requestId: string }> }) {
   await connection();
@@ -40,7 +40,7 @@ async function RequestContent({ params }: { params: Promise<{ id: string; reques
 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-4 py-8">
-      <Link href={`/org/${id}/requests`} className="text-sm font-medium text-brand underline">Back to requests</Link>
+      <Link href={`/org/${id}/requests`} className="text-sm font-medium text-brand underline">Back to lifts</Link>
       <h1 className="mt-4 text-2xl font-semibold">{r.animal_name}</h1>
       <p className="mb-4 text-muted">
         {r.reference} · {statusLabel(r.status)}
@@ -68,7 +68,7 @@ async function RequestContent({ params }: { params: Promise<{ id: string; reques
           <RequestForm action={updateRequest} orgId={id} locations={locations} request={r} submitLabel="Save changes" />
         </>
       ) : (
-        <p className="text-sm text-muted">{r.origin_label} ({r.origin_suburb}) to {r.destination_label} ({r.destination_suburb}). This request can no longer be edited here.</p>
+        <p className="text-sm text-muted">{r.origin_label} ({r.origin_suburb}) to {r.destination_label} ({r.destination_suburb}). This lift can no longer be edited here.</p>
       )}
 
       {r.status === "draft" && (

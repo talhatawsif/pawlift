@@ -112,7 +112,7 @@ export function BottomSheet({ requests, loading, error, locationKnown, selectedI
                     {[0, 1, 2].map((i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-background" />)}
                   </div>
                 ) : n === 0 ? (
-                  <p className="text-sm text-muted">Check back soon. New requests appear here as soon as they&apos;re published.</p>
+                  <p className="text-sm text-muted">Check back soon. New lifts appear here as soon as they&apos;re published.</p>
                 ) : (
                   <ul className="flex flex-col gap-3">
                     {requests.map((r) => (

@@ -33,7 +33,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ request?: str
         <ol className="flex flex-col gap-2">
           {rows.map((r) => (
             <li key={r.id} className="rounded-xl border border-border bg-surface p-3 text-sm">
-              <p className="font-medium">{r.animal_name ?? "Request"} {r.reference ? `(${r.reference})` : ""}{r.org_name ? ` · ${r.org_name}` : ""}</p>
+              <p className="font-medium">{r.animal_name ?? "Lift"} {r.reference ? `(${r.reference})` : ""}{r.org_name ? ` · ${r.org_name}` : ""}</p>
               <p className="text-muted"><time dateTime={r.created_at}>{formatMelbourne(r.created_at)}</time> · {r.actor_name ?? "Unknown admin"}</p>
               <p>{r.reason}</p>
             </li>

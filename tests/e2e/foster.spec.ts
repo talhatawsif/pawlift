@@ -24,7 +24,7 @@ test("foster story: Mia receives Pepper and confirms the arrival", async ({ brow
   await sam.getByRole("button", { name: "Save draft" }).click();
   await expect(sam).toHaveURL(/\/requests\/[0-9a-f-]{36}$/);
   await sam.getByRole("checkbox", { name: /authorised to release/ }).check();
-  await sam.getByRole("button", { name: "Publish request" }).click();
+  await sam.getByRole("button", { name: "Publish lift" }).click();
   await expect(main(sam)).toContainText(/Open for volunteers/);
 
   // Before anyone takes it, Mia sees nothing incoming for it.

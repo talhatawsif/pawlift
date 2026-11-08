@@ -16,7 +16,7 @@ import {
 export const metadata = { title: "Dashboard · PawLift" };
 
 const SECTIONS: { key: Bucket; title: string; empty: string }[] = [
-  { key: "needs_driver", title: "Needs a driver", empty: "Every open request has someone lined up." },
+  { key: "needs_driver", title: "Needs a driver", empty: "Every open lift has someone lined up." },
   { key: "awaiting", title: "Waiting for you to confirm", empty: "" },
   { key: "to_complete", title: "Delivered: confirm the animal arrived", empty: "" },
   { key: "in_progress", title: "On the way", empty: "" },
@@ -53,7 +53,7 @@ function RowCard({ r, orgId, volunteers }: { r: OrgRow; orgId: string; volunteer
         )}
         {b === "confirmed" && r.assignment_id && <ReassignForm orgId={orgId} assignmentId={r.assignment_id} volunteers={volunteers} />}
         {b === "to_complete" && <CompleteForm orgId={orgId} requestId={r.request_id} />}
-        <Link href={`/org/${orgId}/audit?request=${r.request_id}`} className="text-sm font-medium text-brand underline">History for this request</Link>
+        <Link href={`/org/${orgId}/audit?request=${r.request_id}`} className="text-sm font-medium text-brand underline">History for this lift</Link>
       </div>
     </li>
   );
@@ -83,7 +83,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
       <Link href={`/org/${id}`} className="text-sm font-medium text-brand underline">Back to organisation</Link>
       <h1 className="mb-1 mt-4 text-2xl font-semibold">Dashboard</h1>
       <Link href={`/org/${id}/requests/new`} className="mb-4 flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">
-        New request
+        New lift
       </Link>
 
       {open.length > 0 && (

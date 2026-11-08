@@ -49,18 +49,18 @@ async function OrgPageContent({ params }: { params: Promise<{ id: string }> }) {
       </Link>
       {org.verification_status !== "suspended" && (
         <Link href={`/org/${org.id}/requests`} className="mt-2 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
-          Transport requests
+          Lifts
         </Link>
       )}
 
       {org.verification_status === "pending" && (
         <p role="status" className="mt-4 rounded-xl border border-border bg-surface p-3 text-sm">
-          We&rsquo;re checking your details. You can&rsquo;t publish transport requests until you&rsquo;re verified.
+          We&rsquo;re checking your details. You can&rsquo;t publish lifts until you&rsquo;re verified.
         </p>
       )}
       {org.verification_status === "verified" && (
         <p role="status" className="mt-4 rounded-xl border border-border bg-surface p-3 text-sm">
-          You&rsquo;re verified. Coordinators can publish transport requests.
+          You&rsquo;re verified. Coordinators can publish lifts.
         </p>
       )}
       {org.verification_status === "suspended" && (

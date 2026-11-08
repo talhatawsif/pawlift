@@ -32,7 +32,7 @@ const TEXT: Record<string, string> = {
 
 /** Plain-language line and link for a notification. Unknown types still render. */
 export function describeNotification(n: NotificationRow): { text: string; href: string } {
-  const name = n.animal_name ?? "a request";
+  const name = n.animal_name ?? "a lift";
   const ref = n.reference ? ` (${n.reference})` : "";
   const prefix = TEXT[n.type];
   let text: string;

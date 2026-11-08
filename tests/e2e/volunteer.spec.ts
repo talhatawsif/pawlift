@@ -27,7 +27,7 @@ test("volunteer story: Priya takes Biscuit from the map and Sam sees it complete
   // Destination and search.
   await priya.getByRole("combobox", { name: /Where are you heading/ }).fill("Geelong");
   await priya.getByRole("option", { name: /^Geelong \d{4}$/ }).click();
-  await priya.getByRole("button", { name: "Find opportunities along my route" }).click();
+  await priya.getByRole("button", { name: "Find lifts along my route" }).click();
 
   // Route match with extra time, labelled DEMO.
   const route = priya.getByRole("region", { name: "On your route" });
@@ -38,7 +38,7 @@ test("volunteer story: Priya takes Biscuit from the map and Sam sees it complete
   // Changing any search input clears the stale matches; searching again restores them.
   await priya.getByLabel("Most extra driving").selectOption("30");
   await expect(route).toHaveCount(0);
-  await priya.getByRole("button", { name: "Find opportunities along my route" }).click();
+  await priya.getByRole("button", { name: "Find lifts along my route" }).click();
   await expect(card(route, "Biscuit")).toContainText("DEMO estimate");
   await match.getByRole("link", { name: "View details and take this" }).click();
 
@@ -73,6 +73,6 @@ test("volunteer story: Priya takes Biscuit from the map and Sam sees it complete
   await expect(completed).toContainText("Biscuit");
 
   // The audit trail lists the request's events.
-  await card(completed, "Biscuit").getByRole("link", { name: "History for this request" }).click();
+  await card(completed, "Biscuit").getByRole("link", { name: "History for this lift" }).click();
   await expect(main(sam).locator("li")).not.toHaveCount(0);
 });

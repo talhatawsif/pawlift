@@ -29,7 +29,7 @@ async function Content() {
       <Link href="/" className="text-sm font-medium text-brand underline">Back to map</Link>
       <h1 className="mb-4 mt-4 text-2xl font-semibold">Notifications</h1>
       {rows.length === 0 ? (
-        <p className="text-muted">Nothing yet. Updates about your transports and requests appear here.</p>
+        <p className="text-muted">Nothing yet. Updates about your transports and lifts appear here.</p>
       ) : (
         <>
           {unread > 0 && (

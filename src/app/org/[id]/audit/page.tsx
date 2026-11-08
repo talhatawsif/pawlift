@@ -28,7 +28,7 @@ async function Content({ params, searchParams }: { params: Promise<{ id: string 
     <main className="mx-auto min-h-dvh max-w-lg px-4 py-8">
       <Link href={`/org/${id}/dashboard`} className="text-sm font-medium text-brand underline">Back to dashboard</Link>
       <h1 className="mb-1 mt-4 text-2xl font-semibold">Audit trail</h1>
-      <p className="mb-4 text-sm text-muted">{request ? "Everything recorded for one request." : "The latest 100 recorded actions for your organisation."}</p>
+      <p className="mb-4 text-sm text-muted">{request ? "Everything recorded for one lift." : "The latest 100 recorded actions for your organisation."}</p>
       {rows.length === 0 ? <p className="text-muted">Nothing recorded yet.</p> : (
         <ol className="flex flex-col gap-2">
           {rows.map((r) => (

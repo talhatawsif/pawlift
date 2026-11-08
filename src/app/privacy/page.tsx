@@ -9,7 +9,7 @@ export default function PrivacyPage() {
         <ul className="list-disc space-y-1 pl-5">
           <li>Account details: name, email and, for volunteers, a phone number and vehicle details.</li>
           <li>Trips you plan and your location, only when you allow it. You can use a suburb instead.</li>
-          <li>Request details from rescue groups, including pickup and drop-off addresses and contacts.</li>
+          <li>Lift details from rescue groups, including pickup and drop-off addresses and contacts.</li>
           <li>Records of actions in the app (an audit log) so problems can be investigated.</li>
         </ul>
       </Section>

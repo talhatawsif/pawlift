@@ -25,7 +25,7 @@ async function Content() {
     { href: "/admin/organisations", label: "Organisations waiting for verification", n: count(orgs) },
     { href: "/admin/volunteers", label: "Volunteers waiting for verification", n: count(vols) },
     { href: "/admin/incidents", label: "Open incidents", n: count(incidents), cap: 100 },
-    { href: "/admin/requests", label: "Active requests", n: count(requests), cap: 200 },
+    { href: "/admin/requests", label: "Active lifts", n: count(requests), cap: 200 },
   ];
   const links = [
     { href: "/admin/audit", label: "Audit log" },

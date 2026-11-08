@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const ORG_PAGES = [
   ["Dashboard", "dashboard"],
-  ["Requests", "requests"],
+  ["Lifts", "requests"],
   ["Locations", "locations"],
   ["Members", "members"],
   ["History", "history"],
@@ -18,7 +18,7 @@ const ORG_PAGES = [
 
 const ADMIN_PAGES = [
   ["Admin dashboard", "/admin", true],
-  ["All requests", "/admin/requests"],
+  ["All lifts", "/admin/requests"],
   ["Verify organisations", "/admin/organisations"],
   ["Verify volunteers", "/admin/volunteers"],
   ["Incidents", "/admin/incidents"],

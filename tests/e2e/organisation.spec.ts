@@ -71,10 +71,10 @@ test("organisation story: a new organisation is approved, invites Lee, and compl
   const menu = coord.getByRole("button", { name: "Menu" });
   await menu.click();
   const drawer = coord.getByRole("dialog", { name: "Menu" });
-  for (const name of ["Dashboard", "Requests", "Locations", "Members", "History", "Audit trail", "Settings"]) {
+  for (const name of ["Dashboard", "Lifts", "Locations", "Members", "History", "Audit trail", "Settings"]) {
     await expect(drawer.getByRole("link", { name, exact: true })).toBeVisible();
   }
-  await expect(drawer.getByRole("link", { name: "Requests", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(drawer.getByRole("link", { name: "Lifts", exact: true })).toHaveAttribute("aria-current", "page");
   await expect(drawer.getByRole("link", { name: "Dashboard", exact: true })).not.toHaveAttribute("aria-current");
   await coord.keyboard.press("Escape");
   await expect(drawer).toBeHidden();
@@ -90,7 +90,7 @@ test("organisation story: a new organisation is approved, invites Lee, and compl
   await coord.getByRole("button", { name: "Save draft" }).click();
   await expect(coord).toHaveURL(/\/requests\/[0-9a-f-]{36}$/);
   await coord.getByRole("checkbox", { name: /authorised to release/ }).check();
-  await coord.getByRole("button", { name: "Publish request" }).click();
+  await coord.getByRole("button", { name: "Publish lift" }).click();
   await expect(main(coord)).toContainText(/Open for volunteers/);
 
   // It appears on the map home: card in the list and a pin.

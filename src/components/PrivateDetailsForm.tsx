@@ -22,7 +22,7 @@ export function PrivateDetailsForm({ requestId }: { requestId?: string }) {
     <div className="flex flex-col gap-3">
       <form action={action} className="flex flex-col gap-3">
         <div>
-          <label htmlFor="request_id" className="mb-1 block text-sm font-medium">Request id</label>
+          <label htmlFor="request_id" className="mb-1 block text-sm font-medium">Lift id</label>
           <input id="request_id" name="request_id" defaultValue={requestId ?? ""} required className="h-12 w-full rounded-xl border border-border bg-background px-3 text-base" />
         </div>
         <div>

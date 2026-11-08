@@ -39,7 +39,7 @@ export function PublishForm({ orgId, requestId }: { orgId: string; requestId: st
         </span>
       </label>
       {msg(state)}
-      <button type="submit" disabled={pending} className={btn}>Publish request</button>
+      <button type="submit" disabled={pending} className={btn}>Publish lift</button>
     </form>
   );
 }
@@ -54,7 +54,7 @@ export function CancelForm({ orgId, requestId, needsReason }: { orgId: string; r
       <input id="reason" name="reason" maxLength={500} required={needsReason} className="h-12 w-full rounded-xl border border-border bg-background px-3 text-base" />
       {msg(state)}
       <button type="submit" disabled={pending} className="h-12 w-full rounded-xl border border-danger text-base font-semibold text-danger disabled:opacity-60">
-        Cancel request
+        Cancel lift
       </button>
     </form>
   );

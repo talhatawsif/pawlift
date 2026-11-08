@@ -9,7 +9,7 @@ import { windowLabel, type RequestView } from "@/lib/assignments";
 import { publicPhotoUrl, speciesLabel, urgencyLabel } from "@/lib/requests";
 import { ClaimForm } from "@/components/ClaimForm";
 
-export const metadata = { title: "Transport request · PawLift" };
+export const metadata = { title: "Lift · PawLift" };
 
 async function Content({ params }: { params: Promise<{ id: string }> }) {
   await connection();

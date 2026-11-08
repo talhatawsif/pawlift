@@ -55,7 +55,7 @@ export function SearchCard({ account, originLabel, originKnown, onEditOrigin, fo
         {account}
       </div>
       <form
-        aria-label="Find opportunities along your route"
+        aria-label="Find lifts along your route"
         onSubmit={(e) => {
           e.preventDefault();
           if (ready && !pending) onSubmit();
@@ -119,7 +119,7 @@ export function SearchCard({ account, originLabel, originKnown, onEditOrigin, fo
           disabled={!ready || pending}
           className="mt-3 h-12 w-full rounded-xl bg-brand text-base font-semibold text-brand-foreground disabled:opacity-60"
         >
-          {pending ? "Checking routes…" : "Find opportunities along my route"}
+          {pending ? "Checking routes…" : "Find lifts along my route"}
         </button>
         {!ready && (
           <p className="mt-2 text-xs text-muted">

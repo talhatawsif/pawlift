@@ -11,7 +11,7 @@ export default function AboutPage() {
       <Section title="What it is">
         <p>
           PawLift helps animal rescue groups in Western Melbourne find volunteers who are already driving the right way.
-          Rescues post a transport request. Volunteers see requests near them, or along a trip they plan, and offer to
+          Rescues post a lift. Volunteers see lifts near them, or along a trip they plan, and offer to
           help.
         </p>
       </Section>

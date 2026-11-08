@@ -8,7 +8,7 @@ import { formatMelbourne } from "@/lib/org";
 import { DEMO_BADGE, type AdminRequest } from "@/lib/ops";
 import { speciesLabel, statusLabel, urgencyLabel } from "@/lib/requests";
 
-export const metadata = { title: "Requests · PawLift" };
+export const metadata = { title: "Lifts · PawLift" };
 const TABS = ["active", "draft", "completed", "cancelled", "all"] as const;
 
 const DRIVER: Record<string, string> = {
@@ -27,8 +27,8 @@ async function Content({ searchParams }: { searchParams: Promise<{ status?: stri
   return (
     <main className="mx-auto min-h-dvh max-w-2xl px-4 py-8">
       <Link href="/admin" className="text-sm font-medium text-brand underline">Back to admin</Link>
-      <h1 className="mb-1 mt-4 text-2xl font-semibold">Requests</h1>
-      <p className="mb-4 text-sm text-muted">Every organisation&apos;s requests. Addresses, contacts and medical notes are not shown here.</p>
+      <h1 className="mb-1 mt-4 text-2xl font-semibold">Lifts</h1>
+      <p className="mb-4 text-sm text-muted">Every organisation&apos;s lifts. Addresses, contacts and medical notes are not shown here.</p>
       <nav aria-label="Filter by status" className="mb-4 flex flex-wrap gap-2">
         {TABS.map((t) => (
           <Link key={t} href={`/admin/requests?status=${t}`} aria-current={t === status ? "page" : undefined}
@@ -37,8 +37,8 @@ async function Content({ searchParams }: { searchParams: Promise<{ status?: stri
           </Link>
         ))}
       </nav>
-      {error ? <p role="alert" className="text-urgent">Couldn&apos;t load requests. Try again.</p>
-        : rows.length === 0 ? <p className="text-muted">No requests.</p> : (
+      {error ? <p role="alert" className="text-urgent">Couldn&apos;t load lifts. Try again.</p>
+        : rows.length === 0 ? <p className="text-muted">No lifts.</p> : (
         <ul className="flex flex-col gap-2">
           {rows.map((r) => (
             <li key={r.id} className="rounded-xl border border-border bg-surface p-3 text-sm">

@@ -76,3 +76,7 @@ Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email
 - 3b: routing adapter, cache RPCs, DEMO fixtures, geocoding (D29). 3a: map home, bottom sheet, suburb fallback (D28). Unverified: real browser geolocation; suburb centroids are approximate.
 - 2d: requests, photo sanitising, publish guards (D26, D27). 2c: locations, destinations, foster homes (D24, D25). 2b: invitations, membership, volunteer profile and verification (D21–D23). 2a: org registration and admin verification. 1a–1d: scaffold, migrations, auth, db test harness.
 - Standing unverified: mobile layout and keyboard navigation across pages; foster carers cannot edit their own home; signed-out invite links need sign-in then reopen.
+
+## Lift wording (2026-11-09, visible text only)
+- "Lift" replaces request/opportunity/transport request in UI, notification and audit labels, BRIEF §3 and tests; routes, code, DB unchanged. PLAN §2 vocabulary note added.
+- Checks: lint, typecheck, npm test, test:e2e (9 passed) all pass.

@@ -60,10 +60,10 @@ export type PrivateDetailsState = { error?: string; details?: import("@/lib/ops"
 export async function viewPrivateDetails(_: PrivateDetailsState, form: FormData): Promise<PrivateDetailsState> {
   const requestId = String(form.get("request_id") ?? "").trim();
   const reason = String(form.get("reason") ?? "").trim();
-  if (!/^[0-9a-f-]{36}$/i.test(requestId)) return { error: "Enter a valid request id." };
+  if (!/^[0-9a-f-]{36}$/i.test(requestId)) return { error: "Enter a valid lift id." };
   if (reason.length < 10) return { error: "Give a reason of at least 10 characters. It is recorded." };
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("admin_view_private_details", { p_request_id: requestId, p_reason: reason });
-  if (error || !data) return { error: error?.code === "22023" ? "The reason must be 10 to 500 characters." : "We couldn't open that request." };
+  if (error || !data) return { error: error?.code === "22023" ? "The reason must be 10 to 500 characters." : "We couldn't open that lift." };
   return { details: data as unknown as import("@/lib/ops").PrivateDetails };
 }

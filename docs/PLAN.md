@@ -75,6 +75,8 @@ Product requirements live in `docs/BRIEF.md`; this file records how we build the
 
 Add new decisions here with a one-line reason (including any new dependency).
 
+- Vocabulary: an animal needing transport is a "lift" in all visible text (code, routes, tables and RPCs keep "request"); "requests to join" and privacy "access and deletion requests" are unchanged.
+
 ## 3. Data model (key columns only)
 
 All tables: `id uuid pk`, `created_at`, `updated_at`; `is_demo boolean` where data can be seeded. Foreign keys, check constraints and indexes on every FK and status column.
