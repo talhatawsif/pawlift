@@ -6,14 +6,13 @@ import { PERSONAS, isDemoEnv } from "@/lib/demo/personas";
 export function DemoSwitcher({ notice }: { currentUserId?: string; notice?: string }) {
   if (!isDemoEnv()) return null;
   return (
-    <details className="relative">
+    <details className="mt-3 border-t border-border pt-2" open={notice != null}>
       <summary
-        aria-label="Switch demo persona"
-        className="flex h-9 cursor-pointer list-none items-center gap-1 rounded-full border border-border bg-background px-3 text-sm font-medium"
+        className="flex h-10 cursor-pointer list-none items-center gap-2 rounded-lg px-3 text-sm font-medium hover:bg-background"
       >
-        <Users size={16} aria-hidden /> DEMO
+        <Users size={16} aria-hidden /> DEMO personas
       </summary>
-      <div className="absolute right-0 top-11 z-30 w-72 rounded-xl border border-border bg-surface p-3 text-sm shadow-md">
+      <div className="px-3 text-sm">
         <p className="mb-2 text-muted">Demo personas. Not real people or checks.</p>
         {notice === "not-seeded" && (
           <p role="alert" className="mb-2 text-danger">

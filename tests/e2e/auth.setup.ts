@@ -44,7 +44,8 @@ setup("reseed DEMO data and sign each persona in once", async ({ browser }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto("/");
-    await page.getByLabel("Switch demo persona").click();
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByText("DEMO personas", { exact: true }).click();
     await page.getByRole("button", { name: new RegExp(`^${name}\\b`) }).click();
     await waitForSession(context);
     await context.storageState({ path: statePath(key) });

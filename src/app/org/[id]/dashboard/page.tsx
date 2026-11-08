@@ -82,10 +82,9 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
     <main className="mx-auto min-h-dvh max-w-lg px-4 py-8">
       <Link href={`/org/${id}`} className="text-sm font-medium text-brand underline">Back to organisation</Link>
       <h1 className="mb-1 mt-4 text-2xl font-semibold">Dashboard</h1>
-      <p className="mb-4 text-sm text-muted">
-        <Link href={`/org/${id}/requests`} className="font-medium text-brand underline">Requests</Link> ·{" "}
-        <Link href={`/org/${id}/audit`} className="font-medium text-brand underline">Audit trail</Link>
-      </p>
+      <Link href={`/org/${id}/requests/new`} className="mb-4 flex h-12 items-center justify-center rounded-xl bg-brand font-semibold text-brand-foreground">
+        New request
+      </Link>
 
       {open.length > 0 && (
         <section aria-label="Open problems" className="mb-6">

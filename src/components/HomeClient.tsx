@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState, useTransition, type ReactNode } from "react";
-import { BottomSheet, type Snap } from "@/components/BottomSheet";
+import { AddLift } from "@/components/AddLift";
+import { BottomSheet, HEIGHT, type Snap } from "@/components/BottomSheet";
 import { LocationExplainer, type ChosenLocation } from "@/components/LocationExplainer";
 import { SearchCard, type JourneyForm } from "@/components/SearchCard";
 import { RouteMatches } from "@/components/RouteMatches";
@@ -13,9 +14,9 @@ import type { NearbyRequest } from "@/components/RequestCard";
 
 const URGENCY_ORDER: Record<string, number> = { urgent: 0, soon: 1, routine: 2 };
 
-type Props = { requests: PublicRequest[]; error: boolean; account: ReactNode };
+type Props = { requests: PublicRequest[]; error: boolean; account: ReactNode; coordOrgs: { id: string; name: string }[] };
 
-export function HomeClient({ requests, error, account }: Props) {
+export function HomeClient({ requests, error, account, coordOrgs }: Props) {
   const [loc, setLoc] = useState<ChosenLocation | null>(null);
   const [explainer, setExplainer] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -24,6 +25,12 @@ export function HomeClient({ requests, error, account }: Props) {
   const [result, setResult] = useState<JourneyResult | null>(null);
   const [searched, setSearched] = useState<{ origin: { lat: number; lng: number }; destination: { lat: number; lng: number } } | null>(null);
   const [pending, startSearch] = useTransition();
+
+  // Any search input changing makes the shown matches stale.
+  const clearResult = () => {
+    setResult(null);
+    setSearched(null);
+  };
 
   const runSearch = () => {
     if (!loc || !form.destination) return;
@@ -72,7 +79,10 @@ export function HomeClient({ requests, error, account }: Props) {
         originKnown={loc != null}
         onEditOrigin={() => setExplainer(true)}
         form={form}
-        onChange={setForm}
+        onChange={(f) => {
+          setForm(f);
+          clearResult();
+        }}
         onSubmit={runSearch}
         pending={pending}
       />
@@ -100,6 +110,8 @@ export function HomeClient({ requests, error, account }: Props) {
           if (id) setSnap((s) => (s === "peek" ? "half" : s));
         }}
       />
+      {/* Sits just above the sheet; hidden when the full sheet would cover it. */}
+      {coordOrgs.length > 0 && snap !== "full" && <AddLift orgs={coordOrgs} bottom={`calc(${HEIGHT[snap]} + 1rem)`} />}
       {/* The map comes after the search card and list in the DOM so keyboard focus reaches them first;
           both float above it with z-index, so the order does not change the layout. */}
       <MapView
@@ -116,6 +128,7 @@ export function HomeClient({ requests, error, account }: Props) {
           onClose={() => setExplainer(false)}
           onChoose={(l) => {
             setLoc(l);
+            clearResult();
             setExplainer(false);
           }}
         />

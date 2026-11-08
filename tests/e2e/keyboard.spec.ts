@@ -65,9 +65,18 @@ test("map home works by keyboard with a visible focus ring", async ({ browser })
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
 
-  // The account menu opens from the keyboard and its links are reachable.
-  await page.getByLabel("Account menu").focus();
+  // The menu drawer opens from the keyboard, traps focus, closes on Escape and returns focus.
+  const menu = page.getByRole("button", { name: "Menu" });
+  await menu.focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("link", { name: "My assignments" })).toBeVisible();
+  const drawer = page.getByRole("dialog", { name: "Menu" });
+  await expect(drawer.getByRole("link", { name: "My assignments" })).toBeVisible();
+  for (let i = 0; i < 30; i++) {
+    await page.keyboard.press("Tab");
+    expect(await drawer.evaluate((d) => d.contains(document.activeElement))).toBe(true);
+  }
+  await page.keyboard.press("Escape");
+  await expect(drawer).toBeHidden();
+  await expect(menu).toBeFocused();
   await context.close();
 });

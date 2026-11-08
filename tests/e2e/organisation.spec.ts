@@ -62,7 +62,24 @@ test("organisation story: a new organisation is approved, invites Lee, and compl
   await expect(card(main(coord), `Northside vet ${runId}`)).toContainText("Confirmed destination");
 
   // Create the request, choosing the confirmed destination, then publish.
-  await coord.goto(`/org/${orgId}/requests/new`);
+  // The coordinator starts from the map: "Add lift" goes straight to the form (one organisation).
+  await coord.goto("/");
+  await coord.getByRole("link", { name: "Add lift" }).click();
+  await expect(coord).toHaveURL(new RegExp(`/org/${orgId}/requests/new$`));
+
+  // The menu drawer lists the organisation pages and marks the current one.
+  const menu = coord.getByRole("button", { name: "Menu" });
+  await menu.click();
+  const drawer = coord.getByRole("dialog", { name: "Menu" });
+  for (const name of ["Dashboard", "Requests", "Locations", "Members", "History", "Audit trail", "Settings"]) {
+    await expect(drawer.getByRole("link", { name, exact: true })).toBeVisible();
+  }
+  await expect(drawer.getByRole("link", { name: "Requests", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(drawer.getByRole("link", { name: "Dashboard", exact: true })).not.toHaveAttribute("aria-current");
+  await coord.keyboard.press("Escape");
+  await expect(drawer).toBeHidden();
+  await expect(menu).toBeFocused();
+
   await coord.getByLabel("Animal name or reference").fill(animal);
   await coord.getByLabel("Type", { exact: true }).selectOption("dog");
   await chooseOption(coord.getByLabel("Pickup location"), new RegExp(`Northside shelter ${runId}`));
@@ -75,6 +92,12 @@ test("organisation story: a new organisation is approved, invites Lee, and compl
   await coord.getByRole("checkbox", { name: /authorised to release/ }).check();
   await coord.getByRole("button", { name: "Publish request" }).click();
   await expect(main(coord)).toContainText(/Open for volunteers/);
+
+  // It appears on the map home: card in the list and a pin.
+  await coord.goto("/");
+  await expect(coord.getByLabel(new RegExp(`${animal}.*pickup pin`))).toBeAttached();
+  await coord.getByRole("region", { name: "Animals needing a lift" }).getByRole("button", { name: "Show list" }).click();
+  await expect(coord.getByRole("region", { name: "Animals needing a lift" })).toContainText(animal);
 
   // Lee finds it in the list and takes it.
   await lee.goto("/requests");

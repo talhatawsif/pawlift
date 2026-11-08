@@ -43,7 +43,7 @@ export function SearchCard({ account, originLabel, originKnown, onEditOrigin, fo
 
   return (
     <div className="absolute left-4 right-4 top-4 z-20 mx-auto max-w-md rounded-2xl border border-border bg-surface p-3 shadow-md">
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm text-muted">
+      <div className="mb-2 flex items-center justify-between gap-2 text-sm text-muted">
         <button
           type="button"
           onClick={onEditOrigin}

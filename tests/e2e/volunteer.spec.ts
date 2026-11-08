@@ -34,6 +34,12 @@ test("volunteer story: Priya takes Biscuit from the map and Sam sees it complete
   const match = card(route, "Biscuit");
   await expect(match).toContainText(/\+\d+ min driving/);
   await expect(match).toContainText("DEMO estimate");
+
+  // Changing any search input clears the stale matches; searching again restores them.
+  await priya.getByLabel("Most extra driving").selectOption("30");
+  await expect(route).toHaveCount(0);
+  await priya.getByRole("button", { name: "Find opportunities along my route" }).click();
+  await expect(card(route, "Biscuit")).toContainText("DEMO estimate");
   await match.getByRole("link", { name: "View details and take this" }).click();
 
   // Accept.

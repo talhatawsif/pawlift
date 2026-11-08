@@ -10,7 +10,7 @@ import { Chips, Photo, RequestCard, type NearbyRequest } from "@/components/Requ
 
 export type Snap = "peek" | "half" | "full";
 const ORDER: Snap[] = ["peek", "half", "full"];
-const HEIGHT: Record<Snap, string> = { peek: "5.5rem", half: "50dvh", full: "88dvh" };
+export const HEIGHT: Record<Snap, string> = { peek: "5.5rem", half: "50dvh", full: "88dvh" };
 
 type Props = {
   requests: NearbyRequest[];

@@ -86,3 +86,18 @@ for (const vp of VIEWPORTS) {
     expect(failures, failures.join("\n")).toEqual([]);
   });
 }
+
+// The open menu drawer (a modal dialog) is scanned too: the page scans above only see it closed.
+for (const vp of VIEWPORTS) {
+  test(`axe with the menu open at ${vp.name} width`, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, storageState: statePath("sam") });
+    const page = await context.newPage();
+    await settle(page, "/");
+    await page.getByRole("button", { name: "Menu" }).click();
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeVisible();
+    const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+    const bad = result.violations.filter((x) => x.impact === "serious" || x.impact === "critical");
+    expect(bad.map((x) => `${x.id}: ${x.help}`)).toEqual([]);
+    await context.close();
+  });
+}

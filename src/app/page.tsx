@@ -1,21 +1,29 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { AccountMenu } from "@/components/AccountMenu";
+import { NavMenu } from "@/components/NavMenu";
 import { HomeClient } from "@/components/HomeClient";
 import { createClient } from "@/lib/supabase/server";
+import { getMyContext } from "@/lib/session";
 import type { PublicRequest } from "@/lib/requests";
 
 async function HomeContent({ searchParams }: { searchParams: Promise<{ demo?: string }> }) {
   await connection();
+  const { demo } = await searchParams;
   const supabase = await createClient();
   const { data, error } = await supabase.from("public_requests").select("*");
+  const ctx = await getMyContext();
+  // Only shows or hides the button: the new-request page and RPCs check access themselves.
+  const coordOrgs = (ctx?.memberships ?? [])
+    .filter((m) => m.status === "active" && m.is_coordinator)
+    .map((m) => ({ id: m.org_id, name: m.org_name }));
   return (
     <HomeClient
       requests={(data ?? []) as unknown as PublicRequest[]}
       error={error != null}
+      coordOrgs={coordOrgs}
       account={
-        <Suspense fallback={<div className="h-9 w-20" aria-hidden />}>
-          <AccountMenu searchParams={searchParams} />
+        <Suspense fallback={<div className="h-10 w-10" aria-hidden />}>
+          <NavMenu demoNotice={demo} />
         </Suspense>
       }
     />

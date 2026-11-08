@@ -1,6 +1,6 @@
 # PawLift — status
 
-Updated: 2026-11-08 · Checkpoint 7c done. Batch 7 gate passed. MVP demo-ready, not launch-ready.
+Updated: 2026-11-09 · Menu drawer and "Add lift" checkpoint done (UI only). Batch 7 gate passed earlier. MVP demo-ready, not launch-ready.
 
 ## Current
 - Batches 1–4, 6 DONE. Batch 5 removed (D37). Batch 7 (7a–7c) DONE. All planned batches complete.
@@ -21,6 +21,13 @@ None.
 Owner decisions (see `docs/LAUNCH_REPORT.md`): import the repo into Vercel with Deployment Protection and preview env vars per README, then say whether to check the preview; add an openrouteservice key to verify live routing. Optional next checkpoint: saved journeys with `nearby_request` / `route_match` notifications.
 
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM and Next keeps the previous page mounted but hidden, so read the *visible* `main` (`tests/e2e/helpers.ts` `main()`). Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
+
+## Menu and Add lift summary (2026-11-09, UI only, no migrations, no new dependencies)
+- Implemented: `NavMenu` (server; role sections) + `NavDrawer` (client; native modal `<dialog>`, Escape, backdrop click, focus return, Tab wrap in `trapTab.ts`, `aria-current`) replace `AccountMenu`. Menu button sits in the map search card and in a new `src/app/org/[id]/layout.tsx` header (the earlier sidebar was dropped: the drawer replaces it). `DemoSwitcher` is now a section inside the drawer. `AddLift` on the map for active coordinators (one org: link to `/org/<id>/requests/new`; several: org picker dialog), hidden when the sheet is full. Dashboard has a "New request" button. `getMyContext` is wrapped in React `cache`. Failed DEMO persona switch opens the drawer.
+- Tested: lint, typecheck, `npm test` pass; `npm run test:e2e` passes (organisation story now: map "Add lift" → form → publish → pin and card on the map; drawer keyboard test; axe at 1280 and 375 px incl. the drawer open). Sam walked in headless Chromium at 375 and 1280 px (screenshots checked: button clear of map controls and sheet).
+- Unverified: pin for Sam's own new request (script checked too early; the e2e covers a fresh org); `test:db` not run (no database changes); real phones and screen readers; map tiles did not load in the headless run.
+- Coordinator friction (rules unchanged): (1) "Add lift" shows for every active coordinator, including a pending or suspended organisation, which cannot publish; (2) the form is replaced by a text link until the org has two locations incl. a confirmed destination; (3) choosing the same pickup and destination did not navigate and I did not capture the message; (4) release-authority checkbox appears only on the draft page after saving, so publishing is two steps; (5) the draft is invisible on the map until published; (6) the pickup list includes foster homes and vets, and it is easy to choose the destination as pickup.
+- Next action unchanged (owner decisions above). Demo data was reset with `npm run demo:reset`.
 
 ## 7c summary
 - Implemented: complete `README.md` (architecture rules, env var names, setup, commands, demo personas and stories, Vercel preview steps with protection and no service-role key, layout); `docs/LAUNCH_REPORT.md` (gate results, BRIEF §15 evidence, not verified, launch prerequisites, known limits).

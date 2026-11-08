@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 export type Membership = {
@@ -20,14 +21,14 @@ export type MyContext = {
 };
 
 /** The signed-in user's shell context, or null when signed out. Read via RPC (tables are default-deny). */
-export async function getMyContext(): Promise<MyContext | null> {
+export const getMyContext = cache(async (): Promise<MyContext | null> => {
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims) return null;
   const { data, error } = await supabase.rpc("get_my_context");
   if (error || !data) return null;
   return data as unknown as MyContext;
-}
+});
 
 /** Short role labels for the account menu. */
 export function roleLabels(ctx: MyContext): string[] {
