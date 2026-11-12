@@ -42,7 +42,7 @@ export function SearchCard({ account, originLabel, originKnown, onEditOrigin, fo
   const ready = originKnown && form.destination != null;
 
   return (
-    <div className="absolute left-4 right-4 top-4 z-20 mx-auto max-w-md rounded-2xl border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
+    <div data-search-card className="absolute left-4 right-4 top-4 z-20 mx-auto max-w-md rounded-2xl border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
       <div className="mb-2 flex items-center justify-between gap-2 text-sm text-muted">
         <button
           type="button"

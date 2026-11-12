@@ -24,7 +24,7 @@ Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email
 
 ## Design checkpoint 1 (2026-11-09, UI only)
 - `docs/DESIGN.md` + tokens/classes in `globals.css` (`.btn-primary|secondary|text`, `.chip`, `.card`); `SpeciesAvatar` replaces no-photo icons (RequestCard, BottomSheet, RouteMatches); primary buttons app-wide now `btn-primary`; warm empty lines on map and Dashboard.
-- Checks: lint, typecheck, npm test, test:e2e (9 passed, axe incl.). Unverified: real phones; cat silhouette reads a bit blobby; with the sheet half open "Add lift" overlaps the search card at 375 px.
+- Checks: lint, typecheck, npm test, test:e2e (9 passed, axe incl.). Unverified: real phones; cat silhouette reads a bit blobby. "Add lift" now clamps below the search card (fixed, screenshot checked at 375 px).
 
 ## Menu and Add lift summary (2026-11-09, UI only, no migrations, no new dependencies)
 - Implemented: `NavMenu` (server; role sections) + `NavDrawer` (client; native modal `<dialog>`, Escape, backdrop click, focus return, Tab wrap in `trapTab.ts`, `aria-current`) replace `AccountMenu`. Menu button sits in the map search card and in a new `src/app/org/[id]/layout.tsx` header (the earlier sidebar was dropped: the drawer replaces it). `DemoSwitcher` is now a section inside the drawer. `AddLift` on the map for active coordinators (one org: link to `/org/<id>/requests/new`; several: org picker dialog), hidden when the sheet is full. Dashboard has a "New request" button. `getMyContext` is wrapped in React `cache`. Failed DEMO persona switch opens the drawer.

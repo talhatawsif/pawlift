@@ -11,9 +11,10 @@ const pill =
   "absolute left-4 z-10 flex h-12 items-center gap-2 rounded-full bg-surface px-5 font-semibold text-brand shadow-[var(--shadow-soft)] ring-1 ring-border";
 
 /** Map button for active coordinators: straight to the new-request form, or a choice of organisation first. */
-export function AddLift({ orgs, bottom }: { orgs: Org[]; bottom: string }) {
+export function AddLift({ orgs, sheet, minTop }: { orgs: Org[]; sheet: string; minTop: number }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const style = { bottom, transition: "bottom 150ms ease-out" };
+  // Sits above the sheet, but never higher than just under the search card.
+  const style = { top: `max(${minTop}px, calc(100dvh - ${sheet} - 4rem))`, transition: "top 150ms ease-out" };
   const href = (o: Org) => `/org/${o.id}/requests/new`;
 
   if (orgs.length === 1) {

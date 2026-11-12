@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition, type ReactNode } from "react";
+import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import { AddLift } from "@/components/AddLift";
 import { BottomSheet, HEIGHT, type Snap } from "@/components/BottomSheet";
 import { LocationExplainer, type ChosenLocation } from "@/components/LocationExplainer";
@@ -69,6 +69,15 @@ export function HomeClient({ requests, error, account, coordOrgs }: Props) {
     [ordered],
   );
 
+  const [cardBottom, setCardBottom] = useState(0);
+  useEffect(() => {
+    const el = document.querySelector("[data-search-card]");
+    if (!el) return;
+    const ro = new ResizeObserver(() => setCardBottom(el.getBoundingClientRect().bottom));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const originLabel = !loc ? "Choose a location" : loc.kind === "device" ? "Current location" : `${loc.name} ${loc.postcode}`;
 
   return (
@@ -110,8 +119,8 @@ export function HomeClient({ requests, error, account, coordOrgs }: Props) {
           if (id) setSnap((s) => (s === "peek" ? "half" : s));
         }}
       />
-      {/* Sits just above the sheet; hidden when the full sheet would cover it. */}
-      {coordOrgs.length > 0 && snap !== "full" && <AddLift orgs={coordOrgs} bottom={`calc(${HEIGHT[snap]} + 1rem)`} />}
+      {/* Above the sheet, clear of the search card; hidden when the full sheet would cover it. */}
+      {coordOrgs.length > 0 && snap !== "full" && <AddLift orgs={coordOrgs} sheet={HEIGHT[snap]} minTop={cardBottom + 8} />}
       {/* The map comes after the search card and list in the DOM so keyboard focus reaches them first;
           both float above it with z-index, so the order does not change the layout. */}
       <MapView
