@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import { auditLabel, type AuditRow } from "@/lib/assignments";
 import { formatMelbourne } from "@/lib/org";
 
@@ -15,7 +15,7 @@ async function Content({ params, searchParams }: { params: Promise<{ id: string 
   const { id } = await params;
   const { request } = await searchParams;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("list_org_audit", {
     p_org_id: id,

@@ -13,7 +13,7 @@ async function HomeContent({ searchParams }: { searchParams: Promise<{ demo?: st
   const { data, error } = await supabase.from("public_requests").select("*");
   const ctx = await getMyContext();
   // Only shows or hides the button: the new-request page and RPCs check access themselves.
-  const coordOrgs = (ctx?.memberships ?? [])
+  const coordOrgs = (ctx?.account_status === "active" ? ctx.memberships : [])
     .filter((m) => m.status === "active" && m.is_coordinator)
     .map((m) => ({ id: m.org_id, name: m.org_name, verified: m.org_verification === "verified" }));
   return (

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { rpcMessage } from "@/lib/org";
 import { GUIDELINES_VERSION } from "@/lib/guidelines";
 import type { FormState } from "@/app/auth/actions";
+import type { ActionResult } from "@/components/ActionForm";
 
 export async function saveVolunteerProfile(_: FormState, form: FormData): Promise<FormState> {
   const days = form.getAll("days").map(String);
@@ -26,8 +27,9 @@ export async function acceptGuidelines() {
   redirect(error ? "/volunteer?error=guidelines" : "/volunteer?accepted=1");
 }
 
-export async function resubmitVolunteer() {
+export async function resubmitVolunteer(): Promise<ActionResult> {
   const supabase = await createClient();
-  await supabase.rpc("resubmit_volunteer");
+  const { error } = await supabase.rpc("resubmit_volunteer");
+  if (error) return { error: rpcMessage(error.code, "We couldn't resubmit your profile.") };
   redirect("/volunteer");
 }

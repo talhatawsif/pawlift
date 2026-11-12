@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { ArrowRight, ExternalLink, Phone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import { assignmentLabel, legLabel, windowLabel, type MyAssignment, type PrivateDetails, type PrivatePlace } from "@/lib/assignments";
 import { stopLink } from "@/lib/nav-links";
 import { formatMelbourne } from "@/lib/org";
@@ -43,7 +43,7 @@ async function Content({ params, searchParams }: { params: Promise<{ id: string 
   const { id } = await params;
   const sp = await searchParams;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const { data } = await supabase.rpc("list_my_assignments");
   const a = ((data ?? []) as unknown as MyAssignment[]).find((x) => x.assignment_id === id);

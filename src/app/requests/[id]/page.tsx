@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { ArrowRight, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import { windowLabel, type RequestView } from "@/lib/assignments";
 import { publicPhotoUrl, speciesLabel, urgencyLabel } from "@/lib/requests";
 import { ClaimForm } from "@/components/ClaimForm";
@@ -15,7 +15,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
   await connection();
   const { id } = await params;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_request_detail", { p_request_id: id });
   if (error || !data) notFound();

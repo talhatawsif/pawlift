@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import { assignmentLabel, legLabel, windowLabel, type MyAssignment } from "@/lib/assignments";
 
 export const metadata = { title: "My assignments · PawLift" };
@@ -30,7 +30,7 @@ function Row({ a }: { a: MyAssignment }) {
 async function Content() {
   await connection();
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const { data } = await supabase.rpc("list_my_assignments");
   const all = (data ?? []) as unknown as MyAssignment[];

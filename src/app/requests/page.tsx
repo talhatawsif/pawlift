@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { BadgeCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatMelbourne } from "@/lib/org";
+import { SpeciesAvatar } from "@/components/SpeciesAvatar";
 import { publicPhotoUrl, speciesLabel, urgencyLabel, type PublicRequest } from "@/lib/requests";
 
 export const metadata = { title: "Animals needing a lift · PawLift" };
@@ -20,7 +21,7 @@ async function ListContent() {
       (a.window_start ?? "").localeCompare(b.window_start ?? ""),
   );
   return rows.length === 0 ? (
-    <p className="text-muted">No animals need a lift right now.</p>
+    <p className="text-muted">No animals need a lift right now. Check back soon, or ask an organisation how you can help.</p>
   ) : (
     <ul className="flex flex-col gap-3">
       {rows.map((r) => (
@@ -28,7 +29,7 @@ async function ListContent() {
           {r.photo_path ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={publicPhotoUrl(r.photo_path)} alt={r.animal_name} className="size-20 shrink-0 rounded-lg object-cover" />
-          ) : null}
+          ) : <SpeciesAvatar species={r.species} className="size-20" />}
           <div className="min-w-0">
             <p className="font-medium">
               {r.animal_name} <span className="text-sm font-normal text-muted">· {speciesLabel(r.species)} · {urgencyLabel(r.urgency)}</span>

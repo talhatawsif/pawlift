@@ -21,13 +21,14 @@ type Props = {
   volunteers?: Volunteer[];
   volunteerRequired?: boolean;
   style?: "primary" | "secondary";
+  confirm?: string;
 };
 
-function Form({ orgId, action, label, hidden, text, volunteers, volunteerRequired, style }: Props) {
+function Form({ orgId, action, label, hidden, text, volunteers, volunteerRequired, style, confirm }: Props) {
   const [state, run, pending] = useActionState(action, undefined);
   const uid = `${label}-${Object.values(hidden).join("-")}`.replace(/[^a-z0-9-]/gi, "");
   return (
-    <form action={run} className="flex flex-col gap-2">
+    <form action={run} onSubmit={(e) => { if (confirm && !window.confirm(confirm)) e.preventDefault(); }} className="flex flex-col gap-2">
       <input type="hidden" name="org_id" value={orgId} />
       {Object.entries(hidden).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
       {volunteers && (
@@ -55,17 +56,17 @@ export function ConfirmButton({ orgId, assignmentId }: { orgId: string; assignme
   return <Form orgId={orgId} action={confirmAssignment} label="Confirm this volunteer" hidden={{ assignment_id: assignmentId }} />;
 }
 export function ReleaseButton({ orgId, assignmentId }: { orgId: string; assignmentId: string }) {
-  return <Form orgId={orgId} action={releaseReserved} label="Turn down" style="secondary" hidden={{ assignment_id: assignmentId }} text={{ label: "Reason (optional)" }} />;
+  return <Form orgId={orgId} action={releaseReserved} label="Turn down" confirm="Turn down this volunteer? They will be told." style="secondary" hidden={{ assignment_id: assignmentId }} text={{ label: "Reason (optional)" }} />;
 }
 export function WithdrawOfferButton({ orgId, assignmentId }: { orgId: string; assignmentId: string }) {
-  return <Form orgId={orgId} action={withdrawOffer} label="Withdraw offer" style="secondary" hidden={{ assignment_id: assignmentId }} text={{ label: "Reason (optional)" }} />;
+  return <Form orgId={orgId} action={withdrawOffer} label="Withdraw offer" confirm="Withdraw this offer?" style="secondary" hidden={{ assignment_id: assignmentId }} text={{ label: "Reason (optional)" }} />;
 }
 export function OfferForm({ orgId, legId, volunteers }: { orgId: string; legId: string; volunteers: Volunteer[] }) {
   if (volunteers.length === 0) return <p className="text-sm text-muted">No verified volunteers in your organisation yet.</p>;
   return <Form orgId={orgId} action={offerLeg} label="Offer to this volunteer" hidden={{ leg_id: legId }} volunteers={volunteers} volunteerRequired />;
 }
 export function ReassignForm({ orgId, assignmentId, volunteers }: { orgId: string; assignmentId: string; volunteers: Volunteer[] }) {
-  return <Form orgId={orgId} action={reassignLeg} label="Reassign" style="secondary" hidden={{ assignment_id: assignmentId }} text={{ label: "Reason (required)", required: true }} volunteers={volunteers} />;
+  return <Form orgId={orgId} action={reassignLeg} label="Reassign" confirm="Reassign this lift? The current volunteer loses access." style="secondary" hidden={{ assignment_id: assignmentId }} text={{ label: "Reason (required)", required: true }} volunteers={volunteers} />;
 }
 export function CompleteForm({ orgId, requestId }: { orgId: string; requestId: string }) {
   return <Form orgId={orgId} action={completeRequest} label="Animal received: mark complete" hidden={{ request_id: requestId }} text={{ label: "Note (optional)" }} />;

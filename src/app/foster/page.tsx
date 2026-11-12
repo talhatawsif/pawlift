@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import type { FosterHome } from "@/lib/locations";
 import { DEMO_BADGE, requestStatusLabel, type FosterHistoryRow, type IncomingDelivery } from "@/lib/ops";
 import { formatMelbourne } from "@/lib/org";
@@ -15,7 +15,7 @@ export const metadata = { title: "My foster home · PawLift" };
 async function FosterContent() {
   await connection();
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const { data } = await supabase.rpc("get_my_foster_homes");
   const homes = (data ?? []) as unknown as FosterHome[];

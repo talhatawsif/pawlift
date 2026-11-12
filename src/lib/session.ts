@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export type Membership = {
@@ -41,4 +42,13 @@ export function roleLabels(ctx: MyContext): string[] {
     if (m.is_foster_carer) labels.push(`Foster carer, ${m.org_name}`);
   }
   return labels;
+}
+
+/** Only same-site paths, so a crafted link can't send people elsewhere after sign-in. */
+export const safeNext = (n: string | null | undefined) => (n && n.startsWith("/") && !n.startsWith("//") ? n : "/");
+
+/** Sign-in URL that brings the person back to the page they asked for (the proxy records it). */
+export async function signInUrl() {
+  const next = (await headers()).get("x-next-url");
+  return next ? `/sign-in?next=${encodeURIComponent(next)}` : "/sign-in";
 }

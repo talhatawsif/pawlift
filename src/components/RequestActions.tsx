@@ -47,7 +47,7 @@ export function PublishForm({ orgId, requestId }: { orgId: string; requestId: st
 export function CancelForm({ orgId, requestId, needsReason }: { orgId: string; requestId: string; needsReason: boolean }) {
   const [state, action, pending] = useActionState(cancelRequest, undefined);
   return (
-    <form action={action} className="flex flex-col gap-2">
+    <form action={action} onSubmit={(e) => { if (!window.confirm("Cancel this lift? This can't be undone.")) e.preventDefault(); }} className="flex flex-col gap-2">
       <input type="hidden" name="org_id" value={orgId} />
       <input type="hidden" name="request_id" value={requestId} />
       <label htmlFor="reason" className="text-sm font-medium">Reason{needsReason ? "" : " (optional)"}</label>

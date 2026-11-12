@@ -33,7 +33,7 @@ async function AdminOrgsPageContent({ searchParams }: { searchParams: Promise<{ 
         ))}
       </nav>
       {orgs.length === 0 ? (
-        <p className="text-muted">Nothing here.</p>
+        <p className="text-muted">Nothing waiting. All caught up.</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {orgs.map((o) => (

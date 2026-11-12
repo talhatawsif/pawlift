@@ -46,7 +46,7 @@ export function AssignmentActions({ id, status, legStatus }: { id: string; statu
   if (status === "offered") {
     return (
       <div className="flex flex-col gap-4">
-        <One id={id} cfg={{ action: acceptOffer, label: "Accept this transport" }} />
+        <One id={id} cfg={{ action: acceptOffer, label: "Accept this lift" }} />
         <One id={id} cfg={{ action: declineOffer, label: "Decline", style: "secondary", field: { label: "Reason (optional)" } }} />
       </div>
     );
@@ -61,7 +61,7 @@ export function AssignmentActions({ id, status, legStatus }: { id: string; statu
       {legStatus === "en_route" && <One id={id} cfg={{ action: confirmPickup, label: "I've collected the animal", field: { label: "Note (optional)" } }} />}
       {legStatus === "collected" && <One id={id} cfg={{ action: confirmDelivery, label: "I've delivered the animal", field: { label: "Note (optional)" } }} />}
       {(legStatus === "confirmed" || legStatus === "en_route") && (
-        <One id={id} cfg={{ action: withdrawAssignment, label: "Withdraw from this transport", style: "danger", field: { label: "Reason (required)", required: true } }} />
+        <One id={id} cfg={{ action: withdrawAssignment, label: "Withdraw from this lift", style: "danger", field: { label: "Reason (required)", required: true } }} />
       )}
     </div>
   );

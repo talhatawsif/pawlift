@@ -35,7 +35,7 @@ async function JoinContent({ params }: { params: Promise<{ token: string }> }) {
         <>
           <p className="text-muted">Sign in or create an account, then open this invitation link again.</p>
           <div className="mt-4 flex gap-2">
-            <Link href="/sign-in" className="flex h-12 flex-1 items-center justify-center btn-primary">Sign in</Link>
+            <Link href={`/sign-in?next=${encodeURIComponent(`/join/${token}`)}`} className="flex h-12 flex-1 items-center justify-center btn-primary">Sign in</Link>
             <Link href="/sign-up" className="flex h-12 flex-1 items-center justify-center rounded-xl border border-border font-semibold">Create account</Link>
           </div>
         </>

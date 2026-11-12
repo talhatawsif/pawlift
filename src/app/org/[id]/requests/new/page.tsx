@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import type { OrgLocation } from "@/lib/locations";
 import { RequestForm } from "@/components/RequestForm";
 import { createRequest } from "../actions";
@@ -14,7 +14,7 @@ async function NewContent({ params }: { params: Promise<{ id: string }> }) {
   await connection();
   const { id } = await params;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("list_org_locations", { p_org_id: id });
   if (error) notFound();

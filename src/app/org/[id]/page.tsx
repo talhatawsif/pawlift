@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { BadgeCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import { formatMelbourne, typeLabel, verificationLabel, type OrgDetail } from "@/lib/org";
 import { resubmitOrganisation } from "@/app/org/actions";
 import { OrgForm } from "@/components/OrgForm";
@@ -15,7 +15,7 @@ async function OrgPageContent({ params }: { params: Promise<{ id: string }> }) {
   await connection();
   const { id } = await params;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_org_for_coordinator", { p_org_id: id });
   if (error || !data) notFound();
@@ -42,7 +42,7 @@ async function OrgPageContent({ params }: { params: Promise<{ id: string }> }) {
         Locations and destinations
       </Link>
       <Link href={`/org/${org.id}/history`} className="mt-2 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
-        Transport history
+        Lift history
       </Link>
       <Link href={`/org/${org.id}/settings`} className="mt-2 flex h-12 items-center justify-center rounded-xl border border-border bg-surface font-semibold">
         Settings

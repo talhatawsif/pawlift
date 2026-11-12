@@ -30,7 +30,7 @@ async function AdminVolunteersContent({ searchParams }: { searchParams: Promise<
             className={`flex h-9 items-center rounded-full border px-3 text-sm font-medium capitalize ${t === status ? "border-brand bg-brand text-brand-foreground" : "border-border bg-surface"}`}>{t}</Link>
         ))}
       </nav>
-      {items.length === 0 ? <p className="text-muted">Nothing here.</p> : (
+      {items.length === 0 ? <p className="text-muted">Nothing waiting. All caught up.</p> : (
         <ul className="flex flex-col gap-2">
           {items.map((v) => (
             <li key={v.user_id}>

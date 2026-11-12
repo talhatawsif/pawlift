@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import type { OrgLocation } from "@/lib/locations";
 import { publicPhotoUrl, statusLabel, type RequestDetail } from "@/lib/requests";
 import { RequestForm } from "@/components/RequestForm";
@@ -16,7 +16,7 @@ async function RequestContent({ params }: { params: Promise<{ id: string; reques
   await connection();
   const { id, requestId } = await params;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const [{ data, error }, { data: locData }] = await Promise.all([
     supabase.rpc("get_request_for_coordinator", { p_request_id: requestId }),

@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import { bucketOf, incidentLabel, legLabel, windowLabel, type Bucket, type OrgIncident, type OrgRow } from "@/lib/assignments";
 import { formatMelbourne } from "@/lib/org";
 import { urgencyLabel } from "@/lib/requests";
@@ -63,7 +63,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
   await connection();
   const { id } = await params;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const [rowsRes, incRes, memRes] = await Promise.all([
     supabase.rpc("list_org_assignments", { p_org_id: id }),

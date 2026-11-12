@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { rpcMessage } from "@/lib/org";
 import { geocodeAddress, GEOCODE_FAILURE_MESSAGE } from "@/lib/routing";
 import type { OrgLocation } from "@/lib/locations";
+import type { ActionResult } from "@/components/ActionForm";
 
 export type LocationState = { error?: string; ok?: boolean } | undefined;
 
@@ -47,22 +48,24 @@ export async function updateLocation(_: LocationState, form: FormData): Promise<
   return { ok: true };
 }
 
-export async function confirmDestination(form: FormData) {
+export async function confirmDestination(_: ActionResult, form: FormData): Promise<ActionResult> {
   const supabase = await createClient();
-  await supabase.rpc("confirm_destination", {
+  const { error } = await supabase.rpc("confirm_destination", {
     p_location_id: s(form, "location_id"),
     p_confirm: s(form, "confirm") === "true",
   });
+  if (error) return fail(error.code);
   revalidatePath(`/org/${s(form, "org_id")}/locations`);
 }
 
-export async function setFosterStatus(form: FormData) {
+export async function setFosterStatus(_: ActionResult, form: FormData): Promise<ActionResult> {
   const supabase = await createClient();
-  await supabase.rpc("set_foster_status", {
+  const { error } = await supabase.rpc("set_foster_status", {
     p_member_id: s(form, "member_id"),
     p_is_foster: s(form, "is_foster") === "true",
     p_can_confirm_receipt: form.get("can_confirm_receipt") === "on",
   });
+  if (error) return fail(error.code);
   revalidatePath(`/org/${s(form, "org_id")}/members`);
 }
 

@@ -7,12 +7,13 @@ import type { FormState } from "@/app/auth/actions";
 type Props = {
   mode: "sign-in" | "sign-up";
   action: (state: FormState, form: FormData) => Promise<FormState>;
+  next?: string;
 };
 
 const input =
   "h-12 w-full rounded-xl border border-border bg-background px-3 text-base";
 
-export function AuthForm({ mode, action }: Props) {
+export function AuthForm({ mode, action, next }: Props) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const signUp = mode === "sign-up";
   return (
@@ -26,6 +27,7 @@ export function AuthForm({ mode, action }: Props) {
           : "Welcome back to PawLift."}
       </p>
       <form action={formAction} className="flex flex-col gap-4">
+        {next && <input type="hidden" name="next" value={next} />}
         {signUp && (
           <div>
             <label htmlFor="display_name" className="mb-1 block text-sm font-medium">

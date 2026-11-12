@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import { registerOrganisation } from "@/app/org/actions";
 import { OrgForm } from "@/components/OrgForm";
 
@@ -11,7 +11,7 @@ export const metadata = { title: "Register an organisation · PawLift" };
 async function NewOrgPageContent() {
   await connection();
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-4 py-8">
       <Link href="/" className="text-sm font-medium text-brand underline">Back to map</Link>

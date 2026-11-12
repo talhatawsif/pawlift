@@ -4,11 +4,11 @@ import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import { formatMelbourne } from "@/lib/org";
 import { DEMO_BADGE, requestStatusLabel, type HistoryRow } from "@/lib/ops";
 
-export const metadata = { title: "Transport history · PawLift" };
+export const metadata = { title: "Lift history · PawLift" };
 const PAGE = 25;
 
 async function Content({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ before?: string }> }) {
@@ -17,7 +17,7 @@ async function Content({ params, searchParams }: { params: Promise<{ id: string 
   const { before: rawBefore } = await searchParams;
   const before = rawBefore && !Number.isNaN(Date.parse(rawBefore)) ? new Date(rawBefore).toISOString() : null;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("list_transport_history", { p_org_id: id, p_limit: PAGE + 1, p_before: before as string });
   if (error) notFound();
@@ -27,9 +27,9 @@ async function Content({ params, searchParams }: { params: Promise<{ id: string 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-4 py-8">
       <Link href={`/org/${id}`} className="text-sm font-medium text-brand underline">Back to organisation</Link>
-      <h1 className="mb-1 mt-4 text-2xl font-semibold">Transport history</h1>
+      <h1 className="mb-1 mt-4 text-2xl font-semibold">Lift history</h1>
       <p className="mb-4 text-sm text-muted">Completed and cancelled lifts, newest first.</p>
-      {rows.length === 0 ? <p className="text-muted">Nothing here yet.</p> : (
+      {rows.length === 0 ? <p className="text-muted">No finished lifts yet. They will appear here once an animal arrives.</p> : (
         <ul className="flex flex-col gap-2">
           {rows.map((r) => (
             <li key={r.request_id} className="rounded-xl border border-border bg-surface p-3 text-sm">

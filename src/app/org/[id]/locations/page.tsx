@@ -3,9 +3,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import type { OrgDetail } from "@/lib/org";
 import { kindLabel, type OrgLocation, type Suburb } from "@/lib/locations";
+import { ActionForm } from "@/components/ActionForm";
 import { confirmDestination, createLocation, geocodeLocation, updateLocation } from "./actions";
 import { GeocodeButton } from "@/components/GeocodeButton";
 import { LocationForm } from "@/components/LocationForm";
@@ -18,7 +19,7 @@ async function LocationsContent({ params }: { params: Promise<{ id: string }> })
   await connection();
   const { id } = await params;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const [{ data: orgData }, { data: locData, error }, { data: subData }] = await Promise.all([
     supabase.rpc("get_org_for_coordinator", { p_org_id: id }),
@@ -40,7 +41,7 @@ async function LocationsContent({ params }: { params: Promise<{ id: string }> })
         Confirm a location to allow it as a destination.
       </p>
 
-      {locations.length === 0 ? <p className="mb-6 text-muted">No locations yet.</p> : (
+      {locations.length === 0 ? <p className="mb-6 text-muted">No locations yet. Add a pickup point or a destination to get started.</p> : (
         <ul className="mb-8 flex flex-col gap-3">
           {locations.map((l) => (
             <li key={l.id} className="rounded-xl border border-border bg-surface p-3">
@@ -49,13 +50,13 @@ async function LocationsContent({ params }: { params: Promise<{ id: string }> })
                 {kindLabel(l.kind)} · {l.suburb} {l.postcode} ·{" "}
                 {l.is_confirmed_destination ? "Confirmed destination" : "Not confirmed"}
               </p>
-              <form action={confirmDestination} className="mt-2">
+              <ActionForm action={confirmDestination} className="mt-2">
                 <input type="hidden" name="org_id" value={id} />
                 <input type="hidden" name="location_id" value={l.id} />
                 <button name="confirm" value={l.is_confirmed_destination ? "false" : "true"} disabled={!verified && !l.is_confirmed_destination} className={btn}>
                   {l.is_confirmed_destination ? "Remove confirmation" : "Confirm as destination"}
                 </button>
-              </form>
+              </ActionForm>
               {l.kind !== "foster_home" && (
                 <GeocodeButton action={geocodeLocation} orgId={id} locationId={l.id} />
               )}

@@ -12,7 +12,7 @@ export function ReminderToggle({ enabled }: { enabled: boolean }) {
         <span>
           Pickup reminders
           <span className="block text-sm text-muted">
-            We add a reminder here 24 hours and 2 hours before the pickup window of a transport you&apos;ve been confirmed for.
+            We add a reminder here 24 hours and 2 hours before the pickup window of a lift you&apos;ve been confirmed for.
           </span>
         </span>
       </label>

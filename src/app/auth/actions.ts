@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { safeNext } from "@/lib/session";
 import { isDemoEnv, personaEmail, PERSONAS, type PersonaKey } from "@/lib/demo/personas";
 
 export type FormState = { error?: string; notice?: string } | undefined;
@@ -22,7 +23,7 @@ export async function signIn(_: FormState, form: FormData): Promise<FormState> {
           : "That email and password don't match.",
     };
   }
-  redirect("/");
+  redirect(safeNext(str(form, "next")));
 }
 
 export async function signUp(_: FormState, form: FormData): Promise<FormState> {

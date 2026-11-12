@@ -16,7 +16,7 @@ export function DemoSwitcher({ notice }: { currentUserId?: string; notice?: stri
         <p className="mb-2 text-muted">Demo personas. Not real people or checks.</p>
         {notice === "not-seeded" && (
           <p role="alert" className="mb-2 text-danger">
-            That demo account doesn&apos;t exist yet. Demo data is seeded in a later step.
+            That demo account doesn&apos;t exist yet.
           </p>
         )}
         {notice === "missing-password" && (

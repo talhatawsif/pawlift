@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import type { OrgDetail } from "@/lib/org";
 import { formatMelbourne } from "@/lib/org";
 import { speciesLabel, statusLabel, urgencyLabel, type RequestSummary } from "@/lib/requests";
@@ -14,7 +14,7 @@ async function RequestsContent({ params }: { params: Promise<{ id: string }> }) 
   await connection();
   const { id } = await params;
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const [{ data: orgData }, { data: listData, error }] = await Promise.all([
     supabase.rpc("get_org_for_coordinator", { p_org_id: id }),
@@ -31,7 +31,7 @@ async function RequestsContent({ params }: { params: Promise<{ id: string }> }) 
       <Link href={`/org/${id}/requests/new`} className="mb-6 flex h-12 items-center justify-center btn-primary">
         New lift
       </Link>
-      {requests.length === 0 ? <p className="text-muted">No lifts yet.</p> : (
+      {requests.length === 0 ? <p className="text-muted">No lifts yet. Add the first one and volunteers heading that way will see it.</p> : (
         <ul className="flex flex-col gap-3">
           {requests.map((r) => (
             <li key={r.id}>

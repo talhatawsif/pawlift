@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { rpcMessage } from "@/lib/org";
 import type { FormState } from "@/app/auth/actions";
+import type { ActionResult } from "@/components/ActionForm";
 
 export async function acceptInvitation(_: FormState, form: FormData): Promise<FormState> {
   const token = String(form.get("token") ?? "");
@@ -21,8 +22,9 @@ export async function acceptInvitation(_: FormState, form: FormData): Promise<Fo
   redirect("/volunteer?joined=1");
 }
 
-export async function requestMembership(form: FormData) {
+export async function requestMembership(_: ActionResult, form: FormData): Promise<ActionResult> {
   const supabase = await createClient();
-  await supabase.rpc("request_membership", { p_org_id: String(form.get("org_id") ?? "") });
+  const { error } = await supabase.rpc("request_membership", { p_org_id: String(form.get("org_id") ?? "") });
+  if (error) return { error: rpcMessage(error.code, "We couldn't send that request.") };
   revalidatePath("/join");
 }

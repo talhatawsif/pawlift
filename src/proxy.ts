@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 /** Refreshes the Supabase session cookie on each request. */
 export async function proxy(request: NextRequest) {
+  request.headers.set("x-next-url", request.nextUrl.pathname + request.nextUrl.search);
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

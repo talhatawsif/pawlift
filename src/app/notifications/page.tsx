@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMyContext } from "@/lib/session";
+import { getMyContext, signInUrl } from "@/lib/session";
 import { formatMelbourne } from "@/lib/org";
 import { describeNotification, type NotificationRow } from "@/lib/notifications";
 import { markAllRead, markOneRead } from "@/app/notifications/actions";
@@ -14,7 +14,7 @@ export const metadata = { title: "Notifications · PawLift" };
 async function Content() {
   await connection();
   const ctx = await getMyContext();
-  if (!ctx) redirect("/sign-in");
+  if (!ctx) redirect(await signInUrl());
   const supabase = await createClient();
   const [listRes, prefRes] = await Promise.all([
     supabase.rpc("list_my_notifications", { p_limit: 50 }),
@@ -29,7 +29,7 @@ async function Content() {
       <Link href="/" className="text-sm font-medium text-brand underline">Back to map</Link>
       <h1 className="mb-4 mt-4 text-2xl font-semibold">Notifications</h1>
       {rows.length === 0 ? (
-        <p className="text-muted">Nothing yet. Updates about your transports and lifts appear here.</p>
+        <p className="text-muted">Nothing yet. Updates about your lifts appear here.</p>
       ) : (
         <>
           {unread > 0 && (
