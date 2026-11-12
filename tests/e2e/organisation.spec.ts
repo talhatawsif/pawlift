@@ -87,10 +87,10 @@ test("organisation story: a new organisation is approved, invites Lee, and compl
   await coord.getByLabel("Pickup window starts").fill(melbourneLocal(1));
   await coord.getByLabel("Pickup window ends").fill(melbourneLocal(6));
   await coord.getByLabel("Special handling").fill("Friendly (DEMO)");
-  await coord.getByRole("button", { name: "Save draft" }).click();
-  await expect(coord).toHaveURL(/\/requests\/[0-9a-f-]{36}$/);
+  // One step: tick the release checkbox and publish straight from the form.
   await coord.getByRole("checkbox", { name: /authorised to release/ }).check();
   await coord.getByRole("button", { name: "Publish lift" }).click();
+  await expect(coord).toHaveURL(/\/requests\/[0-9a-f-]{36}$/);
   await expect(main(coord)).toContainText(/Open for volunteers/);
 
   // It appears on the map home: card in the list and a pin.

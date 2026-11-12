@@ -15,9 +15,11 @@ type Props = {
   locations: OrgLocation[];
   request?: RequestDetail;
   submitLabel: string;
+  /** New-lift form only: adds the release checkbox and a one-step Publish button. */
+  canPublish?: boolean;
 };
 
-export function RequestForm({ action, orgId, locations, request, submitLabel }: Props) {
+export function RequestForm({ action, orgId, locations, request, submitLabel, canPublish }: Props) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const [from, setFrom] = useState(request?.origin_location_id ?? "");
   const [to, setTo] = useState(request?.destination_location_id ?? "");
@@ -96,9 +98,20 @@ export function RequestForm({ action, orgId, locations, request, submitLabel }: 
       </div>
       {state?.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
       {state?.ok && <p role="status" className="text-sm text-muted">Saved.</p>}
-      <button type="submit" disabled={pending} className="h-12 btn-primary disabled:opacity-60">
-        {submitLabel}
+      {canPublish && (
+        <label className="flex items-start gap-2 text-sm">
+          <input type="checkbox" name="attest" className="mt-1 size-5" />
+          <span>My organisation is authorised to release and transport this animal, and the destination has agreed to receive it. (Needed to publish.)</span>
+        </label>
+      )}
+      <button type="submit" name="intent" value={canPublish ? "publish" : "save"} disabled={pending} className="h-12 btn-primary disabled:opacity-60">
+        {canPublish ? "Publish lift" : submitLabel}
       </button>
+      {canPublish && (
+        <button type="submit" name="intent" value="draft" disabled={pending} className="h-12 btn-secondary disabled:opacity-60">
+          {submitLabel}
+        </button>
+      )}
     </form>
   );
 }

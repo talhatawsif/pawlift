@@ -46,9 +46,18 @@ export async function createRequest(_: RequestState, form: FormData): Promise<Re
   const f = fields(form);
   if ("error" in f) return { error: f.error };
   const orgId = s(form, "org_id");
+  const publish = s(form, "intent") === "publish";
+  const attest = s(form, "attest") === "on";
+  if (publish && !attest) return { error: "Tick the box to confirm your organisation can release this animal." };
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_request", { p_org_id: orgId, ...f.common });
   if (error || !data) return { error: requestError(error, "We couldn't save that. Please try again.") };
+  // One step: the same publish_request RPC re-checks verification and the attestation. On failure the draft stays and its page shows the Publish form.
+  // shortcut: no photo on this path (photos attach to drafts only), save a draft first to add one.
+  if (publish && !(await supabase.rpc("publish_request", { p_request_id: data, p_attest: attest })).error) {
+    revalidatePath("/requests");
+    revalidatePath("/");
+  }
   revalidatePath(`/org/${orgId}/requests`);
   redirect(`/org/${orgId}/requests/${data}`);
 }
