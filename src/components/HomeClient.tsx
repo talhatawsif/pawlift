@@ -14,7 +14,7 @@ import type { NearbyRequest } from "@/components/RequestCard";
 
 const URGENCY_ORDER: Record<string, number> = { urgent: 0, soon: 1, routine: 2 };
 
-type Props = { requests: PublicRequest[]; error: boolean; account: ReactNode; coordOrgs: { id: string; name: string }[] };
+type Props = { requests: PublicRequest[]; error: boolean; account: ReactNode; coordOrgs: { id: string; name: string; verified: boolean }[] };
 
 export function HomeClient({ requests, error, account, coordOrgs }: Props) {
   const [loc, setLoc] = useState<ChosenLocation | null>(null);

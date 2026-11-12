@@ -24,6 +24,7 @@ Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email
 
 ## Design checkpoint 1 (2026-11-09, UI only)
 - `docs/DESIGN.md` + tokens/classes in `globals.css` (`.btn-primary|secondary|text`, `.chip`, `.card`); `SpeciesAvatar` replaces no-photo icons (RequestCard, BottomSheet, RouteMatches); primary buttons app-wide now `btn-primary`; warm empty lines on map and Dashboard.
+- d1.b: cat avatar redrawn; Add lift clears the search card and, for unverified orgs, explains instead of linking; friendly card for the locations gate; pickup list hides the chosen destination. One-step publish awaits plan approval.
 - Checks: lint, typecheck, npm test, test:e2e (9 passed, axe incl.). Unverified: real phones; cat silhouette reads a bit blobby. "Add lift" now clamps below the search card (fixed, screenshot checked at 375 px).
 
 ## Menu and Add lift summary (2026-11-09, UI only, no migrations, no new dependencies)

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import type { RequestState } from "@/app/org/[id]/requests/actions";
 import { SPECIES, URGENCY, type RequestDetail } from "@/lib/requests";
 import type { OrgLocation } from "@/lib/locations";
@@ -19,6 +19,8 @@ type Props = {
 
 export function RequestForm({ action, orgId, locations, request, submitLabel }: Props) {
   const [state, formAction, pending] = useActionState(action, undefined);
+  const [from, setFrom] = useState(request?.origin_location_id ?? "");
+  const [to, setTo] = useState(request?.destination_location_id ?? "");
   const destinations = locations.filter((l) => l.is_confirmed_destination);
   const id = request ? `req-${request.id}` : "req-new";
   const dt = (iso: string | null | undefined) => (iso ? isoToMelbourneLocal(iso) : "");
@@ -47,14 +49,14 @@ export function RequestForm({ action, orgId, locations, request, submitLabel }: 
       </div>
       <div>
         <label htmlFor={`${id}-from`} className="mb-1 block text-sm font-medium">Pickup location</label>
-        <select id={`${id}-from`} name="origin_location_id" required defaultValue={request?.origin_location_id ?? ""} className={input}>
+        <select id={`${id}-from`} name="origin_location_id" required value={from} onChange={(e) => setFrom(e.target.value)} className={input}>
           <option value="" disabled>Choose a location</option>
-          {locations.map((l) => <option key={l.id} value={l.id}>{l.label_public} · {l.suburb}</option>)}
+          {locations.filter((l) => l.id !== to).map((l) => <option key={l.id} value={l.id}>{l.label_public} · {l.suburb}</option>)}
         </select>
       </div>
       <div>
         <label htmlFor={`${id}-to`} className="mb-1 block text-sm font-medium">Destination (confirmed locations only)</label>
-        <select id={`${id}-to`} name="destination_location_id" required defaultValue={request?.destination_location_id ?? ""} className={input}>
+        <select id={`${id}-to`} name="destination_location_id" required value={to} onChange={(e) => { setTo(e.target.value); if (e.target.value === from) setFrom(""); }} className={input}>
           <option value="" disabled>Choose a destination</option>
           {destinations.map((l) => <option key={l.id} value={l.id}>{l.label_public} · {l.suburb}</option>)}
         </select>

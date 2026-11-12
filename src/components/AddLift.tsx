@@ -5,13 +5,15 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { trapTab } from "@/components/trapTab";
 
-type Org = { id: string; name: string };
+type Org = { id: string; name: string; verified: boolean };
 
 const pill =
   "absolute left-4 z-10 flex h-12 items-center gap-2 rounded-full bg-surface px-5 font-semibold text-brand shadow-[var(--shadow-soft)] ring-1 ring-border";
 
 /** Map button for active coordinators: straight to the new-request form, or a choice of organisation first. */
-export function AddLift({ orgs, sheet, minTop }: { orgs: Org[]; sheet: string; minTop: number }) {
+export function AddLift({ orgs: all, sheet, minTop }: { orgs: Org[]; sheet: string; minTop: number }) {
+  // Only verified organisations can publish; if none is, the button explains why.
+  const orgs = all.filter((o) => o.verified);
   const ref = useRef<HTMLDialogElement>(null);
   // Sits above the sheet, but never higher than just under the search card.
   const style = { top: `max(${minTop}px, calc(100dvh - ${sheet} - 4rem))`, transition: "top 150ms ease-out" };
@@ -37,7 +39,10 @@ export function AddLift({ orgs, sheet, minTop }: { orgs: Org[]; sheet: string; m
         className="m-auto w-80 max-w-[85vw] rounded-2xl bg-surface p-0 text-foreground shadow-md backdrop:bg-black/40"
       >
         <div className="p-4" onClick={(e) => (e.target as HTMLElement).closest("a") && ref.current?.close()}>
-          <p className="mb-2 font-semibold">Which organisation is this lift for?</p>
+          <p className="mb-2 font-semibold">{orgs.length ? "Which organisation is this lift for?" : "Almost there"}</p>
+          {orgs.length === 0 && (
+            <p className="text-sm text-muted">Your organisation is waiting for PawLift to approve it. Once it is, you can add lifts here.</p>
+          )}
           <ul>
             {orgs.map((o) => (
               <li key={o.id}>

@@ -15,7 +15,7 @@ async function HomeContent({ searchParams }: { searchParams: Promise<{ demo?: st
   // Only shows or hides the button: the new-request page and RPCs check access themselves.
   const coordOrgs = (ctx?.memberships ?? [])
     .filter((m) => m.status === "active" && m.is_coordinator)
-    .map((m) => ({ id: m.org_id, name: m.org_name }));
+    .map((m) => ({ id: m.org_id, name: m.org_name, verified: m.org_verification === "verified" }));
   return (
     <HomeClient
       requests={(data ?? []) as unknown as PublicRequest[]}

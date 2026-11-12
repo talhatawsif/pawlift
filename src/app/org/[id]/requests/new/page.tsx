@@ -25,10 +25,11 @@ async function NewContent({ params }: { params: Promise<{ id: string }> }) {
       <h1 className="mb-1 mt-4 text-2xl font-semibold">New lift</h1>
       <p className="mb-4 text-sm text-muted">Saved as a draft. You can add a photo and publish on the next page.</p>
       {locations.length < 2 ? (
-        <p className="text-sm text-muted">
-          Add at least two locations (a pickup and a confirmed destination) on the{" "}
-          <Link href={`/org/${id}/locations`} className="font-medium text-brand underline">locations page</Link> first.
-        </p>
+        <div className="card flex flex-col gap-3 p-4">
+          <p className="font-semibold">First, where is this lift going?</p>
+          <p className="text-sm text-muted">Add a pickup and a confirmed destination, then come back to post your lift.</p>
+          <Link href={`/org/${id}/locations`} className="flex h-12 items-center justify-center btn-primary">Add a location</Link>
+        </div>
       ) : (
         <RequestForm action={createRequest} orgId={id} locations={locations} submitLabel="Save draft" />
       )}
