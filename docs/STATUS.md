@@ -20,6 +20,8 @@ None.
 ## Exact next action
 Owner decisions (see `docs/LAUNCH_REPORT.md`): import the repo into Vercel with Deployment Protection and preview env vars per README, then say whether to check the preview; add an openrouteservice key to verify live routing. Optional next checkpoint: saved journeys with `nearby_request` / `route_match` notifications.
 
+Known, accepted for now: anonymous visitors can run the journey search (up to 6 ORS calls each, no rate limit); revisit before a live ORS key or public launch.
+
 Notes: `db push --remote --yes` needed in agent mode (ask first). "Confirm email" still ON in pawlift-dev. Pages that read cookies wrap an async content component in `<Suspense>` (see `src/app/page.tsx`); in dev the fallback `<main>Loading…</main>` stays in the DOM and Next keeps the previous page mounted but hidden, so read the *visible* `main` (`tests/e2e/helpers.ts` `main()`). Browser pane must be *shown* (`show_pane preview`). Generated RPC types make nullable args non-null; cast at the call site. Never render lucide components at module scope on the server. Dev server often already runs on :3000 (use it; `preview_start` fails). Demo rows are visible only to demo personas (DEMO switcher: Priya volunteer, Sam coordinator); `npm run demo:reset` refreshes windows (seed time → +7 days) and now clears audit rows first.
 
 ## Design checkpoint 1 (2026-11-09, UI only)

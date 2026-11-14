@@ -16,6 +16,8 @@ export function melbourneLocalToIso(local: string): string | null {
   if (!m) return null;
   const [y, mo, d, h, mi] = m.slice(1).map(Number);
   const asUtc = Date.UTC(y, mo - 1, d, h, mi);
+  // Date.UTC rolls over (31 Feb, month 13, hour 25); reject anything that doesn't read back the same.
+  if (new Date(asUtc).toISOString().slice(0, 16) !== local) return null;
   let guess = asUtc - offsetMs(asUtc);
   guess = asUtc - offsetMs(guess); // settle across a daylight-saving boundary
   const out = new Date(guess);

@@ -11,5 +11,8 @@ describe("Melbourne time conversion", () => {
     expect(isoToMelbourneLocal(iso)).toBe("2026-11-08T17:30");
     expect(melbourneLocalToIso("tomorrow")).toBeNull();
     expect(melbourneLocalToIso("")).toBeNull();
+    expect(melbourneLocalToIso("2026-02-31T10:00")).toBeNull();
+    expect(melbourneLocalToIso("2026-13-01T10:00")).toBeNull();
+    expect(melbourneLocalToIso("2026-11-08T25:00")).toBeNull();
   });
 });

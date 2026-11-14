@@ -45,7 +45,7 @@ export function roleLabels(ctx: MyContext): string[] {
 }
 
 /** Only same-site paths, so a crafted link can't send people elsewhere after sign-in. */
-export const safeNext = (n: string | null | undefined) => (n && n.startsWith("/") && !n.startsWith("//") ? n : "/");
+export const safeNext = (n: string | null | undefined) => (n && /^\/(?![/\\])/.test(n) ? n : "/");
 
 /** Sign-in URL that brings the person back to the page they asked for (the proxy records it). */
 export async function signInUrl() {
