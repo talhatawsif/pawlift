@@ -123,17 +123,22 @@ Do not deploy publicly without the project owner's explicit OK. A preview is pre
 
 1. In Vercel, import the GitHub repository `pawlift` (framework: Next.js; build command and output are
    the defaults; `npm run build` copies the MapLibre worker into `public/` first).
-2. Turn on **Deployment Protection** (Vercel Authentication) for preview deployments.
-3. Add environment variables for the Preview environment only: `NEXT_PUBLIC_SUPABASE_URL`,
-   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and if you want the demo, `APP_ENV=demo` and `DEMO_PASSWORD`.
-   Optionally `ORS_API_KEY` and `ORS_BASE_URL`. **Never add `SUPABASE_SERVICE_ROLE_KEY`** (the app
-   doesn't use it).
+2. Keep **Deployment Protection** (Vercel Authentication) on for both Production and Preview deployments.
+3. Add environment variables for **Production and Preview**: `NEXT_PUBLIC_SUPABASE_URL` and
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` (the only required ones). Optionally `ORS_API_KEY` and
+   `ORS_BASE_URL` (without them routing uses the demo fallback). `APP_ENV=demo` and `DEMO_PASSWORD`
+   stay optional, demo only (see the warning below). **Never add `SUPABASE_SERVICE_ROLE_KEY`** (the
+   app doesn't use it).
 4. With `APP_ENV=demo`, anyone who can open the site can sign in as Demo Admin, a real platform admin
    in that Supabase project. Only point a demo deployment at a demo-only Supabase project, and keep it
    protected.
 5. In Supabase → Authentication → URL Configuration, set the Site URL (and allowed redirect URLs) to
    the preview address so sign-up confirmation links land there. New users confirm, then sign in.
 6. Reminders and expiry sweeps run in the database (pg_cron), so no Vercel cron jobs are needed.
+7. Keep-alive: `.github/workflows/keepalive.yml` runs daily (and on manual dispatch) and reads one row
+   from `public_requests` via the Supabase REST API, so the free-tier project isn't auto-paused. It
+   fails if the status isn't 200. Add two GitHub repository secrets: `SUPABASE_URL` and
+   `SUPABASE_ANON_KEY` (the anon key only).
 
 ## Layout
 
